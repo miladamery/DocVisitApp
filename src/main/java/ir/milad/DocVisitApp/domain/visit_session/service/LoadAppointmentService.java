@@ -4,20 +4,21 @@ import ir.milad.DocVisitApp.domain.visit_session.Appointment;
 import ir.milad.DocVisitApp.domain.visit_session.VisitSessionRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
-public class LoadTurnService {
+public class LoadAppointmentService {
 
     private final VisitSessionRepository visitSessionRepository;
 
-    public LoadTurnService(VisitSessionRepository visitSessionRepository) {
+    public LoadAppointmentService(VisitSessionRepository visitSessionRepository) {
         this.visitSessionRepository = visitSessionRepository;
     }
 
     public Optional<Appointment> loadTurn(String id) {
         return visitSessionRepository
-                .findForTodayAndNow()
+                .getActiveSession(LocalDateTime.now())
                 .flatMap(visitSession -> visitSession.findTurnById(id));
     }
 }

@@ -1,6 +1,8 @@
 package ir.milad.DocVisitApp.domain.visit_session;
 
+import com.github.f4b6a3.tsid.TsidCreator;
 import ir.milad.DocVisitApp.domain.ApplicationException;
+import ir.milad.DocVisitApp.domain.patient.Patient;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -8,13 +10,12 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.LinkedList;
 import java.util.Optional;
-import java.util.UUID;
 
 @Getter
 @Setter
 public class VisitSession {
 
-    private final UUID id;
+    private final String id;
     private final LocalDate date;
     private final LocalTime fromTime;
     private final LocalTime toTime;
@@ -23,7 +24,7 @@ public class VisitSession {
     private final LinkedList<Appointment> appointments;
 
     public VisitSession(LocalDate date, LocalTime fromTime, LocalTime toTime, Integer sessionLength) {
-        this.id = UUID.randomUUID();
+        this.id = TsidCreator.getTsid().toString();
         this.date = date;
         this.fromTime = fromTime;
         this.toTime = toTime;

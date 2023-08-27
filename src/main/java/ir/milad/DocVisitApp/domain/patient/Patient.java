@@ -1,4 +1,4 @@
-package ir.milad.DocVisitApp.domain.visit_session;
+package ir.milad.DocVisitApp.domain.patient;
 
 import lombok.Data;
 

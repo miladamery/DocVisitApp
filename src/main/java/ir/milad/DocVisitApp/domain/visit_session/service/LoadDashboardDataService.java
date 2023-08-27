@@ -15,7 +15,7 @@ public class LoadDashboardDataService {
     }
 
     public DashboardData load() {
-        var vs = visitSessionRepository.findForTodayAndNow();
+        var vs = visitSessionRepository.findActiveSessionForTodayAndNow();
         if (vs.isEmpty())
             return new DashboardData(0L, "No Session is set");
 

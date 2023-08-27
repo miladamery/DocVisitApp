@@ -22,7 +22,7 @@ public class LoadPatientsDataService {
     }
 
     public PatientsData load(int pageNum) {
-        var vs = visitSessionRepository.findForTodayAndNow();
+        var vs = visitSessionRepository.findActiveSessionForTodayAndNow();
         if (vs.isEmpty())
             throw new ApplicationException("No active session for seeing patients data.");
 

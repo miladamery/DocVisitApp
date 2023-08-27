@@ -18,9 +18,8 @@ public class CreateVisitSessionService {
     }
 
     public void create(LocalDate date, LocalTime fromTime, LocalTime toTime, Integer sessionLength) {
-        if (this.visitSessionRepository.findByDateAndFromTimeAndToTime(date, fromTime, toTime).isPresent())
-            throw new ApplicationException("Visit session for given time exists.");
-        // TODO: 8/26/2023 Check duplicate or overlapping session do not enter
-        visitSessionRepository.save(new VisitSession(date, fromTime, toTime, sessionLength));
+        if (this.visitSessionRepository.exists(date))
+            throw new ApplicationException("Visit session for " + date.toString() + " exists.");
+        visitSessionRepository.setActiveVisitSession(new VisitSession(date, fromTime, toTime, sessionLength));
     }
 }

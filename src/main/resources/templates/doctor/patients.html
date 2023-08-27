@@ -6,7 +6,7 @@
 </head>
 <body>
 <th:block th:fragment="patients">
-    <div hx-get="/doctor/patients" hx-trigger="every 1s" hx-swap="outerHTML" style="font-family: Poppins, serif;">
+    <div hx-get="/doctor/patients" hx-trigger="every 5s" hx-swap="outerHTML" style="font-family: Poppins, serif;">
         <div class="container-fluid p-5 rounded mt-5"
              style="background-color: #494462; font-style: normal;">
             <div class="row" style="color: white;">
@@ -50,7 +50,10 @@
                 <!--end::Heading-->
                 <!--begin::Toolbar-->
                 <div class="card-toolbar">
-                    <a href="#" style="background-color: #C5A470;color: white;" class="btn btn-lg my-1">Add Patient +</a>
+                    <button style="background-color: #C5A470;color: white;" class="btn btn-lg my-1"
+                            data-bs-toggle="modal" data-bs-target="#doc_patient_form">Add Patient
+                        +
+                    </button>
                 </div>
                 <!--end::Toolbar-->
             </div>
@@ -88,18 +91,22 @@
                             <td th:text="${appointment.patient.firstName}"></td>
                             <td th:text="${appointment.patient.lastName}"></td>
                             <td th:text="${appointment.patient.age()}"></td>
-                            <td th:text="${appointment.visitTime}"></td>
+                            <td th:text="${appointment.visitTime.withSecond(0).withNano(0)}"></td>
                             <td th:text="${appointment.patient.phoneNumber}"></td>
                             <td th:text="${appointment.turnNumber}"></td>
                             <th:block th:switch="${appointment.status}">
                                 <td th:case="${T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).WAITING}"
-                                ><span class="badge badge-light-primary fs-7 fw-bold text-capitalize">Waiting</span></td>
+                                ><span class="badge badge-light-primary fs-7 fw-bold text-capitalize">Waiting</span>
+                                </td>
                                 <td th:case="${T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).VISITING}"
-                                ><span class="badge badge-light-warning fs-7 fw-bold text-capitalize">In Progress</span></td>
+                                ><span class="badge badge-light-warning fs-7 fw-bold text-capitalize">In Progress</span>
+                                </td>
                                 <td th:case="${T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).VISITED}"
-                                ><span class="badge badge-light-success fs-7 fw-bold text-capitalize">VISITED</span></td>
+                                ><span class="badge badge-light-success fs-7 fw-bold text-capitalize">VISITED</span>
+                                </td>
                                 <td th:case="${T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).CANCELED}"
-                                ><span class="badge badge-light-danger fs-7 fw-bold text-capitalize">CANCELED</span></td>
+                                ><span class="badge badge-light-danger fs-7 fw-bold text-capitalize">CANCELED</span>
+                                </td>
                                 <td th:case="${T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).EXPIRED}"
                                 ><span class="badge badge-light-danger fs-7 fw-bold text-capitalize">EXPIRED</span></td>
                             </th:block>
@@ -112,6 +119,76 @@
                 <!--end::Table wrapper-->
             </div>
             <!--end::Card body-->
+        </div>
+    </div>
+
+    <div class="modal fade" tabindex="-1" id="doc_patient_form">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title">Add Patient</h3>
+
+                    <!--begin::Close-->
+                    <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal"
+                         aria-label="Close">
+                        <i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span class="path2"></span></i>
+                    </div>
+                    <!--end::Close-->
+                </div>
+                <form hx-post="/doctor/give/appointment" hx-ext="json-enc" hx-swap="none"
+                      _="on htmx:afterRequest(elt, xhr, target, requestConfig, successful)
+                            if successful is true then send click to #patients_modal_close
+                            else call alert('Adding patient failed.')
+                            end
+                        ">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="first_name">First Name:</label>
+                                    <input type="text" class="form-control" id="first_name" name="firstName" aria-describedby="first_name" placeholder="First Name" required>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="last_name">Last Name:</label>
+                                    <input type="text" class="form-control" id="last_name" name="lastName" aria-describedby="last_name" placeholder="Last Name" required>
+                                </div>
+                            </div>
+
+                            <div class="col-6 mt-5">
+                                <div class="form-group">
+                                    <label for="last_name">Date Of Birth:</label>
+                                    <input id="patients_date_of_birth" name="dateOfBirth" type="text"
+                                           class="form-control" placeholder="Date Of Birth" required
+                                    />
+                                </div>
+                            </div>
+                            <script>
+                                flatpickr("#patients_date_of_birth", {
+                                    disableMobile: "true",
+                                    defaultDate: "today"
+                                });
+                            </script>
+                            <div class="col-6 mt-5">
+                                <div class="form-group">
+                                    <label for="last_name">Phone Number:</label>
+                                    <input id="phone_number" name="phoneNumber" type="text"
+                                           class="form-control"  placeholder="Phone Number" required
+                                           hx-validate="true"
+                                    />
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button id="patients_modal_close" type="button" class="btn btn-light" data-bs-dismiss="modal">Close</button>
+                        <input type="submit" class="btn btn-primary"></input>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 </th:block>

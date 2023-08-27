@@ -2,19 +2,15 @@ package ir.milad.DocVisitApp.infra.web;
 
 import io.vavr.control.Try;
 import ir.milad.DocVisitApp.domain.ApplicationException;
+import ir.milad.DocVisitApp.domain.patient.Patient;
+import ir.milad.DocVisitApp.domain.patient.service.TakeAppointmentService;
 import ir.milad.DocVisitApp.domain.visit_session.Appointment;
 import ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus;
-import ir.milad.DocVisitApp.domain.visit_session.Patient;
-import ir.milad.DocVisitApp.domain.visit_session.service.CancelCheckInService;
+import ir.milad.DocVisitApp.domain.visit_session.service.CancelAppointmentService;
 import ir.milad.DocVisitApp.domain.visit_session.service.GetActiveSessionService;
-import ir.milad.DocVisitApp.domain.visit_session.service.LoadTurnService;
-import ir.milad.DocVisitApp.domain.visit_session.service.TakeTurnService;
+import ir.milad.DocVisitApp.domain.visit_session.service.LoadAppointmentService;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -28,25 +24,25 @@ public class PatientController {
     public static final String HTMX_REDIRECT_HEADER = "HX-Redirect";
     public static final String ERROR_500_ATTRIBUTE_NAME = "errorMessage";
 
-    private final TakeTurnService takeTurnService;
+    private final TakeAppointmentService takeAppointmentService;
     private final GetActiveSessionService getActiveSessionService;
-    private final LoadTurnService loadTurnService;
-    private final CancelCheckInService cancelCheckInService;
+    private final LoadAppointmentService loadAppointmentService;
+    private final CancelAppointmentService cancelAppointmentService;
 
     public PatientController(
-            TakeTurnService takeTurnService,
+            TakeAppointmentService takeAppointmentService,
             GetActiveSessionService getActiveSessionService,
-            LoadTurnService loadTurnService,
-            CancelCheckInService cancelCheckInService) {
-        this.takeTurnService = takeTurnService;
+            LoadAppointmentService loadAppointmentService,
+            CancelAppointmentService cancelAppointmentService) {
+        this.takeAppointmentService = takeAppointmentService;
         this.getActiveSessionService = getActiveSessionService;
-        this.loadTurnService = loadTurnService;
-        this.cancelCheckInService = cancelCheckInService;
+        this.loadAppointmentService = loadAppointmentService;
+        this.cancelAppointmentService = cancelAppointmentService;
     }
 
     @GetMapping("/index")
     public String index() {
-        return getActiveSessionService.forTodayAndNow()
+        return getActiveSessionService.findActiveSessionForTodayAndNow()
                 .map(__ -> "patient/index")
                 .orElse("patient/no-active-visit-session");
     }
@@ -55,7 +51,7 @@ public class PatientController {
     public String getTurn(@Valid @RequestBody PatientRequestModel request, Model model) {
         return Try.of(() -> {
                     var patient = getPatientFromRequest(request);
-                    return takeTurnService.getAppointment(patient, LocalTime.now().withSecond(0).withNano(0));
+                    return takeAppointmentService.takeAppointment(patient, LocalTime.now().withSecond(0).withNano(0));
                 })
                 .map(appointment -> appointmentInfo(model, appointment))
                 .recover(throwable -> {
@@ -71,7 +67,7 @@ public class PatientController {
 
     @GetMapping("/load/appointment")
     public String loadTurn(@RequestParam String id, Model model) {
-        return loadTurnService.loadTurn(id)
+        return loadAppointmentService.loadTurn(id)
                 .map(appointment -> {
                     if (appointment.getStatus() == AppointmentStatus.VISITING) {
                         model.addAttribute("turnNumber", appointment.getTurnNumber());
@@ -87,7 +83,7 @@ public class PatientController {
 
     @DeleteMapping("/cancel/appointment")
     public String cancelAppointment(@RequestParam String id, HttpServletResponse response, Model model) {
-        return Try.run(() -> cancelCheckInService.cancel(id))
+        return Try.run(() -> cancelAppointmentService.cancel(id))
                 .map(__ -> {
                     response.setHeader(HTMX_REDIRECT_HEADER, "/patient/index");
                     return "";
@@ -114,17 +110,4 @@ public class PatientController {
         return "patient/appointment-info :: appointment";
     }
 
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class PatientRequestModel {
-        @NotBlank(message = "first name is blank")
-        public String firstName;
-        @NotBlank(message = "last name is blank")
-        public String lastName;
-        @NotBlank(message = "phone number is blank")
-        public String phoneNumber;
-        @NotBlank(message = "date Of Birth is blank")
-        public String dateOfBirth;
-    }
 }

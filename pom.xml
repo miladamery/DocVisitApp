@@ -29,7 +29,7 @@
         </dependency>
         <dependency>
             <groupId>one.microstream</groupId>
-            <artifactId>microstream-storage-embedded</artifactId>
+            <artifactId>microstream-integrations-spring-boot3</artifactId>
             <version>08.01.01-MS-GA</version>
         </dependency>
         <dependency>

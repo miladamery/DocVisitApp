@@ -3,6 +3,7 @@ package ir.milad.DocVisitApp.domain.visit_session;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.github.f4b6a3.tsid.TsidCreator;
 import ir.milad.DocVisitApp.domain.UnitTestRequired;
+import ir.milad.DocVisitApp.domain.patient.Patient;
 import lombok.Data;
 
 import java.time.Duration;

@@ -18,14 +18,14 @@ public class ExpireElapsedTurnsService {
 
     @Scheduled(fixedDelay = 1000)
     public void expire() {
-        var vs = visitSessionRepository.findForTodayAndNow();
+        var vs = visitSessionRepository.findActiveSessionForTodayAndNow();
         if (vs.isPresent()) {
             var visitSession = vs.get();
             visitSession.getAppointments().forEach(appointment -> {
                 if (appointment.getVisitTime().plusMinutes(visitSession.getSessionLength()).isBefore(LocalTime.now()))
                     appointment.setStatus(AppointmentStatus.EXPIRED);
             });
-            visitSessionRepository.update();
+            visitSessionRepository.updateActiveVisitSession();
         }
     }
 }

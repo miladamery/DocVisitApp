@@ -1,9 +1,9 @@
 package ir.milad.DocVisitApp;
 
 import ir.milad.DocVisitApp.domain.ApplicationException;
+import ir.milad.DocVisitApp.domain.patient.Patient;
 import ir.milad.DocVisitApp.domain.visit_session.Appointment;
 import ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus;
-import ir.milad.DocVisitApp.domain.visit_session.Patient;
 import ir.milad.DocVisitApp.domain.visit_session.VisitSession;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

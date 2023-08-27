@@ -1,18 +1,19 @@
 package ir.milad.DocVisitApp.domain.visit_session;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
+import java.time.LocalDateTime;
 import java.util.Optional;
-import java.util.UUID;
 
 public interface VisitSessionRepository {
-    void save(VisitSession visitSession);
+    void setActiveVisitSession(VisitSession visitSession);
 
-    Optional<VisitSession> findById(UUID id);
+    Optional<VisitSession> getActiveSession(LocalDateTime dateTime);
 
-    Optional<VisitSession> findByDateAndFromTimeAndToTime(LocalDate date, LocalTime fromTime, LocalTime toTime);
+    boolean exists(LocalDate date);
 
-    Optional<VisitSession> findForTodayAndNow();
+    void updateActiveVisitSession();
 
-    void update();
+    default Optional<VisitSession> findActiveSessionForTodayAndNow() {
+        return getActiveSession(LocalDateTime.now());
+    }
 }

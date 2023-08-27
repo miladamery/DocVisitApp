@@ -1,7 +1,8 @@
 package ir.milad.DocVisitApp.infra.web;
 
-import io.vavr.control.Try;
+import ir.milad.DocVisitApp.domain.patient.Patient;
 import ir.milad.DocVisitApp.domain.visit_session.service.CreateVisitSessionService;
+import ir.milad.DocVisitApp.domain.visit_session.service.DoctorGivingAppointmentService;
 import ir.milad.DocVisitApp.domain.visit_session.service.LoadDashboardDataService;
 import ir.milad.DocVisitApp.domain.visit_session.service.LoadPatientsDataService;
 import jakarta.validation.Valid;
@@ -16,8 +17,6 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-import static ir.milad.DocVisitApp.infra.web.PatientController.ERROR_500_ATTRIBUTE_NAME;
-
 @Controller
 @RequestMapping("/doctor")
 public class DoctorController {
@@ -25,14 +24,17 @@ public class DoctorController {
     private final CreateVisitSessionService createVisitSessionService;
     private final LoadDashboardDataService loadDashboardDataService;
     private final LoadPatientsDataService loadPatientsDataService;
+    private final DoctorGivingAppointmentService doctorGivingAppointmentService;
 
     public DoctorController(
             CreateVisitSessionService createVisitSessionService,
             LoadDashboardDataService loadDashboardDataService,
-            LoadPatientsDataService loadPatientsDataService) {
+            LoadPatientsDataService loadPatientsDataService,
+            DoctorGivingAppointmentService doctorGivingAppointmentService) {
         this.createVisitSessionService = createVisitSessionService;
         this.loadDashboardDataService = loadDashboardDataService;
         this.loadPatientsDataService = loadPatientsDataService;
+        this.doctorGivingAppointmentService = doctorGivingAppointmentService;
     }
 
     @PostMapping(value = "/create/visit_session")
@@ -44,6 +46,13 @@ public class DoctorController {
                 request.toTime,
                 request.sessionLength
         );
+    }
+
+    @PostMapping("/give/appointment")
+    @ResponseBody
+    public void giveAppointment(@Valid @RequestBody PatientRequestModel request, Model model) {
+        var patient = new Patient(request.phoneNumber, request.firstName, request.lastName, request.dateOfBirth);
+        doctorGivingAppointmentService.giveAppointment(patient, LocalTime.now().withNano(0));
     }
 
     @GetMapping("/index")
@@ -60,16 +69,9 @@ public class DoctorController {
 
     @GetMapping("/patients")
     public String patients(Model model) {
-        return Try.of(() -> loadPatientsDataService.load(1))
-                .map(patientsData -> {
-                    model.addAttribute("data", patientsData);
-                    return "/doctor/patients :: patients";
-                })
-                .recover(throwable -> {
-                    model.addAttribute(ERROR_500_ATTRIBUTE_NAME, "Your turn not found");
-                    return "500";
-                })
-                .get();
+        var patientsData = loadPatientsDataService.load(1);
+        model.addAttribute("data", patientsData);
+        return "/doctor/patients :: patients";
     }
 
     private void loadDashboardInfo(Model model) {
