@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<!--begin::sidebar menu-->
+<div th:fragment="_menu" class="app-sidebar-menu overflow-hidden flex-column-fluid">
+    <!--begin::Menu wrapper-->
+    <div id="kt_app_sidebar_menu_wrapper" class="app-sidebar-wrapper">
+        <!--begin::Scroll wrapper-->
+        <div
+                id="kt_app_sidebar_menu_scroll"
+                class="scroll-y my-5 mx-3"
+                data-kt-scroll="true"
+                data-kt-scroll-activate="true"
+                data-kt-scroll-height="auto"
+                data-kt-scroll-dependencies="#kt_app_sidebar_logo, #kt_app_sidebar_footer"
+                data-kt-scroll-wrappers="#kt_app_sidebar_menu"
+                data-kt-scroll-offset="5px"
+                data-kt-scroll-save-state="true"
+        >
+            <!--begin::Menu-->
+            <div
+                    class="menu menu-column menu-rounded menu-sub-indention fw-semibold fs-6"
+                    id="#kt_app_sidebar_menu"
+                    data-kt-menu="true"
+                    data-kt-menu-expand="false">
+                <div class="menu-item" hx-get="/doctor/dashboard" hx-target="#kt_app_content_container"  hx-trigger="click"
+                     _="on click remove .active from <a.menu-link/> then add .active to #dashboard_menu"
+                >
+                    <a class="menu-link active" id="dashboard_menu">
+                        <span class="menu-icon">
+                            <i class="ki-duotone ki-element-11 fs-2">
+                            <span class="path1"></span>
+                            <span class="path2"></span>
+                            <span class="path3"></span>
+                            <span class="path4"></span>
+                            </i>
+                        </span>
+                        <span class="menu-title">Dashboard</span>
+                    </a>
+                </div>
+
+                <div class="menu-item" hx-get="/doctor/patients" hx-target="#kt_app_content_container"  hx-trigger="click"
+                     _="on click remove .active from <a.menu-link/> then add .active to #patient_menu"
+                >
+                    <a class="menu-link" id="patient_menu">
+                        <span class="menu-icon">
+                            <i><img th:src="@{/images/patient.png}"></i>
+                        </span>
+                        <span class="menu-title">Patient</span>
+                    </a>
+                </div>
+
+                <div class="menu-item"
+                     _="on click remove .active from <a.menu-link/> then add .active to #calendar_menu"
+                >
+                    <a class="menu-link" id="calendar_menu">
+                        <span class="menu-icon">
+                            <i><img th:src="@{/images/calendar.png}"></i>
+                        </span>
+                        <span class="menu-title">Calendar</span>
+                    </a>
+                </div>
+            </div>
+            <!--end::Menu-->
+        </div>
+        <!--end::Scroll wrapper-->
+    </div>
+    <!--end::Menu wrapper-->
+</div>
+<!--end::sidebar menu-->
+</body>

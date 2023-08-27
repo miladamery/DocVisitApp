@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<!--begin::App-->
+<div class="d-flex flex-column flex-root app-root" id="kt_app_root" th:fragment="_default">
+    <!--begin::Page-->
+    <div class="app-page  flex-column flex-column-fluid " id="kt_app_page">
+        <section th:replace="doctor/layout/partials/_header.html :: _header"></section>
+        <!--layout-partial:layout/partials/_header.html-->
+        <!--begin::Wrapper-->
+        <div class="app-wrapper  flex-column flex-row-fluid " id="kt_app_wrapper">
+            <section th:replace="doctor/layout/partials/_sidebar.html :: _sidebar"></section>
+            <!--layout-partial:layout/partials/_sidebar.html-->
+            <!--begin::Main-->
+            <div class="app-main flex-column flex-row-fluid" id="kt_app_main">
+                <!--begin::Content wrapper-->
+                <div class="d-flex flex-column flex-column-fluid">
+                    <!--<section th:replace="doctor/layout/partials/_toolbar.html :: _toolbar"></section>-->
+                    <!--layout-partial:layout/partials/_toolbar.html-->
+                    <section th:replace="doctor/layout/partials/_content.html :: _content"></section>
+                    <!--layout-partial:layout/partials/_content.html-->
+                </div>
+                <!--end::Content wrapper-->
+                <section th:replace="doctor/layout/partials/_footer.html :: _footer"></section>
+                <!--layout-partial:layout/partials/_footer.html-->
+            </div>
+            <!--end:::Main-->
+        </div>
+        <!--end::Wrapper-->
+    </div>
+    <!--end::Page-->
+</div>
+<!--end::App-->
+<!--layout-partial:partials/_drawers.html-->
+</body>
+</html>

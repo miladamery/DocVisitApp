@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{patient/layout.html}" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.ultraq.net.nz/thymeleaf/layout" xmlns:th="http://www.thymeleaf.org"
+>
+<head>
+    <meta charset="UTF-8">
+    <title>Take Turn</title>
+</head>
+<body>
+    <section layout:fragment="content">
+        <form hx-post="/patient/get/appointment" hx-ext="json-enc" hx-target="this" hx-swap="outerHTML">
+            <div class="row">
+                <div class="col-sm-8 offset-md-2 mt-2">
+                    <p>
+                        <span id="doc-name">DR.ALIREZA PAK</span><br/>
+                        <span style="font-family: Poppins,serif; color: #323232; font-size: small;">Docteur en Médecine et Science</span>
+                    </p>
+                </div>
+
+                <div class="col-sm-12">
+                    <img th:src="@{/images/drpak.png}" style="border-radius: 50%; border: 5px solid #494462;">
+                </div>
+
+                <div class="col-sm-12 md-2">
+                    <h5 style="font-family: Poppins; color: #494462; font-weight: bolder;">Dr. Alireza Pak</h5>
+                </div>
+
+                <div class="col-sm-12 mt-3">
+                    <h6 style="font-family: Poppins; color: #323232; font-weight: bolder;">Welcome to Dr Pak Check-in</h6>
+                </div>
+
+                <div class="col-sm-12">
+                    <h6 style="font-family: Poppins,serif; color: #323232;font-size: smaller;">Please fill out the form to make an appointment.</h6>
+                </div>
+                <div class="col-sm-8 offset-sm-2 p-2">
+                    <input id="first_name" name="firstName" type="text"
+                           class="input-group"  placeholder="  &#xf007   First Name*" required
+                           hx-validate="true"
+                    />
+                </div>
+                <div class="col-sm-8 offset-sm-2 p-2">
+                    <input id="last_name" name="lastName" type="text"
+                           class="input-group"  placeholder="  &#xf007   Last Name*" required
+                           hx-validate="true"
+                    />
+                </div>
+
+                <div class="col-sm-8 offset-sm-2 p-2">
+                    <input id="date_of_birth" name="dateOfBirth" type="text"
+                           class="input-group" placeholder="  &#xf073   Date Of Birth*" required
+                           hx-validate="true"
+                    />
+                </div>
+                <script>
+                    flatpickr("#date_of_birth", {
+                        disableMobile: "true",
+                        defaultDate: "today"
+                    });
+                </script>
+                <div class="col-sm-8 offset-sm-2 p-2">
+                    <input id="phone_number" name="phoneNumber" type="text"
+                           class="input-group"  placeholder="  &#xf095   Phone Number*" required
+                           hx-validate="true"
+                    />
+                </div>
+                <div class="col-sm-8 offset-sm-2 p-2 d-grid gap-2">
+                    <input id="take_turn" class="btn btn-primary" type="submit"
+                           value="Submit" style="background-color: #C5A470; height: 60px;"
+                    />
+                </div>
+            </div>
+        </form>
+    </section>
+</body>
+</html>

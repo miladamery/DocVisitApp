@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+    <!--begin::Head-->
+    <head><base href=""/>
+        <title>Dr.Pak</title>
+        <meta charset="utf-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+        <link rel="shortcut icon" href="assets/media/logos/favicon.ico"/>
+        <!--begin::Fonts(mandatory for all pages)-->
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,400,500,600,700"/>        <!--end::Fonts-->
+                    <!--begin::Vendor Stylesheets(used for this page only)-->
+                            <link th:href="@{/metronic/assets/plugins/custom/fullcalendar/fullcalendar.bundle.css}" rel="stylesheet" type="text/css"/>
+                            <link th:href="@{/metronic/assets/plugins/custom/datatables/datatables.bundle.css}" rel="stylesheet" type="text/css"/>
+                        <!--end::Vendor Stylesheets-->
+                    <!--begin::Global Stylesheets Bundle(mandatory for all pages)-->
+                            <link th:href="@{/metronic/assets/plugins/global/plugins.bundle.css}" rel="stylesheet" type="text/css"/>
+                            <link th:href="@{/metronic/assets/css/style.bundle.css}" rel="stylesheet" type="text/css"/>
+                        <!--end::Global Stylesheets Bundle-->
+        <link rel="stylesheet" th:href="@{/css/fonts.css}">
+        <style>
+            .numberCircle {
+                display: inline-block;
+                line-height: 0px;
+                border-radius: 50%;
+                border: 2px dotted;
+                border-color: white;
+                font-size: 24px;
+            }
+
+            .numberCircle span {
+                display: inline-block;
+                padding-top: 50%;
+                padding-bottom: 50%;
+                margin-left: 8px;
+                margin-right: 8px;
+                color: white;
+            }
+        </style>
+        <script>
+            // Frame-busting to prevent site from being loaded within a frame without permission (click-jacking)
+            if (window.top != window.self) {
+                window.top.location.replace(window.self.location.href);
+            }
+        </script>
+        <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+        <script src="https://unpkg.com/htmx.org@1.9.4"
+                integrity="sha384-zUfuhFKKZCbHTY6aRR46gxiqszMk5tcHjsVFxnUo8VMus4kHGVdIYVbOYYNlKmHV"
+                crossorigin="anonymous"></script>
+        <script src="https://unpkg.com/htmx.org/dist/ext/json-enc.js"></script>
+        <script src="https://unpkg.com/hyperscript.org@0.9.11"></script>
+    </head>
+    <!--end::Head-->
+    <!--begin::Body-->
+    <body  id="kt_app_body" data-kt-app-layout="dark-sidebar" data-kt-app-header-fixed="true" data-kt-app-sidebar-enabled="true" data-kt-app-sidebar-fixed="true" data-kt-app-sidebar-hoverable="true" data-kt-app-sidebar-push-header="true" data-kt-app-sidebar-push-toolbar="true" data-kt-app-sidebar-push-footer="true" data-kt-app-toolbar-enabled="true"  class="app-default" >
+    <script>
+        var defaultThemeMode = "light";
+        var themeMode;
+        if ( document.documentElement ) {
+            if ( document.documentElement.hasAttribute("data-bs-theme-mode")) {
+                themeMode = document.documentElement.getAttribute("data-bs-theme-mode");
+            } else {
+                if ( localStorage.getItem("data-bs-theme") !== null ) {
+                    themeMode = localStorage.getItem("data-bs-theme");
+                } else {
+                    themeMode = defaultThemeMode;
+                }
+            }
+            if (themeMode === "system") {
+                themeMode = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+            }
+            document.documentElement.setAttribute("data-bs-theme", themeMode);
+        }
+    </script>
+    <section th:replace="doctor/layout/_default.html :: _default"></section>
+<!--layout-partial:partials/theme-mode/_init.html-->
+<!--layout-partial:layout/_default.html-->
+<!--layout-partial:partials/_scrolltop.html-->
+                    <!--begin::Modals-->
+<!--layout-partial:partials/modals/_upgrade-plan.html-->
+<!--layout-partial:partials/modals/create-app/_main.html-->
+<!--layout-partial:partials/modals/_new-target.html-->
+<!--layout-partial:partials/modals/_view-users.html-->
+<!--layout-partial:partials/modals/users-search/_main.html-->
+<!--layout-partial:partials/modals/_invite-friends.html-->
+            <!--end::Modals-->
+        <!--begin::Javascript-->
+        <script>
+            var hostUrl = "assets/";
+        </script>
+                    <!--begin::Global Javascript Bundle(mandatory for all pages)-->
+                            <script th:src="@{/metronic/assets/plugins/global/plugins.bundle.js}"></script>
+                            <script th:src="@{/metronic/assets/js/scripts.bundle.js}"></script>
+                        <!--end::Global Javascript Bundle-->
+                    <!--begin::Vendors Javascript(used for this page only)-->
+                            <script th:src="@{/metronic/assets/plugins/custom/fullcalendar/fullcalendar.bundle.js}" ></script>
+                            <script src="https://cdn.amcharts.com/lib/5/index.js"></script>
+                            <script src="https://cdn.amcharts.com/lib/5/xy.js"></script>
+                            <script src="https://cdn.amcharts.com/lib/5/percent.js"></script>
+                            <script src="https://cdn.amcharts.com/lib/5/radar.js"></script>
+                            <script src="https://cdn.amcharts.com/lib/5/themes/Animated.js"></script>
+                            <script src="https://cdn.amcharts.com/lib/5/map.js"></script>
+                            <script src="https://cdn.amcharts.com/lib/5/geodata/worldLow.js"></script>
+                            <script src="https://cdn.amcharts.com/lib/5/geodata/continentsLow.js"></script>
+                            <script src="https://cdn.amcharts.com/lib/5/geodata/usaLow.js"></script>
+                            <script src="https://cdn.amcharts.com/lib/5/geodata/worldTimeZonesLow.js"></script>
+                            <script src="https://cdn.amcharts.com/lib/5/geodata/worldTimeZoneAreasLow.js"></script>
+                            <script th:src="@{/metronic/assets/plugins/custom/datatables/datatables.bundle.js}"></script>
+                        <!--end::Vendors Javascript-->
+                    <!--begin::Custom Javascript(used for this page only)-->
+                            <script th:src="@{/metronic/assets/js/widgets.bundle.js}"></script>
+                            <script th:src="@{/metronic/assets/js/custom/widgets.js}"></script>
+                            <script th:src="@{/metronic/assets/js/custom/apps/chat/chat.js}"></script>
+                            <script th:src="@{/metronic/assets/js/custom/utilities/modals/upgrade-plan.js}"></script>
+                            <script th:src="@{/metronic/assets/js/custom/utilities/modals/create-app.js}"></script>
+                            <script th:src="@{/metronic/assets/js/custom/utilities/modals/new-target.js}"></script>
+                            <script th:src="@{/metronic/assets/js/custom/utilities/modals/users-search.js}"></script>
+                        <!--end::Custom Javascript-->
+                <!--end::Javascript-->
+            </body>
+    <!--end::Body-->
+</html>

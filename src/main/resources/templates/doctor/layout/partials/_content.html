@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<!--begin::Content-->
+<div th:fragment="_content" id="kt_app_content" class="app-content  flex-column-fluid " >
+    <!--begin::Content container-->
+    <div id="kt_app_content_container" class="app-container  container-fluid">
+        <section th:replace="/doctor/dashboard.html :: dashboard"></section>
+    </div>
+    <!--end::Content container-->
+</div>
+<!--end::Content-->
+</body>

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Patients</title>
+</head>
+<body>
+<th:block th:fragment="patients">
+    <div hx-get="/doctor/patients" hx-trigger="every 1s" hx-swap="outerHTML" style="font-family: Poppins, serif;">
+        <div class="container-fluid p-5 rounded mt-5"
+             style="background-color: #494462; font-style: normal;">
+            <div class="row" style="color: white;">
+                <div class="col-6 text-center mt-5" style="border-right: 5px solid #C5A470;">
+                    <span style="font-size: xxx-large;" th:text="${data.day}"></span>&nbsp;&nbsp;
+                    <span style="font-size: xx-large;" th:text="${data.month}"></span>&nbsp;&nbsp;
+                    <span style="font-size: xx-large;" th:text="${data.year}"></span>&nbsp;&nbsp;
+                </div>
+                <div class="col-6 text-center">
+                    <div class="row">
+                        <div class="col-12">
+                            <span style="font-size: xxx-large;" th:text="${data.summary.total}"></span>&nbsp;&nbsp;
+                            <span style="font-size: large;">Total Patients</span>
+                        </div>
+                        <div class="col-12">
+                        <span class="numberCircle"><span style="font-size: large;"
+                                                         th:text="${data.summary.waiting}"></span></span><span
+                                style="font-size: medium;">&nbsp;&nbsp;Waiting&nbsp;&nbsp;</span>
+                            <span class="numberCircle"><span style="font-size: large;"
+                                                             th:text="${data.summary.visited}"></span></span><span
+                                style="font-size: medium;">&nbsp;&nbsp;Visited&nbsp;&nbsp;</span>
+                            <span class="numberCircle"><span style="font-size: large;"
+                                                             th:text="${data.summary.cancelled}"></span></span><span
+                                style="font-size: medium;">&nbsp;&nbsp;Canceled&nbsp;&nbsp;</span>
+                            <span class="numberCircle"><span style="font-size: large;"
+                                                             th:text="${data.summary.expired}"></span></span><span
+                                style="font-size: medium;">&nbsp;&nbsp;Expired&nbsp;&nbsp;</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-5 my-xl-10">
+            <!--begin::Card header-->
+            <div class="card-header">
+                <!--begin::Heading-->
+                <div class="card-title">
+                    <h3 class="fs-1 fw-bold" style="color: #494462;">Patients List</h3>
+                </div>
+                <!--end::Heading-->
+                <!--begin::Toolbar-->
+                <div class="card-toolbar">
+                    <a href="#" style="background-color: #C5A470;color: white;" class="btn btn-lg my-1">Add Patient +</a>
+                </div>
+                <!--end::Toolbar-->
+            </div>
+            <!--end::Card header-->
+            <!--begin::Card body-->
+            <div class="card-body p-0">
+                <!--begin::Table wrapper-->
+                <div class="table-responsive">
+                    <!--begin::Table-->
+                    <table class="table align-middle table-row-bordered table-row-solid gy-4 gs-9 text-center">
+                        <!--begin::Thead-->
+                        <thead class="border-gray-200 fs-5 fw-semibold bg-lighten">
+                        <tr>
+                            <th>History</th>
+                            <th>First Name</th>
+                            <th>Last Name</th>
+                            <th>Age</th>
+                            <th>Check-in Time</th>
+                            <th>Phone Number</th>
+                            <th>Ticket Number</th>
+                            <th>Status
+                                <i class="ki-duotone ki-filter">
+                                    <i class="path1"></i>
+                                    <i class="path2"></i>
+                                </i>
+                            </th>
+                            <th>Action</th>
+                        </tr>
+                        </thead>
+                        <!--end::Thead-->
+                        <!--begin::Tbody-->
+                        <tbody class="fw-6 fw-semibold text-gray-600">
+                        <tr th:each="appointment: ${data.appointments}">
+                            <td><i class="fa fa-history fs-2x text-danger" aria-hidden="true"></i></td>
+                            <td th:text="${appointment.patient.firstName}"></td>
+                            <td th:text="${appointment.patient.lastName}"></td>
+                            <td th:text="${appointment.patient.age()}"></td>
+                            <td th:text="${appointment.visitTime}"></td>
+                            <td th:text="${appointment.patient.phoneNumber}"></td>
+                            <td th:text="${appointment.turnNumber}"></td>
+                            <th:block th:switch="${appointment.status}">
+                                <td th:case="${T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).WAITING}"
+                                ><span class="badge badge-light-primary fs-7 fw-bold text-capitalize">Waiting</span></td>
+                                <td th:case="${T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).VISITING}"
+                                ><span class="badge badge-light-warning fs-7 fw-bold text-capitalize">In Progress</span></td>
+                                <td th:case="${T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).VISITED}"
+                                ><span class="badge badge-light-success fs-7 fw-bold text-capitalize">VISITED</span></td>
+                                <td th:case="${T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).CANCELED}"
+                                ><span class="badge badge-light-danger fs-7 fw-bold text-capitalize">CANCELED</span></td>
+                                <td th:case="${T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).EXPIRED}"
+                                ><span class="badge badge-light-danger fs-7 fw-bold text-capitalize">EXPIRED</span></td>
+                            </th:block>
+                        </tr>
+                        </tbody>
+                        <!--end::Tbody-->
+                    </table>
+                    <!--end::Table-->
+                </div>
+                <!--end::Table wrapper-->
+            </div>
+            <!--end::Card body-->
+        </div>
+    </div>
+</th:block>
+</body>
+</html>
