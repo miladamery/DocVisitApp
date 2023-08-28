@@ -2,6 +2,8 @@ package ir.milad.DocVisitApp.infra.persistence;
 
 import ir.milad.DocVisitApp.domain.visit_session.VisitSession;
 import ir.milad.DocVisitApp.domain.visit_session.VisitSessionRepository;
+import one.microstream.storage.types.StorageManager;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
@@ -11,13 +13,14 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 @Repository
+@DependsOn("embeddedStorageManager")
 public class MicroStreamVisitSessionRepository implements VisitSessionRepository {
 
     private final ReadWriteLock lock;
     private final Database database;
 
-    public MicroStreamVisitSessionRepository(Database database) {
-        this.database = database;
+    public MicroStreamVisitSessionRepository(StorageManager storageManager) {
+        this.database = (Database) storageManager.root();
         lock = new ReentrantReadWriteLock();
     }
 
@@ -39,6 +42,11 @@ public class MicroStreamVisitSessionRepository implements VisitSessionRepository
         } finally {
             lock.readLock().unlock();
         }
+    }
+
+    @Override
+    public Optional<VisitSession> getActiveSession(LocalDate date) {
+        return database.getActiveSession(date);
     }
 
     @Override

@@ -9,17 +9,20 @@ import lombok.Setter;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.LinkedList;
+import java.util.Objects;
 import java.util.Optional;
 
 @Getter
 @Setter
 public class VisitSession {
 
+    private final static int APPOINTMENT_BEGIN_NUMBER = 99;
+
     private final String id;
-    private final LocalDate date;
-    private final LocalTime fromTime;
-    private final LocalTime toTime;
-    private final Integer sessionLength;
+    private LocalDate date;
+    private LocalTime fromTime;
+    private LocalTime toTime;
+    private Integer sessionLength;
     private LocalTime lastTurnEndTime;
     private final LinkedList<Appointment> appointments;
 
@@ -46,14 +49,15 @@ public class VisitSession {
                 .orElseGet(() -> giveNewAppointment(patient, entryTime));
     }
 
-    public void cancelAppointment(String id) {
+    public Patient cancelAppointment(String id) {
         // TODO: 8/25/2023 Use manifold String interpolation
-        var turn = findTurnById(id).orElseThrow(() -> new ApplicationException("Turn with id: " + id + " Not Found"));
-        if (turn.status != AppointmentStatus.WAITING)
+        var appointment = findAppointmentById(id)
+                .orElseThrow(() -> new ApplicationException("Turn with id: " + id + " Not Found"));
+        if (appointment.status != AppointmentStatus.WAITING)
             throw new ApplicationException("Cant cancel turn");
 
-        turn.status = AppointmentStatus.CANCELED;
-        var index = appointments.indexOf(turn);
+        appointment.status = AppointmentStatus.CANCELED;
+        var index = appointments.indexOf(appointment);
         for (int i = appointments.size() - 1; i > index; i--) {
             var reference = appointments.get(i - 1);
             var toChange = appointments.get(i);
@@ -63,9 +67,10 @@ public class VisitSession {
         }
 
         lastTurnEndTime = appointments.getLast().visitTime.plusMinutes(sessionLength);
+        return appointment.getPatient();
     }
 
-    public Optional<Appointment> findTurnById(String id) {
+    public Optional<Appointment> findAppointmentById(String id) {
         return appointments.stream().filter(t -> t.id.equals(id)).findFirst();
     }
 
@@ -76,6 +81,16 @@ public class VisitSession {
                 numberOfAppointmentsByStatus(Optional.of(AppointmentStatus.VISITED)),
                 numberOfAppointmentsByStatus(Optional.of(AppointmentStatus.CANCELED)),
                 numberOfAppointmentsByStatus(Optional.of(AppointmentStatus.EXPIRED)));
+    }
+
+    public void update(LocalDate date, LocalTime fromTime, LocalTime toTime, Integer sessionLength) {
+        if (appointments.size() > 0 && ( !fromTime.equals(this.fromTime) || Objects.equals(sessionLength, this.sessionLength)))
+            throw new ApplicationException("Can't change session from time/session length. Reason: Patients are in waiting.");
+
+        this.date = date;
+        this.fromTime = fromTime;
+        this.toTime = toTime;
+        this.sessionLength = sessionLength;
     }
 
     public long numberOfAppointmentsAwaiting() {
@@ -98,7 +113,7 @@ public class VisitSession {
             lastTurnEndTime = lastTurnEndTime.plusMinutes(sessionLength);
         }
 
-        var appointment = new Appointment(appointments.size() + 1, appointments.size(), visitTime, patient);
+        var appointment = new Appointment(appointments.size() + 1 + APPOINTMENT_BEGIN_NUMBER, appointments.size(), visitTime, patient);
         appointments.offer(appointment);
         return appointment;
     }

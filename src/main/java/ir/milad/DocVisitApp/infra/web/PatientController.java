@@ -3,12 +3,11 @@ package ir.milad.DocVisitApp.infra.web;
 import io.vavr.control.Try;
 import ir.milad.DocVisitApp.domain.ApplicationException;
 import ir.milad.DocVisitApp.domain.patient.Patient;
-import ir.milad.DocVisitApp.domain.patient.service.TakeAppointmentService;
+import ir.milad.DocVisitApp.domain.patient.PatientIsBlockedException;
+import ir.milad.DocVisitApp.domain.patient.service.*;
 import ir.milad.DocVisitApp.domain.visit_session.Appointment;
 import ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus;
-import ir.milad.DocVisitApp.domain.visit_session.service.CancelAppointmentService;
-import ir.milad.DocVisitApp.domain.visit_session.service.GetActiveSessionService;
-import ir.milad.DocVisitApp.domain.visit_session.service.LoadAppointmentService;
+import ir.milad.DocVisitApp.domain.visit_session.service.GetActiveVisitSessionService;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
@@ -25,30 +24,35 @@ public class PatientController {
     public static final String ERROR_500_ATTRIBUTE_NAME = "errorMessage";
 
     private final TakeAppointmentService takeAppointmentService;
-    private final GetActiveSessionService getActiveSessionService;
-    private final LoadAppointmentService loadAppointmentService;
-    private final CancelAppointmentService cancelAppointmentService;
+    private final GetActiveVisitSessionService getActiveVisitSessionService;
+    private final LoadPatientAppointmentService loadPatientAppointmentService;
+    private final CancelPatientAppointmentService cancelPatientAppointmentService;
+    private final LoadPatientHistoryService loadPatientHistoryService;
+    private final BlockPatientService blockPatientService;
 
     public PatientController(
             TakeAppointmentService takeAppointmentService,
-            GetActiveSessionService getActiveSessionService,
-            LoadAppointmentService loadAppointmentService,
-            CancelAppointmentService cancelAppointmentService) {
+            GetActiveVisitSessionService getActiveVisitSessionService,
+            LoadPatientAppointmentService loadPatientAppointmentService,
+            CancelPatientAppointmentService cancelPatientAppointmentService,
+            LoadPatientHistoryService loadPatientHistoryService, BlockPatientService blockPatientService) {
         this.takeAppointmentService = takeAppointmentService;
-        this.getActiveSessionService = getActiveSessionService;
-        this.loadAppointmentService = loadAppointmentService;
-        this.cancelAppointmentService = cancelAppointmentService;
+        this.getActiveVisitSessionService = getActiveVisitSessionService;
+        this.loadPatientAppointmentService = loadPatientAppointmentService;
+        this.cancelPatientAppointmentService = cancelPatientAppointmentService;
+        this.loadPatientHistoryService = loadPatientHistoryService;
+        this.blockPatientService = blockPatientService;
     }
 
     @GetMapping("/index")
     public String index() {
-        return getActiveSessionService.findActiveSessionForTodayAndNow()
+        return getActiveVisitSessionService.findActiveSessionForTodayAndNow()
                 .map(__ -> "patient/index")
                 .orElse("patient/no-active-visit-session");
     }
 
     @PostMapping(value = "/get/appointment")
-    public String getTurn(@Valid @RequestBody PatientRequestModel request, Model model) {
+    public String getAppointment(@Valid @RequestBody PatientRequestModel request, Model model) {
         return Try.of(() -> {
                     var patient = getPatientFromRequest(request);
                     return takeAppointmentService.takeAppointment(patient, LocalTime.now().withSecond(0).withNano(0));
@@ -57,6 +61,8 @@ public class PatientController {
                 .recover(throwable -> {
                     if (throwable instanceof ApplicationException) {
                         return "patient/no-active-visit-session";
+                    } else if (throwable instanceof PatientIsBlockedException) {
+                        return "patient/blocked-by-doctor";
                     } else {
                         model.addAttribute(ERROR_500_ATTRIBUTE_NAME, throwable.getMessage());
                         return "500";
@@ -67,7 +73,7 @@ public class PatientController {
 
     @GetMapping("/load/appointment")
     public String loadTurn(@RequestParam String id, Model model) {
-        return loadAppointmentService.loadTurn(id)
+        return loadPatientAppointmentService.loadPatientAppointment(id)
                 .map(appointment -> {
                     if (appointment.getStatus() == AppointmentStatus.VISITING) {
                         model.addAttribute("turnNumber", appointment.getTurnNumber());
@@ -83,7 +89,7 @@ public class PatientController {
 
     @DeleteMapping("/cancel/appointment")
     public String cancelAppointment(@RequestParam String id, HttpServletResponse response, Model model) {
-        return Try.run(() -> cancelAppointmentService.cancel(id))
+        return Try.run(() -> cancelPatientAppointmentService.cancel(id))
                 .map(__ -> {
                     response.setHeader(HTMX_REDIRECT_HEADER, "/patient/index");
                     return "";
@@ -93,6 +99,25 @@ public class PatientController {
                     return "500";
                 })
                 .get();
+    }
+
+    @GetMapping("/load/history")
+    public String loadPatientHistory(
+            @RequestParam String firstName,
+            @RequestParam String lastName,
+            @RequestParam String dateOfBirth,
+            Model model
+    ) {
+        var patient = new Patient("", firstName, lastName, dateOfBirth);
+        model.addAttribute("patient", patient);
+        model.addAttribute("histories", loadPatientHistoryService.load(patient));
+        return "/doctor/patients-history :: patient-history";
+    }
+
+    @PutMapping("/block")
+    @ResponseBody
+    public void block(@Valid @RequestBody PatientRequestModel request) {
+        blockPatientService.block(getPatientFromRequest(request));
     }
 
     private Patient getPatientFromRequest(PatientRequestModel request) {

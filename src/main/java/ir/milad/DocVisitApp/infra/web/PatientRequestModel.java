@@ -13,8 +13,7 @@ public class PatientRequestModel {
     public String firstName;
     @NotBlank(message = "last name is blank")
     public String lastName;
-    @NotBlank(message = "phone number is blank")
-    public String phoneNumber;
+    public String phoneNumber = "";
     @NotBlank(message = "date Of Birth is blank")
     public String dateOfBirth;
 }

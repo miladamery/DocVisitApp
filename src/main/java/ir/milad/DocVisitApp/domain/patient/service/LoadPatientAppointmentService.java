@@ -1,4 +1,4 @@
-package ir.milad.DocVisitApp.domain.visit_session.service;
+package ir.milad.DocVisitApp.domain.patient.service;
 
 import ir.milad.DocVisitApp.domain.visit_session.Appointment;
 import ir.milad.DocVisitApp.domain.visit_session.VisitSessionRepository;
@@ -8,17 +8,17 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
-public class LoadAppointmentService {
+public class LoadPatientAppointmentService {
 
     private final VisitSessionRepository visitSessionRepository;
 
-    public LoadAppointmentService(VisitSessionRepository visitSessionRepository) {
+    public LoadPatientAppointmentService(VisitSessionRepository visitSessionRepository) {
         this.visitSessionRepository = visitSessionRepository;
     }
 
-    public Optional<Appointment> loadTurn(String id) {
+    public Optional<Appointment> loadPatientAppointment(String id) {
         return visitSessionRepository
                 .getActiveSession(LocalDateTime.now())
-                .flatMap(visitSession -> visitSession.findTurnById(id));
+                .flatMap(visitSession -> visitSession.findAppointmentById(id));
     }
 }

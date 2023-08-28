@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Patient History</title>
+</head>
+<body>
+<th:block th:fragment="patient-history">
+    <div class="row text-center">
+        <th:block th:each="history,iter : ${histories}">
+            <div class="col-4 mt-5" th:text="${iter.index + 1}"></div>
+            <div class="col-4 mt-5" th:text="${history.date}"></div>
+            <div class="col-4 mt-5 text-truncate">
+                <th:block th:switch="${history.status}">
+                    <th:block th:case="${T(ir.milad.DocVisitApp.domain.patient.PatientHistoryStatus).VISITED}">
+                <span class="badge badge-light-success fs-7 fw-bold text-capitalize">Waiting</span>
+                    </th:block>
+                    <th:block th:case="${T(ir.milad.DocVisitApp.domain.patient.PatientHistoryStatus).CANCELLED}">
+                        <span class="badge badge-light-danger fs-7 fw-bold text-capitalize">CANCELLED</span>
+                    </th:block>
+                    <th:block th:case="${T(ir.milad.DocVisitApp.domain.patient.PatientHistoryStatus).BLOCKED}">
+                        <span class="badge badge-light-danger fs-7 fw-bold text-capitalize">BLOCKED</span>
+                    </th:block>
+                    <th:block th:case="${T(ir.milad.DocVisitApp.domain.patient.PatientHistoryStatus).EXPIRED}">
+                        <span class="badge badge-light-warning fs-7 fw-bold text-capitalize">EXPIRED</span>
+                    </th:block>
+                </th:block>
+            </div>
+        </th:block>
+    </div>
+    <input type="hidden" name="firstName" th:class="'block-patient'" th:value="${patient.firstName}"/>
+    <input type="hidden" name="lastName" th:class="'block-patient'" th:value="${patient.lastName}"/>
+    <input type="hidden" name="dateOfBirth" th:class="'block-patient'" th:value="${patient.dateOfBirth}"/>
+</th:block>
+</body>
+</html>

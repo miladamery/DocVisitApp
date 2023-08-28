@@ -1,10 +1,10 @@
 package ir.milad.DocVisitApp.infra.web;
 
 import ir.milad.DocVisitApp.domain.patient.Patient;
-import ir.milad.DocVisitApp.domain.visit_session.service.CreateVisitSessionService;
 import ir.milad.DocVisitApp.domain.visit_session.service.DoctorGivingAppointmentService;
 import ir.milad.DocVisitApp.domain.visit_session.service.LoadDashboardDataService;
 import ir.milad.DocVisitApp.domain.visit_session.service.LoadPatientsDataService;
+import ir.milad.DocVisitApp.domain.visit_session.service.UpsertVisitSessionService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import lombok.Getter;
@@ -21,17 +21,17 @@ import java.time.LocalTime;
 @RequestMapping("/doctor")
 public class DoctorController {
 
-    private final CreateVisitSessionService createVisitSessionService;
+    private final UpsertVisitSessionService upsertVisitSessionService;
     private final LoadDashboardDataService loadDashboardDataService;
     private final LoadPatientsDataService loadPatientsDataService;
     private final DoctorGivingAppointmentService doctorGivingAppointmentService;
 
     public DoctorController(
-            CreateVisitSessionService createVisitSessionService,
+            UpsertVisitSessionService upsertVisitSessionService,
             LoadDashboardDataService loadDashboardDataService,
             LoadPatientsDataService loadPatientsDataService,
             DoctorGivingAppointmentService doctorGivingAppointmentService) {
-        this.createVisitSessionService = createVisitSessionService;
+        this.upsertVisitSessionService = upsertVisitSessionService;
         this.loadDashboardDataService = loadDashboardDataService;
         this.loadPatientsDataService = loadPatientsDataService;
         this.doctorGivingAppointmentService = doctorGivingAppointmentService;
@@ -40,7 +40,7 @@ public class DoctorController {
     @PostMapping(value = "/create/visit_session")
     @ResponseBody
     public void createVisitSession(@Valid @RequestBody VisitSessionRequest request) {
-        createVisitSessionService.create(
+        upsertVisitSessionService.upsert(
                 request.date,
                 request.fromTime,
                 request.toTime,

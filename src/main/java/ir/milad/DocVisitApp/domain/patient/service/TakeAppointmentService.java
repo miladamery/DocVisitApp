@@ -1,7 +1,7 @@
 package ir.milad.DocVisitApp.domain.patient.service;
 
 import ir.milad.DocVisitApp.domain.ApplicationException;
-import ir.milad.DocVisitApp.domain.patient.Patient;
+import ir.milad.DocVisitApp.domain.patient.*;
 import ir.milad.DocVisitApp.domain.visit_session.Appointment;
 import ir.milad.DocVisitApp.domain.visit_session.VisitSessionRepository;
 import org.springframework.stereotype.Service;
@@ -14,15 +14,23 @@ import java.time.LocalTime;
 public class TakeAppointmentService {
 
     private final VisitSessionRepository visitSessionRepository;
+    private final PatientRepository patientRepository;
 
-    public TakeAppointmentService(VisitSessionRepository visitSessionRepository) {
+    public TakeAppointmentService(VisitSessionRepository visitSessionRepository, PatientRepository patientRepository) {
         this.visitSessionRepository = visitSessionRepository;
+        this.patientRepository = patientRepository;
     }
 
     public synchronized Appointment takeAppointment(Patient patient, LocalTime entryTime) {
-        var appointment = visitSessionRepository.getActiveSession(LocalDateTime.of(LocalDate.now(), entryTime))
-                .orElseThrow(() -> new ApplicationException("Active session not found."))
-                .giveAppointment(patient, entryTime);
+        var vs = visitSessionRepository.getActiveSession(LocalDateTime.of(LocalDate.now(), entryTime))
+                .orElseThrow(() -> new ApplicationException("Active session not found."));
+
+        if (patientRepository.isBlocked(patient)) {
+            patientRepository.addPatientHistory(patient, new PatientHistory(LocalDate.now(), PatientHistoryStatus.BLOCKED));
+            throw new PatientIsBlockedException("Patient is blocked");
+        }
+
+        var appointment = vs.giveAppointment(patient, entryTime);
         visitSessionRepository.updateActiveVisitSession();
         return appointment;
     }

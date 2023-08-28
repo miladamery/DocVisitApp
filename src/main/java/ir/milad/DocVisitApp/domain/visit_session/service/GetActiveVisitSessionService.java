@@ -7,10 +7,10 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 
 @Service
-public class GetActiveSessionService {
+public class GetActiveVisitSessionService {
     private final VisitSessionRepository visitSessionRepository;
 
-    public GetActiveSessionService(VisitSessionRepository visitSessionRepository) {
+    public GetActiveVisitSessionService(VisitSessionRepository visitSessionRepository) {
         this.visitSessionRepository = visitSessionRepository;
     }
 

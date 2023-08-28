@@ -6,13 +6,12 @@ import java.util.Optional;
 
 public interface VisitSessionRepository {
     void setActiveVisitSession(VisitSession visitSession);
-
     Optional<VisitSession> getActiveSession(LocalDateTime dateTime);
 
+    Optional<VisitSession> getActiveSession(LocalDate date);
+
     boolean exists(LocalDate date);
-
     void updateActiveVisitSession();
-
     default Optional<VisitSession> findActiveSessionForTodayAndNow() {
         return getActiveSession(LocalDateTime.now());
     }

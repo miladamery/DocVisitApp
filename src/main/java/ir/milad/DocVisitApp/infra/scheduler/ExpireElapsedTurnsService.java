@@ -3,11 +3,10 @@ package ir.milad.DocVisitApp.infra.scheduler;
 import ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus;
 import ir.milad.DocVisitApp.domain.visit_session.VisitSessionRepository;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Service;
 
 import java.time.LocalTime;
 
-@Service
+/*@Service*/
 public class ExpireElapsedTurnsService {
 
     private final VisitSessionRepository visitSessionRepository;
@@ -16,7 +15,7 @@ public class ExpireElapsedTurnsService {
         this.visitSessionRepository = visitSessionRepository;
     }
 
-    @Scheduled(fixedDelay = 1000)
+    @Scheduled(initialDelay = 10000, fixedDelay = 1000)
     public void expire() {
         var vs = visitSessionRepository.findActiveSessionForTodayAndNow();
         if (vs.isPresent()) {
