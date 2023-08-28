@@ -122,6 +122,22 @@
                                 <td th:case="${T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).EXPIRED}"
                                 ><span class="badge badge-light-danger fs-7 fw-bold text-capitalize">EXPIRED</span></td>
                             </th:block>
+                            <td th:if="${appointment.status == T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).WAITING}">
+                                <span class="badge badge-light-primary fs-7 fw-bold text-capitalize cursor-pointer"
+                                      th:attr="hx-put='/patient/check/in/' + ${appointment.id}"
+                                      hx-swap="none"
+                                      hx-ext="json-enc"
+                                      hx-trigger="click"
+                                >Check-In</span>
+                            </td>
+                            <td th:if="${appointment.status == T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).VISITING}">
+                                <span class="badge badge-light-warning fs-7 fw-bold text-capitalize cursor-pointer"
+                                      th:attr="hx-put='/patient/done/' + ${appointment.id}"
+                                      hx-swap="none"
+                                      hx-ext="json-enc"
+                                      hx-trigger="click"
+                                >done</span>
+                            </td>
                             <input type="hidden" name="firstName" th:class="'input-hidden-' + ${appointment.id}" th:value="${appointment.patient.firstName}"/>
                             <input type="hidden" name="lastName" th:class="'input-hidden-' + ${appointment.id}" th:value="${appointment.patient.lastName}"/>
                             <input type="hidden" name="dateOfBirth" th:class="'input-hidden-' + ${appointment.id}" th:value="${appointment.patient.dateOfBirth}"/>
