@@ -24,7 +24,7 @@ public class DoctorGivingAppointmentService {
 
         LocalTime realEntryTime;
         if (isDocGivingAppointmentBeforeSessionStart(entryTime, vs))
-            realEntryTime = vs.getLastTurnEndTime();
+            realEntryTime = vs.getLastAppointmentTime();
         else
             realEntryTime = entryTime;
 

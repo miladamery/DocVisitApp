@@ -3,7 +3,6 @@ package ir.milad.DocVisitApp.infra.persistence;
 import ir.milad.DocVisitApp.domain.visit_session.VisitSession;
 import ir.milad.DocVisitApp.domain.visit_session.VisitSessionRepository;
 import one.microstream.storage.types.StorageManager;
-import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
@@ -13,7 +12,6 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 @Repository
-@DependsOn("embeddedStorageManager")
 public class MicroStreamVisitSessionRepository implements VisitSessionRepository {
 
     private final ReadWriteLock lock;

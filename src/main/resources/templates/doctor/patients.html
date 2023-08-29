@@ -11,7 +11,7 @@
 </head>
 <body>
 <th:block th:fragment="patients">
-    <div hx-get="/doctor/patients" hx-trigger="every 10s" hx-swap="outerHTML" style="font-family: Poppins, serif;">
+    <div id="patients_container" hx-get="/doctor/patients" hx-include="#pageNum" hx-trigger="every 120s" hx-swap="outerHTML" style="font-family: Poppins, serif;">
         <div class="container-fluid p-5 rounded mt-5"
              style="background-color: #494462; font-style: normal;">
             <div class="row" style="color: white;">
@@ -70,7 +70,7 @@
                     <table class="table align-middle table-row-bordered table-row-solid gy-4 gs-9 text-center">
                         <!--begin::Thead-->
                         <thead class="border-gray-200 fs-5 fw-semibold bg-lighten">
-                        <tr>
+                            <tr>
                             <th>History</th>
                             <th>First Name</th>
                             <th>Last Name</th>
@@ -90,7 +90,7 @@
                         <!--end::Thead-->
                         <!--begin::Tbody-->
                         <tbody class="fw-6 fw-semibold text-gray-600">
-                        <tr th:each="appointment: ${data.appointments}">
+                            <tr th:each="appointment: ${data.appointments}">
                             <td><i class="fa fa-history fs-2x text-danger cursor-pointer" aria-hidden="true"
                                    data-bs-toggle="modal" data-bs-target="#doc_patient_history"
                                    hx-get="/patient/load/history"
@@ -98,8 +98,7 @@
                                    hx-ext="json-enc"
                                    hx-trigger="click"
                                    th:hx-include="'.input-hidden-' + ${appointment.id}"
-                            ></i>
-                            </td>
+                            ></i></td>
                             <td th:text="${appointment.patient.firstName}"></td>
                             <td th:text="${appointment.patient.lastName}"></td>
                             <td th:text="${appointment.patient.age()}"></td>
@@ -122,7 +121,12 @@
                                 <td th:case="${T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).EXPIRED}"
                                 ><span class="badge badge-light-danger fs-7 fw-bold text-capitalize">EXPIRED</span></td>
                             </th:block>
-                            <td th:if="${appointment.status == T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).WAITING}">
+                            <td th:if="
+                                ${
+                                    appointment.status == T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).WAITING &&
+
+                                    data.summary.nextAppointmentId.equals(appointment.id)
+                                }">
                                 <span class="badge badge-light-primary fs-7 fw-bold text-capitalize cursor-pointer"
                                       th:attr="hx-put='/patient/check/in/' + ${appointment.id}"
                                       hx-swap="none"
@@ -144,6 +148,36 @@
                         </tr>
                         </tbody>
                         <!--end::Tbody-->
+                        <tfoot>
+                            <tr>
+                                <td colspan="10" class="text-center fs-6">
+                                    <i style="color: #494462;" class="fs-4 fa-solid fa-less-than cursor-pointer"
+                                       th:classappend="${data.hasPrevious() ? '' : 'd-none'}"
+                                       hx-get="/doctor/patients"
+                                       hx-include="#previousPage"
+                                       hx-trigger="click"
+                                       hx-target="#patients_container"
+                                       hx-swap="outerHTML"
+                                    ></i>
+                                    &nbsp;&nbsp;
+                                    <span class="fs-2" style="color: #494462"
+                                          th:text="${data.pagination()}"
+                                    >1 -- 98</span>
+                                    &nbsp;&nbsp;
+                                    <i style="color: #494462;" class="fs-4 fa-solid fa-greater-than cursor-pointer"
+                                       th:classappend="${data.hasNextPage() ? '' : 'd-none'}"
+                                       hx-get="/doctor/patients"
+                                       hx-include="#nextPage"
+                                       hx-trigger="click"
+                                       hx-target="#patients_container"
+                                    ></i>
+                                </td>
+                            </tr>
+                            <input type="hidden" id="pageNum" name="pageNum" th:value="${data.pageNum}" />
+                            <input type="hidden" id="nextPage" name="pageNum" th:value="${data.pageNum + 1}" />
+                            <input type="hidden" id="previousPage" name="pageNum" th:value="${data.pageNum - 1}" />
+                            <input type="hidden" id="pageSize" name="pageSize" th:value="${data.pageSize}" />
+                        </tfoot>
                     </table>
                     <!--end::Table-->
                 </div>
@@ -248,8 +282,7 @@
 
                 <div class="modal-footer">
                     <button id="patients_history_modal_close" type="button" class="btn btn-light" data-bs-dismiss="modal"
-                            _="on click remove .block-patient"
-                    >
+                            _="on click remove .block-patient">
                         Close
                     </button>
                     <button class="btn" style="background-color: #C5A470;color: white;"

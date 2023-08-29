@@ -1,7 +1,6 @@
 package ir.milad.DocVisitApp.domain.patient.service;
 
 import ir.milad.DocVisitApp.domain.ApplicationException;
-import ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus;
 import ir.milad.DocVisitApp.domain.visit_session.VisitSessionRepository;
 import org.springframework.stereotype.Service;
 
@@ -14,12 +13,10 @@ public class PatientAppointmentCheckInService {
         this.visitSessionRepository = visitSessionRepository;
     }
 
-    public void checkIn(String id) {
+    public synchronized void checkIn(String appointmentId) {
         visitSessionRepository.findActiveSessionForTodayAndNow()
                 .orElseThrow(() -> new ApplicationException("Active session not found."))
-                .findAppointmentById(id)
-                .orElseThrow(() -> new ApplicationException("Appointment didnt found:" + id))
-                .setStatus(AppointmentStatus.VISITING);
+                .checkIn(appointmentId);
         visitSessionRepository.updateActiveVisitSession();
     }
 }

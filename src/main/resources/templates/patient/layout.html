@@ -34,8 +34,8 @@
         integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF"
         crossorigin="anonymous"></script>
 <main>
-    <div class="container text-center mt-5" id="main-container">
-        <img th:src="@{/images/img.png}">
+    <div class="container text-center" id="main-container">
+        <img th:src="@{/images/img2.svg}">
         <section layout:fragment="content">
             <p>Page content goes here</p>
         </section>
@@ -47,11 +47,12 @@
             <img th:src="@{/images/united-kingdom.png}">
             English
         </button>
-        <button type="button" class="btn mbtn" style="background-color: #494462;color: white;" value="fr">
+        <button type="button" class="btn mbtn"
+                style="background-color: #494462;color: white;border-left: 1px white solid;" value="fr">
             <img th:src="@{/images/french.png}">
             French
         </button>
-        <button type="button" class="btn mbtn" style="background-color: #494462;color: white;" value="fa">
+        <button type="button" class="btn mbtn" style="background-color: #494462;color: white;border-left: 1px white solid;" value="fa">
             <img th:src="@{/images/flag-iran.png}">
             Persian
         </button>

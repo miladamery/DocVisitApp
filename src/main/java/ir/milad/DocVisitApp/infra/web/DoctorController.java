@@ -68,10 +68,18 @@ public class DoctorController {
     }
 
     @GetMapping("/patients")
-    public String patients(Model model) {
-        var patientsData = loadPatientsDataService.load(1);
+    public String patients(
+            @RequestParam(required = false, defaultValue = "1") Integer pageNum,
+            Model model
+    ) {
+        var patientsData = loadPatientsDataService.load(pageNum);
         model.addAttribute("data", patientsData);
         return "/doctor/patients :: patients";
+    }
+
+    @GetMapping("/calendar")
+    public String calendar(Model model) {
+        return "/doctor/calendar.html :: calendar";
     }
 
     private void loadDashboardInfo(Model model) {

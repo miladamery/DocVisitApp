@@ -141,6 +141,58 @@ class VisitSessionTest {
         assertEquals(turns.get(5).getVisitTime(), LocalTime.of(9, 32));
         assertEquals(turns.get(5).getTurnsToAwait(), 4);
 
-        assertEquals(vs.getLastTurnEndTime(), LocalTime.of(9, 40));
+        assertEquals(vs.getLastAppointmentTime(), LocalTime.of(9, 40));
+    }
+
+    @DisplayName("""
+            Given VisitSession with some patients in
+            When appointment is done
+            Then other patients appointment should get updated
+            """)
+    @Test
+    public void test6() {
+        var vs = new VisitSession(
+                LocalDate.now(),
+                LocalTime.of(9, 0, 0),
+                LocalTime.of(12, 0, 0),
+                8
+        );
+
+        var patients = Arrays.asList(
+                new Patient("0", "A", "B", "2023-08-05"),
+                new Patient("1", "C", "D", "2023-08-05"),
+                new Patient("2", "E", "F", "2023-08-05"),
+                new Patient("3", "G", "H", "2023-08-05"),
+                new Patient("4", "I", "J", "2023-08-05"),
+                new Patient("5", "K", "L", "2023-08-05")
+        );
+
+        var time = LocalTime.of(9, 0);
+        var turns = new ArrayList<Appointment>();
+        for (Patient patient: patients) {
+            turns.add(vs.giveAppointment(patient, time));
+            time = time.plusMinutes(1);
+        }
+        vs.checkIn(turns.get(0).getId());
+        vs.done(turns.get(0).getId(), turns.get(0).getVisitTime().plusMinutes(vs.getSessionLength()));
+
+        vs.checkIn(turns.get(1).getId());
+        vs.done(turns.get(1).getId(), turns.get(1).getVisitTime().plusMinutes(vs.getSessionLength()));
+
+        vs.checkIn(turns.get(2).getId());
+        vs.done(turns.get(2).getId(), turns.get(2).getVisitTime().plusMinutes(vs.getSessionLength()));
+
+        vs.checkIn(turns.get(3).getId());
+        vs.done(turns.get(3).getId(), turns.get(3).getVisitTime().plusMinutes(vs.getSessionLength() * 2));
+
+        vs.checkIn(turns.get(4).getId());
+        vs.done(turns.get(4).getId(), turns.get(4).getVisitTime().plusMinutes(vs.getSessionLength() - 3));
+
+        assertEquals(turns.get(0).getVisitTime(), LocalTime.of(9, 0));
+        assertEquals(turns.get(1).getVisitTime(), LocalTime.of(9, 8));
+        assertEquals(turns.get(2).getVisitTime(), LocalTime.of(9, 16));
+        assertEquals(turns.get(3).getVisitTime(), LocalTime.of(9, 24));
+        assertEquals(turns.get(4).getVisitTime(), LocalTime.of(9, 40));
+        assertEquals(turns.get(5).getVisitTime(), LocalTime.of(9, 45));
     }
 }

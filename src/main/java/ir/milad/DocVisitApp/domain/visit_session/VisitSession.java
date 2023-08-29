@@ -23,7 +23,7 @@ public class VisitSession {
     private LocalTime fromTime;
     private LocalTime toTime;
     private Integer sessionLength;
-    private LocalTime lastTurnEndTime;
+    private LocalTime lastAppointmentTime;
     private final LinkedList<Appointment> appointments;
 
     public VisitSession(LocalDate date, LocalTime fromTime, LocalTime toTime, Integer sessionLength) {
@@ -36,7 +36,7 @@ public class VisitSession {
         if (fromTime.isAfter(toTime))
             throw new ApplicationException("Start time cant be after end time.");
 
-        lastTurnEndTime = fromTime;
+        lastAppointmentTime = fromTime;
         appointments = new LinkedList<>();
     }
 
@@ -66,8 +66,33 @@ public class VisitSession {
             toChange.visitTime = reference.visitTime;
         }
 
-        lastTurnEndTime = appointments.getLast().visitTime.plusMinutes(sessionLength);
+        lastAppointmentTime = appointments.getLast().visitTime.plusMinutes(sessionLength);
         return appointment.getPatient();
+    }
+
+    public void checkIn(String appointmentId) {
+        var appointment = findAppointmentById(appointmentId)
+                .orElseThrow(() -> new ApplicationException("Appointment didnt found:" + id));
+        if (appointment.status != AppointmentStatus.WAITING)
+            throw new ApplicationException("Wrong appointment to check-in! This patient status is not WAITING.");
+        // TODO: 8/29/2023 Check first waiting person can check in?
+        appointment.setStatus(AppointmentStatus.VISITING);
+    }
+
+    public void done(String appointmentId, LocalTime doneTime) {
+        var appointment = findAppointmentById(appointmentId)
+                .orElseThrow(() -> new ApplicationException("Appointment didnt found:" + id));
+        if (appointment.status != AppointmentStatus.VISITING)
+            throw new ApplicationException("Wrong appointment to done! Doctor is not visiting this patient.");
+        appointment.setStatus(AppointmentStatus.VISITED);
+        var index = appointments.indexOf(appointment);
+        var count = 0;
+        var refTime = doneTime.withSecond(0);
+        for (int i = index + 1; i < appointments.size(); i++) {
+            appointments.get(i).visitTime = refTime.plusMinutes(count * sessionLength);
+            count++;
+        }
+        lastAppointmentTime = refTime.plusMinutes(count);
     }
 
     public Optional<Appointment> findAppointmentById(String id) {
@@ -75,12 +100,15 @@ public class VisitSession {
     }
 
     public VisitSessionSummary summary() {
+        var nextAppointmentId = appointments.stream().filter(appointment -> appointment.status == AppointmentStatus.WAITING)
+                .findFirst().map(Appointment::getId).orElse("-1");
         return new VisitSessionSummary(
                 numberOfAppointmentsByStatus(Optional.empty()),
                 numberOfAppointmentsAwaiting(),
                 numberOfAppointmentsByStatus(Optional.of(AppointmentStatus.VISITED)),
                 numberOfAppointmentsByStatus(Optional.of(AppointmentStatus.CANCELED)),
-                numberOfAppointmentsByStatus(Optional.of(AppointmentStatus.EXPIRED)));
+                numberOfAppointmentsByStatus(Optional.of(AppointmentStatus.EXPIRED)),
+                nextAppointmentId);
     }
 
     public void update(LocalDate date, LocalTime fromTime, LocalTime toTime, Integer sessionLength) {
@@ -97,6 +125,7 @@ public class VisitSession {
         return numberOfAppointmentsByStatus(Optional.of(AppointmentStatus.WAITING));
     }
 
+
     private Long numberOfAppointmentsByStatus(Optional<AppointmentStatus> status) {
         return status
                 .map(appointmentStatus -> appointments.stream().filter(appointment -> appointment.status == appointmentStatus).count())
@@ -105,12 +134,12 @@ public class VisitSession {
 
     private Appointment giveNewAppointment(Patient patient, LocalTime entryTime) {
         LocalTime visitTime;
-        if (entryTime.isAfter(lastTurnEndTime)) {
+        if (entryTime.isAfter(lastAppointmentTime)) {
             visitTime = entryTime;
-            lastTurnEndTime = entryTime.plusMinutes(sessionLength);
+            lastAppointmentTime = entryTime.plusMinutes(sessionLength);
         } else {
-            visitTime = lastTurnEndTime;
-            lastTurnEndTime = lastTurnEndTime.plusMinutes(sessionLength);
+            visitTime = lastAppointmentTime;
+            lastAppointmentTime = lastAppointmentTime.plusMinutes(sessionLength);
         }
 
         var appointment = new Appointment(appointments.size() + 1 + APPOINTMENT_BEGIN_NUMBER, appointments.size(), visitTime, patient);
@@ -126,7 +155,7 @@ public class VisitSession {
     }
 
     private boolean visitSessionIsOver(LocalTime entryTime) {
-        return entryTime.isAfter(toTime) || lastTurnEndTime.isAfter(toTime);
+        return entryTime.isAfter(toTime) || lastAppointmentTime.isAfter(toTime);
     }
 
 }

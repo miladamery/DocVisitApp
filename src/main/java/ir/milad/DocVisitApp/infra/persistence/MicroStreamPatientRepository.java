@@ -4,7 +4,6 @@ import ir.milad.DocVisitApp.domain.patient.Patient;
 import ir.milad.DocVisitApp.domain.patient.PatientHistory;
 import ir.milad.DocVisitApp.domain.patient.PatientRepository;
 import one.microstream.storage.types.StorageManager;
-import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -12,7 +11,6 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 @Repository
-@DependsOn("embeddedStorageManager")
 public class MicroStreamPatientRepository implements PatientRepository {
     private final ReadWriteLock lock;
     private final Database database;
