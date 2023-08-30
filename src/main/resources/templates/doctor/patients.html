@@ -11,7 +11,7 @@
 </head>
 <body>
 <th:block th:fragment="patients">
-    <div id="patients_container" hx-get="/doctor/patients" hx-include="#pageNum" hx-trigger="every 120s" hx-swap="outerHTML" style="font-family: Poppins, serif;">
+    <div id="patients_container" hx-get="/doctor/patients" hx-include="#pageNum" hx-trigger="every 30s" hx-swap="outerHTML" style="font-family: Poppins, serif;">
         <div class="container-fluid p-5 rounded mt-5"
              style="background-color: #494462; font-style: normal;">
             <div class="row" style="color: white;">
@@ -132,6 +132,10 @@
                                       hx-swap="none"
                                       hx-ext="json-enc"
                                       hx-trigger="click"
+                                      _="on htmx:afterRequest(elt, xhr, target, requestConfig, successful)
+                                            if successful is true then send click to #pageNum
+                                            else call alert('Done Operation failed.')
+                                        end"
                                 >Check-In</span>
                             </td>
                             <td th:if="${appointment.status == T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).VISITING}">
@@ -140,6 +144,10 @@
                                       hx-swap="none"
                                       hx-ext="json-enc"
                                       hx-trigger="click"
+                                      _="on htmx:afterRequest(elt, xhr, target, requestConfig, successful)
+                                            if successful is true then send click to #pageNum
+                                            else call alert('Done Operation failed.')
+                                        end"
                                 >done</span>
                             </td>
                             <input type="hidden" name="firstName" th:class="'input-hidden-' + ${appointment.id}" th:value="${appointment.patient.firstName}"/>
@@ -173,7 +181,13 @@
                                     ></i>
                                 </td>
                             </tr>
-                            <input type="hidden" id="pageNum" name="pageNum" th:value="${data.pageNum}" />
+                            <input type="hidden" id="pageNum" name="pageNum" th:value="${data.pageNum}"
+                                   hx-get="/doctor/patients"
+                                   hx-include="#pageNum"
+                                   hx-trigger="click"
+                                   hx-swap="outerHTML"
+                                   hx-target="#patients_container"
+                            />
                             <input type="hidden" id="nextPage" name="pageNum" th:value="${data.pageNum + 1}" />
                             <input type="hidden" id="previousPage" name="pageNum" th:value="${data.pageNum - 1}" />
                             <input type="hidden" id="pageSize" name="pageSize" th:value="${data.pageSize}" />
