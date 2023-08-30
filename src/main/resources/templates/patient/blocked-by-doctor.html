@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{patient/layout.html}" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xsi:schemaLocation="http://www.ultraq.net.nz/thymeleaf/layout"
+      xsi:schemaLocation="http://www.ultraq.net.nz/thymeleaf/layout" xmlns:th="http://www.thymeleaf.org"
 >
 <head>
     <meta charset="UTF-8">
@@ -10,7 +10,7 @@
 <body>
 <section layout:fragment="content">
     <div class="d-flex align-items-center justify-content-center m-5" style="background-color: #494462;">
-        <p class="m-3 p-3" style="font-family: Poppins, serif;color: #FFF;border: 2px solid #C5A470;">
+        <p th:text="#{blocked.message}" class="m-3 p-3" style="font-family: Poppins, serif;color: #FFF;border: 2px solid #C5A470;">
             Blocked! You have been blocked by the doctor due to multiple cancellations. You are not allowed to book an appointment!
         </p>
     </div>

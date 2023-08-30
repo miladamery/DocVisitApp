@@ -1,4 +1,4 @@
-package ir.milad.DocVisitApp.infra.web;
+package ir.milad.DocVisitApp.infra.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -45,22 +45,37 @@
 <footer class="footer mt-auto">
     <div class="btn-group" role="group" aria-label="Basic example" style="width: 100%; height: 60px;">
         <button type="button" class="btn mbtn" style="" value="en"
-                _="on click remove .selected from .mbtn then add .selected to me">
+                _=" on click remove .selected from .mbtn then add .selected to me end
+                    on click call reload('/patient/index?language=en') end"
+                th:classappend="${language == 'en'} ? 'selected' : ''"
+        >
             <img th:src="@{/images/united-kingdom.png}">
             English
         </button>
         <button type="button" class="btn mbtn"
                 style="background-color: #494462;color: white;border-left: 1px white solid;" value="fr"
-                _="on click remove .selected from .mbtn then add .selected to me">
+                _=" on click remove .selected from .mbtn then add .selected to me end
+                    on click call reload('/patient/index?language=fr') end"
+                th:classappend="${language == 'fr'} ? 'selected' : ''"
+        >
             <img th:src="@{/images/french.png}">
             French
         </button>
         <button type="button" class="btn mbtn" style="border-left: 1px white solid;" value="fa"
-                _="on click remove .selected from .mbtn then add .selected to me">
+                _="
+                    on click remove .selected from .mbtn then add .selected to me end
+                    on click call reload('/patient/index?language=fa') end"
+                th:classappend="${language == 'fa'} ? 'selected' : ''"
+        >
             <img th:src="@{/images/flag-iran.png}">
             Persian
         </button>
     </div>
 </footer>
+<script>
+    function reload(locationAddr) {
+        location = locationAddr
+    }
+</script>
 </body>
 </html>

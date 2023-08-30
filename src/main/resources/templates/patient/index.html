@@ -21,28 +21,28 @@
                 </div>
 
                 <div class="col-sm-12 mt-3">
-                    <h6 style="font-family: Poppins; color: #323232; font-weight: bolder;">Welcome to Dr Pak Check-in</h6>
+                    <h6 style="font-family: Poppins; color: #323232; font-weight: bolder;" th:text="#{greeting}">Welcome to Dr Pak Check-in</h6>
                 </div>
 
                 <div class="col-sm-12">
-                    <h6 style="font-family: Poppins,serif; color: #323232;font-size: smaller;">Please fill out the form to make an appointment.</h6>
+                    <h6 style="font-family: Poppins,serif; color: #323232;font-size: smaller;" th:text="#{form.request}">Please fill out the form to make an appointment.</h6>
                 </div>
                 <div class="col-sm-8 offset-sm-2 p-1 ">
                     <input id="first_name" name="firstName" type="text"
-                           class="form-control"  placeholder="  &#xf007   First Name*" required
+                           class="form-control"  th:placeholder="'  &#xf007   ' +  #{first.name}" placeholder="  &#xf007   First Name*" required
                            hx-validate="true"
                     />
                 </div>
                 <div class="col-sm-8 offset-sm-2 p-1 ">
                     <input id="last_name" name="lastName" type="text"
-                           class="form-control"  placeholder="  &#xf007   Last Name*" required
+                           class="form-control"  th:placeholder="'  &#xf007   ' + #{last.name}" placeholder="  &#xf007   Last Name*" required
                            hx-validate="true"
                     />
                 </div>
 
                 <div class="col-sm-8 offset-sm-2 p-1 ">
                     <input id="date_of_birth" name="dateOfBirth" type="text"
-                           class="form-control " placeholder="  &#xf073   Date Of Birth*" required
+                           class="form-control " th:placeholder="'  &#xf073   ' + #{date.of.birth}" placeholder="  &#xf073   Date Of Birth*" required
                            hx-validate="true"
                     />
                 </div>
@@ -54,13 +54,13 @@
                 </script>
                 <div class="col-sm-8 offset-sm-2 p-1 ">
                     <input id="phone_number" name="phoneNumber" type="text"
-                           class="form-control"  placeholder="  &#xf095   Phone Number*" required
+                           class="form-control"  th:placeholder="'  &#xf095   ' + #{phone.number}" placeholder="  &#xf095   Phone Number*" required
                            hx-validate="true"
                     />
                 </div>
                 <div class="col-sm-8 offset-sm-2 p-2 d-grid gap-2">
                     <input id="take_turn" class="btn" type="submit"
-                           value="Submit" style="background-color: #C5A470; height: 60px;color: white;"
+                           th:value="#{take.turn.submit}" value="Submit" style="background-color: #C5A470; height: 60px;color: white;"
                     />
                 </div>
             </div>

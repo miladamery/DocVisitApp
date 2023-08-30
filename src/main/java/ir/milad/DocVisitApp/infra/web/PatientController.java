@@ -48,7 +48,8 @@ public class PatientController {
     }
 
     @GetMapping("/index")
-    public String index() {
+    public String index(@RequestParam(defaultValue = "fr") String language, Model model) {
+        model.addAttribute("language", language);
         return getActiveVisitSessionService.findActiveSessionForTodayAndNow()
                 .map(__ -> "patient/index")
                 .orElse("patient/no-active-visit-session");
@@ -75,7 +76,8 @@ public class PatientController {
     }
 
     @GetMapping("/load/appointment")
-    public String loadTurn(@RequestParam String id, Model model) {
+    public String loadTurn(@RequestParam(defaultValue = "fr") String language, @RequestParam String id, Model model) {
+        model.addAttribute("language", language);
         return loadPatientAppointmentService.loadPatientAppointment(id)
                 .map(appointment -> {
                     if (appointment.getStatus() == AppointmentStatus.VISITING) {
@@ -91,7 +93,9 @@ public class PatientController {
     }
 
     @DeleteMapping("/cancel/appointment")
-    public String cancelAppointment(@RequestParam String id, HttpServletResponse response, Model model) {
+    public String cancelAppointment(
+            @RequestParam String id, HttpServletResponse response,
+            Model model) {
         return Try.run(() -> cancelPatientAppointmentService.cancel(id))
                 .map(__ -> {
                     response.setHeader(HTMX_REDIRECT_HEADER, "/patient/index");
