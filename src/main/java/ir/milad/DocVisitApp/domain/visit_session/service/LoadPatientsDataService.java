@@ -56,9 +56,9 @@ public class LoadPatientsDataService {
         }
 
         public String pagination() {
-            if (pageNum == 1) {
-                return " 1 - " + appointments.size();
-            } else {
+            if (appointments.size() == 0)
+                return "";
+            else {
                 var a = (pageNum - 1) * pageSize;
                 var b = a + appointments.size();
                 return (a + 1) + " - " + b + " of " + summary.total;

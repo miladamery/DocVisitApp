@@ -11,7 +11,7 @@
 </head>
 <body>
 <th:block th:fragment="patients">
-    <div id="patients_container" hx-get="/doctor/patients" hx-include="#pageNum" hx-trigger="every 30s" hx-swap="outerHTML" style="font-family: Poppins, serif;">
+    <div id="patients_container" hx-get="/doctor/patients" hx-include="#pageNum" hx-trigger="every 30s" style="font-family: Poppins, serif;">
         <div class="container-fluid p-5 rounded mt-5"
              style="background-color: #494462; font-style: normal;">
             <div class="row" style="color: white;">
@@ -165,7 +165,6 @@
                                        hx-include="#previousPage"
                                        hx-trigger="click"
                                        hx-target="#patients_container"
-                                       hx-swap="outerHTML"
                                     ></i>
                                     &nbsp;&nbsp;
                                     <span class="fs-2" style="color: #494462"
@@ -185,7 +184,6 @@
                                    hx-get="/doctor/patients"
                                    hx-include="#pageNum"
                                    hx-trigger="click"
-                                   hx-swap="outerHTML"
                                    hx-target="#patients_container"
                             />
                             <input type="hidden" id="nextPage" name="pageNum" th:value="${data.pageNum + 1}" />
