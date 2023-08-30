@@ -22,7 +22,12 @@ input::placeholder {
     font-family: Poppins, FontAwesome, serif;
 }
 
-.mbtn:focus {
+.mbtn {
+    background-color: #494462;
+    color: white !important;
+}
+
+.mbtn.selected {
     background-color: #857FA7 !important;
 }
 
