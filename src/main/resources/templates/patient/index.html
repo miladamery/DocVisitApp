@@ -41,17 +41,17 @@
                 </div>
 
                 <div class="col-sm-8 offset-sm-2 p-1 ">
-                    <input id="date_of_birth" name="dateOfBirth" type="text"
+                    <input id="date_of_birth" name="dateOfBirth" type="date"
                            class="form-control " th:placeholder="'  &#xf073   ' + #{date.of.birth}" placeholder="  &#xf073   Date Of Birth*" required
                            hx-validate="true"
                     />
                 </div>
-                <script>
+                <!--<script>
                     flatpickr("#date_of_birth", {
                         disableMobile: "true",
                         allowInput: "true"
                     });
-                </script>
+                </script>-->
                 <div class="col-sm-8 offset-sm-2 p-1 ">
                     <input id="phone_number" name="phoneNumber" type="text"
                            class="form-control"  th:placeholder="'  &#xf095   ' + #{phone.number}" placeholder="  &#xf095   Phone Number*" required
