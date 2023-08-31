@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -64,6 +65,16 @@ public class MicroStreamVisitSessionRepository implements VisitSessionRepository
             database.updateActiveVisitSession();
         } finally {
             lock.writeLock().unlock();
+        }
+    }
+
+    @Override
+    public List<VisitSession> getVisitSessionHistories() {
+        lock.readLock().lock();
+        try {
+            return database.visitSessionsHistory.get();
+        } finally {
+            lock.readLock().unlock();
         }
     }
 }

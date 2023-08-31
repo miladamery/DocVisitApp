@@ -23,7 +23,7 @@ public class ExpireElapsedTurnsService {
 
     /*@Scheduled(initialDelay = 10000, fixedDelay = 10000)*/
     public void expire() {
-        var vs = visitSessionRepository.findActiveSessionForTodayAndNow();
+        var vs = visitSessionRepository.findActiveSessionForToday();
         if (vs.isPresent()) {
             var visitSession = vs.get();
             // TODO: 8/29/2023 Move logic to VisitSession

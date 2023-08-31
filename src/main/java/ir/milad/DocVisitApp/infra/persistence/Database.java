@@ -27,9 +27,11 @@ public class Database {
 
     public void setActiveVisitSession(VisitSession visitSession) {
         Objects.requireNonNull(visitSession, "Database.setCurrentActiveVisitSession can't accept null visitSession");
-        activeVisitSession.ifPresent(session -> visitSessionsHistory.get().add(session));
+        visitSessionsHistory.get().add(visitSession);
         activeVisitSession = Optional.of(visitSession);
-        storageManager.storeRoot();
+        var eagerStorer = storageManager.createEagerStorer();
+        eagerStorer.storeAll(this);
+        eagerStorer.commit();
     }
 
     public boolean hasActiveVisitSession(LocalDate date) {

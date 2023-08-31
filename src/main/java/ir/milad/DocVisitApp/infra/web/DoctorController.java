@@ -1,11 +1,13 @@
 package ir.milad.DocVisitApp.infra.web;
 
 import ir.milad.DocVisitApp.domain.patient.Patient;
+import ir.milad.DocVisitApp.domain.visit_session.VisitSessionRepository;
 import ir.milad.DocVisitApp.domain.visit_session.service.DoctorGivingAppointmentService;
 import ir.milad.DocVisitApp.domain.visit_session.service.LoadDashboardDataService;
 import ir.milad.DocVisitApp.domain.visit_session.service.LoadPatientsDataService;
 import ir.milad.DocVisitApp.domain.visit_session.service.UpsertVisitSessionService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,8 +16,13 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAdjusters;
+import java.util.Arrays;
+import java.util.List;
 
 @Controller
 @RequestMapping("/doctor")
@@ -26,15 +33,19 @@ public class DoctorController {
     private final LoadPatientsDataService loadPatientsDataService;
     private final DoctorGivingAppointmentService doctorGivingAppointmentService;
 
+    private final VisitSessionRepository visitSessionRepository;
+
     public DoctorController(
             UpsertVisitSessionService upsertVisitSessionService,
             LoadDashboardDataService loadDashboardDataService,
             LoadPatientsDataService loadPatientsDataService,
-            DoctorGivingAppointmentService doctorGivingAppointmentService) {
+            DoctorGivingAppointmentService doctorGivingAppointmentService,
+            VisitSessionRepository visitSessionRepository) {
         this.upsertVisitSessionService = upsertVisitSessionService;
         this.loadDashboardDataService = loadDashboardDataService;
         this.loadPatientsDataService = loadPatientsDataService;
         this.doctorGivingAppointmentService = doctorGivingAppointmentService;
+        this.visitSessionRepository = visitSessionRepository;
     }
 
     @PostMapping(value = "/create/visit_session")
@@ -79,6 +90,77 @@ public class DoctorController {
 
     @GetMapping("/calendar")
     public String calendar(Model model) {
+        var today = LocalDate.now();
+        LocalDate previousMonday = today.with(TemporalAdjusters.previous(DayOfWeek.MONDAY));
+        var times = Arrays.asList("08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18");
+        var dates = Arrays.asList(
+                previousMonday,
+                previousMonday.plusDays(1),
+                previousMonday.plusDays(2),
+                previousMonday.plusDays(3),
+                previousMonday.plusDays(4),
+                previousMonday.plusDays(5),
+                previousMonday.plusDays(6)
+        );
+        var ttimes = times.stream().map(t -> {
+            var time = LocalTime.of(Integer.valueOf(t), 0);
+            var res = dates.stream().map(ld ->
+                    visitSessionRepository.getVisitSessionHistories().stream().anyMatch(vs ->
+                            vs.getDate().equals(ld) &&
+                                    ((vs.getFromTime().equals(time) || vs.getFromTime().isBefore(time)) &&
+                                            (vs.getToTime().isAfter(time) || vs.getToTime().equals(time))
+                                    )
+                    )
+            ).toList();
+            return new TimeData(t, res);
+        }).toList();
+        var monday = new DayOfMonthAndText(
+                previousMonday.getDayOfMonth(),
+                previousMonday.getDayOfWeek().name(),
+                previousMonday.equals(LocalDate.now())
+        );
+        var tuesday = new DayOfMonthAndText(
+                previousMonday.plusDays(1).getDayOfMonth(),
+                previousMonday.plusDays(1).getDayOfWeek().name().toLowerCase(),
+                previousMonday.plusDays(1).equals(LocalDate.now())
+        );
+        var wednesday = new DayOfMonthAndText(
+                previousMonday.plusDays(2).getDayOfMonth(),
+                previousMonday.plusDays(2).getDayOfWeek().name().toLowerCase(),
+                previousMonday.plusDays(2).equals(LocalDate.now())
+        );
+        var thursday = new DayOfMonthAndText(
+                previousMonday.plusDays(3).getDayOfMonth(),
+                previousMonday.plusDays(3).getDayOfWeek().name().toLowerCase(),
+                previousMonday.plusDays(3).equals(LocalDate.now())
+        );
+        var friday = new DayOfMonthAndText(
+                previousMonday.plusDays(4).getDayOfMonth(),
+                previousMonday.plusDays(4).getDayOfWeek().name().toLowerCase(),
+                previousMonday.plusDays(4).equals(LocalDate.now())
+        );
+        var saturday = new DayOfMonthAndText(
+                previousMonday.plusDays(5).getDayOfMonth(),
+                previousMonday.plusDays(5).getDayOfWeek().name().toLowerCase(),
+                previousMonday.plusDays(5).equals(LocalDate.now())
+        );
+        var sunday = new DayOfMonthAndText(
+                previousMonday.plusDays(6).getDayOfMonth(),
+                previousMonday.plusDays(6).getDayOfWeek().name().toLowerCase(),
+                previousMonday.plusDays(6).equals(LocalDate.now())
+        );
+        var days = Arrays.asList(monday, tuesday, wednesday, thursday, friday, saturday, sunday);
+
+        var d = today.format(DateTimeFormatter.ofPattern("dd"));
+        var m = today.format(DateTimeFormatter.ofPattern("MMMM"));
+        var y = today.format(DateTimeFormatter.ofPattern("yyyy"));
+
+        model.addAttribute("days", days);
+        model.addAttribute("times", ttimes);
+        model.addAttribute("d", d);
+        model.addAttribute("m", m);
+        model.addAttribute("y", y);
+        model.addAttribute("today", LocalDate.now().toString().formatted(DateTimeFormatter.ofPattern("yyyyMMdd")));
         return "/doctor/calendar.html :: calendar";
     }
 
@@ -91,10 +173,35 @@ public class DoctorController {
     @Getter
     @Setter
     public static class VisitSessionRequest {
+        @NotNull
         private LocalDate date;
+        @NotNull
         private LocalTime fromTime;
+        @NotNull
         private LocalTime toTime;
         @Positive(message = "visit session length can't be lower than 0")
         private Integer sessionLength;
+    }
+
+    public static class DayOfMonthAndText {
+        public Integer dayOfMonth;
+        public String day;
+        public Boolean isToday;
+
+        public DayOfMonthAndText(Integer dayOfMonth, String day, Boolean isToday) {
+            this.dayOfMonth = dayOfMonth;
+            this.day = day;
+            this.isToday = isToday;
+        }
+    }
+
+    public static class TimeData {
+        public String time;
+        public List<Boolean> hasSessions;
+
+        public TimeData(String time, List<Boolean> hasSessions) {
+            this.time = time;
+            this.hasSessions = hasSessions;
+        }
     }
 }

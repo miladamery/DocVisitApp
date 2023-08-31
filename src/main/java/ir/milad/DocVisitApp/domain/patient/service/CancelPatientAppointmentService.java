@@ -20,7 +20,7 @@ public class CancelPatientAppointmentService {
     }
 
     public synchronized void cancel(String appointmentId) {
-        var patient = visitSessionRepository.findActiveSessionForTodayAndNow()
+        var patient = visitSessionRepository.findActiveSessionForToday()
                 .orElseThrow(() -> new ApplicationException("Active session not found."))
                 .cancelAppointment(appointmentId);
         patientRepository.addPatientHistory(patient, new PatientHistory(LocalDate.now(), PatientHistoryStatus.CANCELLED));

@@ -14,7 +14,7 @@ public class PatientAppointmentCheckInService {
     }
 
     public synchronized void checkIn(String appointmentId) {
-        visitSessionRepository.findActiveSessionForTodayAndNow()
+        visitSessionRepository.findActiveSessionForToday()
                 .orElseThrow(() -> new ApplicationException("Active session not found."))
                 .checkIn(appointmentId);
         visitSessionRepository.updateActiveVisitSession();

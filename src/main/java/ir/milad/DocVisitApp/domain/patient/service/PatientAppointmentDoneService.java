@@ -21,7 +21,7 @@ public class PatientAppointmentDoneService {
     }
 
     public void done(String id) {
-        var appointment = visitSessionRepository.findActiveSessionForTodayAndNow()
+        var appointment = visitSessionRepository.findActiveSessionForToday()
                 .orElseThrow(() -> new ApplicationException("Active session not found."))
                 .findAppointmentById(id)
                 .orElseThrow(() -> new ApplicationException("Appointment didnt found:" + id));

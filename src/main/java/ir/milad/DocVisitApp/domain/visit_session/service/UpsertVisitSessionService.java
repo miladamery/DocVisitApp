@@ -17,10 +17,12 @@ public class UpsertVisitSessionService {
     }
 
     public void upsert(LocalDate date, LocalTime fromTime, LocalTime toTime, Integer sessionLength) {
-        if (this.visitSessionRepository.exists(date)) {
-            this.visitSessionRepository.findActiveSessionForTodayAndNow().get().update(date, fromTime, toTime, sessionLength);
+        var vs = visitSessionRepository.findActiveSessionForToday();
+        if (vs.isPresent()) {
+            vs.get().update(date, fromTime, toTime, sessionLength);
             this.visitSessionRepository.updateActiveVisitSession();
-        } else
+        } else {
             visitSessionRepository.setActiveVisitSession(new VisitSession(date, fromTime, toTime, sessionLength));
+        }
     }
 }

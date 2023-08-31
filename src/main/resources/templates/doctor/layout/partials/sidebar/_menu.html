@@ -51,7 +51,11 @@
                 </div>
 
                 <div class="menu-item"
-                     _="on click remove .active from <a.menu-link/> then add .active to #calendar_menu"
+                     hx-get="/doctor/calendar" hx-target="#kt_app_content_container" hx-trigger="click"
+                     _="
+                        on click remove .active from <a.menu-link/> then add .active to #calendar_menu end
+                        on htmx:afterSettle call initCalendar() end
+                        "
                 >
                     <a class="menu-link" id="calendar_menu">
                         <span class="menu-icon">
