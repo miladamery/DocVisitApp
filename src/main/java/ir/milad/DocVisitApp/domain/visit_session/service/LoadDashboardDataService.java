@@ -19,7 +19,7 @@ public class LoadDashboardDataService {
         if (vs.isEmpty())
             return new DashboardData(0L, "No Session is set");
 
-        var officeHours = vs.get().getFromTime() + " " + vs.get().getToTime();
+        var officeHours = vs.get().getFromTime() + " - " + vs.get().getToTime();
         var numberOfPeopleAwaiting = vs.get().numberOfAppointmentsAwaiting();
         return new DashboardData(numberOfPeopleAwaiting, officeHours);
     }

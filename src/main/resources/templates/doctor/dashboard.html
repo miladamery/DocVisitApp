@@ -35,7 +35,9 @@
                     <!--begin::Position-->
                     <div class="fs-4 fw-bold mb-6" style="color: #494462;" th:text="${dashboardInfo.numberOfPeopleAwaiting} + ' people'">20 people</div>
                     <!--end::Position-->
-                    <button class="btn btn-sm btn-center" style="background-color: #C5A470;color: white;width: 50%;">View All</button>
+                    <button class="btn btn-sm btn-center" style="background-color: #C5A470;color: white;width: 50%;"
+                            hx-get="/doctor/patients" hx-target="#kt_app_content_container"  hx-trigger="click"
+                    >View All</button>
                 </div>
                 <!--begin::Card body-->
             </div>
@@ -58,7 +60,9 @@
                     <div class="fs-4 fw-bold mb-6" style="color: #494462;" th:text="${dashboardInfo.officeHours}">08:00 AM - 02:00 PM</div>
                     <!--end::Position-->
                     <!--begin::Follow-->
-                    <button class="btn btn-sm btn-center" style="background-color: #C5A470;color: white;width: 50%;">View All</button>
+                    <button class="btn btn-sm btn-center" style="background-color: #C5A470;color: white;width: 50%;"
+                            hx-get="/doctor/calendar" hx-target="#kt_app_content_container" hx-trigger="click"
+                    >View All</button>
                     <!--end::Follow-->
                 </div>
                 <!--begin::Card body-->
