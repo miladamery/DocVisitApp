@@ -6,7 +6,9 @@
 </head>
 <body>
 <th:block th:fragment="dashboard">
-    <div class="container-fluid p-5 bg-white rounded mt-5" style="font-family: Poppins, serif;">
+    <div class="container-fluid p-5 bg-white rounded mt-5" style="font-family: Poppins, serif;"
+         hx-get="/doctor/dashboard" hx-target="#kt_app_content_container"  hx-trigger="every 30s"
+    >
         <div class="row">
             <div class="col-xl-2 col-lg-2 col-md-2">
                 <img th:src="@{/images/DrPak.svg}" style="border-radius: 50%; border: 5px solid #494462;" alt="Dr Pak image" class="img-fluid">

@@ -124,7 +124,7 @@
                             <td th:if="
                                 ${
                                     appointment.status == T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).WAITING &&
-
+                                    !data.isVisiting() &&
                                     data.summary.nextAppointmentId.equals(appointment.id)
                                 }">
                                 <span class="badge badge-light-primary fs-7 fw-bold text-capitalize cursor-pointer"

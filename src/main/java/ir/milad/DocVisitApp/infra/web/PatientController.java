@@ -5,7 +5,6 @@ import ir.milad.DocVisitApp.domain.ApplicationException;
 import ir.milad.DocVisitApp.domain.patient.Patient;
 import ir.milad.DocVisitApp.domain.patient.PatientIsBlockedException;
 import ir.milad.DocVisitApp.domain.patient.service.*;
-import ir.milad.DocVisitApp.domain.visit_session.Appointment;
 import ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus;
 import ir.milad.DocVisitApp.domain.visit_session.service.GetActiveVisitSessionService;
 import jakarta.servlet.http.HttpServletResponse;
@@ -80,11 +79,12 @@ public class PatientController {
         model.addAttribute("language", language);
         return loadPatientAppointmentService.loadPatientAppointment(id)
                 .map(appointment -> {
-                    if (appointment.getStatus() == AppointmentStatus.VISITING) {
-                        model.addAttribute("turnNumber", appointment.getTurnNumber());
+                    if (appointment.status == AppointmentStatus.VISITING) {
+                        model.addAttribute("turnNumber", appointment.turnNumber);
                         return "patient/appointment-arrived.html :: appointment-arrived";
                     } else
                         return appointmentInfo(model, appointment);
+
                 })
                 .orElseGet(() -> {
                     model.addAttribute(ERROR_500_ATTRIBUTE_NAME, "Your turn not found");
@@ -148,9 +148,9 @@ public class PatientController {
         );
     }
 
-    private String appointmentInfo(Model model, Appointment appointment) {
+    private String appointmentInfo(Model model, AppointmentData appointment) {
         model.addAttribute("appointment", appointment);
-        model.addAttribute("waitingTime", appointment.waitingTimeFromNow());
+        model.addAttribute("waitingTime", appointment.waitingTime);
         return "patient/appointment-info :: appointment";
     }
 

@@ -1,6 +1,7 @@
 package ir.milad.DocVisitApp.domain.patient.service;
 
-import ir.milad.DocVisitApp.domain.visit_session.Appointment;
+import ir.milad.DocVisitApp.domain.ApplicationException;
+import ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus;
 import ir.milad.DocVisitApp.domain.visit_session.VisitSessionRepository;
 import org.springframework.stereotype.Service;
 
@@ -16,9 +17,11 @@ public class LoadPatientAppointmentService {
         this.visitSessionRepository = visitSessionRepository;
     }
 
-    public Optional<Appointment> loadPatientAppointment(String id) {
-        return visitSessionRepository
-                .getActiveSession(LocalDateTime.now())
-                .flatMap(visitSession -> visitSession.findAppointmentById(id));
+    public Optional<AppointmentData> loadPatientAppointment(String id) {
+        var vs = visitSessionRepository.getActiveSession(LocalDateTime.now())
+                .orElseThrow(() -> new ApplicationException("Visit Session Not Found."));
+        var appointment = vs.findAppointmentById(id);
+        var visited = vs.numberOfAppointmentsByStatus(Optional.of(AppointmentStatus.VISITED));
+        return appointment.map(ap -> new AppointmentData(ap, ap.getTurnsToAwait() - visited));
     }
 }

@@ -4,11 +4,11 @@ import ir.milad.DocVisitApp.domain.ApplicationException;
 import ir.milad.DocVisitApp.domain.patient.PatientHistory;
 import ir.milad.DocVisitApp.domain.patient.PatientHistoryStatus;
 import ir.milad.DocVisitApp.domain.patient.PatientRepository;
-import ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus;
 import ir.milad.DocVisitApp.domain.visit_session.VisitSessionRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 
 @Service
 public class PatientAppointmentDoneService {
@@ -21,12 +21,12 @@ public class PatientAppointmentDoneService {
     }
 
     public void done(String id) {
-        var appointment = visitSessionRepository.findActiveSessionForToday()
-                .orElseThrow(() -> new ApplicationException("Active session not found."))
-                .findAppointmentById(id)
+        var visitSession = visitSessionRepository.findActiveSessionForToday()
+                .orElseThrow(() -> new ApplicationException("Active session not found."));
+        var appointment = visitSession.findAppointmentById(id)
                 .orElseThrow(() -> new ApplicationException("Appointment didnt found:" + id));
+        visitSession.done(appointment.getId(), LocalTime.now());
         patientRepository.addPatientHistory(appointment.getPatient(), new PatientHistory(LocalDate.now(), PatientHistoryStatus.VISITED));
-        appointment.setStatus(AppointmentStatus.VISITED);
         visitSessionRepository.updateActiveVisitSession();
     }
 }

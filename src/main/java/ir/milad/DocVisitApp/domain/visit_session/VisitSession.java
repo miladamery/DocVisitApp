@@ -125,8 +125,7 @@ public class VisitSession {
         return numberOfAppointmentsByStatus(Optional.of(AppointmentStatus.WAITING));
     }
 
-
-    private Long numberOfAppointmentsByStatus(Optional<AppointmentStatus> status) {
+    public Long numberOfAppointmentsByStatus(Optional<AppointmentStatus> status) {
         return status
                 .map(appointmentStatus -> appointments.stream().filter(appointment -> appointment.status == appointmentStatus).count())
                 .orElseGet(() -> (long) appointments.size());

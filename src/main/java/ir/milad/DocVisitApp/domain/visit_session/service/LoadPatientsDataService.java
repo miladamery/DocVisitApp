@@ -2,6 +2,7 @@ package ir.milad.DocVisitApp.domain.visit_session.service;
 
 import ir.milad.DocVisitApp.domain.ApplicationException;
 import ir.milad.DocVisitApp.domain.visit_session.Appointment;
+import ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus;
 import ir.milad.DocVisitApp.domain.visit_session.VisitSessionRepository;
 import ir.milad.DocVisitApp.domain.visit_session.VisitSessionSummary;
 import org.springframework.stereotype.Service;
@@ -77,6 +78,10 @@ public class LoadPatientsDataService {
                 return false;
 
             return true;
+        }
+
+        public boolean isVisiting() {
+            return appointments.stream().anyMatch(ap -> ap.getStatus() == AppointmentStatus.VISITING);
         }
     }
 }
