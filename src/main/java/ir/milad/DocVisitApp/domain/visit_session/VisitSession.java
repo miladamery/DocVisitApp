@@ -112,7 +112,7 @@ public class VisitSession {
     }
 
     public void update(LocalDate date, LocalTime fromTime, LocalTime toTime, Integer sessionLength) {
-        if (appointments.size() > 0 && ( !fromTime.equals(this.fromTime) || Objects.equals(sessionLength, this.sessionLength)))
+        if (appointments.size() > 0 && ( !fromTime.equals(this.fromTime) || !Objects.equals(sessionLength, this.sessionLength)))
             throw new ApplicationException("Can't change session from time/session length. Reason: Patients are in waiting.");
 
         this.date = date;
