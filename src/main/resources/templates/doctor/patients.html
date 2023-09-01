@@ -214,7 +214,9 @@
                 </div>
                 <form hx-post="/doctor/give/appointment" hx-ext="json-enc" hx-swap="none"
                       _="on htmx:afterRequest(elt, xhr, target, requestConfig, successful)
-                            if successful is true then send click to #patients_modal_close
+                            if successful is true
+                                send click to #patients_modal_close
+                                send click to #refreshPage
                             else call alert('Adding patient failed.')
                             end
                         ">
@@ -268,6 +270,9 @@
                         </button>
                         <input type="submit" class="btn btn-primary" />
                     </div>
+                    <input id="refreshPage" type="hidden" hx-get="/doctor/patients" hx-include="#pageNum" hx-trigger="click"
+                           hx-target="#patients_container" hx-swap="outerHTML"
+                    >
                 </form>
             </div>
         </div>
