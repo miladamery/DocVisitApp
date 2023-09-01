@@ -65,22 +65,22 @@
             <div class="grid place-content-center fillform mb-2">
                 <span th:text="#{form.request}">Please fill out the form to make an appointment.</span>
             </div>
-            <form id="get-appointment-form"
+            <form autocomplete="off" id="get-appointment-form"
                   th:attr="hx-post='/patient/get/appointment?language=' + ${language}"
                   hx-ext="json-enc"
                   hx-target="#main_container"
             >
                 <div class="grid place-content-center">
-                    <input class="user" type="text" name="firstName" th:placeholder="#{first.name}" placeholder="First Name*" required/>
+                    <input autocomplete="off" class="user" type="text" name="firstName" th:placeholder="#{first.name}" placeholder="First Name*" required/>
                 </div>
                 <div class="grid place-content-center mt-4">
-                    <input class="user" type="text" name="lastName" th:placeholder="#{last.name}" placeholder="Last Name*" required/>
+                    <input autocomplete="off" class="user" type="text" name="lastName" th:placeholder="#{last.name}" placeholder="Last Name*" required/>
                 </div>
                 <div class="grid place-content-center mt-4">
-                    <input class="calendar" type="text" name="dateOfBirth" th:placeholder="#{date.of.birth}" placeholder="Date of Birth*" id="date-picker" required />
+                    <input autocomplete="off" class="calendar" type="text" name="dateOfBirth" th:placeholder="#{date.of.birth}" placeholder="Date of Birth*" id="date-picker" required />
                 </div>
                 <div class="grid place-content-center mt-4">
-                    <input class="phone" type="text" name="phoneNumber" th:placeholder="#{phone.number}" placeholder="Phone Number*" required/>
+                    <input autocomplete="off" class="phone" type="text" name="phoneNumber" th:placeholder="#{phone.number}" placeholder="Phone Number*" required/>
                 </div>
                 <div class="grid place-content-center mt-4">
                     <input th:value="#{take.turn.submit}" type="submit" class="text-white font-bold py-2 px-4 rounded" />
