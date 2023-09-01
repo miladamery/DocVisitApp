@@ -92,7 +92,7 @@ public class VisitSession {
             appointments.get(i).visitTime = refTime.plusMinutes(count * sessionLength);
             count++;
         }
-        lastAppointmentTime = refTime.plusMinutes(count);
+        lastAppointmentTime = refTime.plusMinutes(count * sessionLength);
     }
 
     public Optional<Appointment> findAppointmentById(String id) {
