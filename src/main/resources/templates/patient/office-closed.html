@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Office Closed</title>
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,400,500,600,700"/>
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
+
+    <script src="https://unpkg.com/htmx.org@1.9.5"></script>
+</head>
+<body class="min-h-screen bg-no-repeat bg-cover">
+    <th:block th:fragment="office-closed">
+        <section id="main_container">
+            <main >
+                <div class="grid place-content-center mt-12">
+                    <img th:src="@{/img/logo1.svg}" />
+                </div>
+                <div class="mt-8 px-6">
+                    <div class="grid place-content-center mx-3 rounded-xl" style="background-color: #494462;color: #FFF;text-align: center;font-family: Poppins;font-size: 1.125rem;font-style: normal;font-weight: 400;line-height: 1.625rem;letter-spacing: -0.01875rem;">
+                        <div class="border-2 p-10 pt-4 mx-3 mb-5 mt-8 rounded-lg" style="border-color: #C5A470;">
+                            <p class="mb-4 text-2xl" th:text="#{sorry.title}">Sorry!</p>
+                            <p class="text-lg" th:text="#{sorry.message}">
+                                Dr PAK's office hours are currently closed. Please return during our designated hours for appointment requests.</p>
+                            <br/>
+                            <p class="text-2xl" th:text="#{sorry.thank.you}">Thank you!</p>
+                        </div>
+                    </div>
+                </div>
+            </main>
+            <footer class="fixed bottom-0 left-0 z-20 w-full">
+                <div class="grid grid-cols-3 place-content-center">
+                    <div style="background-color: #494462;"
+                         class="lang_icons p-4 text-white flex justify-center capitalize"
+                         id="en_lang"
+                         hx-get="/patient/closed?language=en"
+                         hx-target="#main_container"
+                         hx-trigger="click"
+                         th:classappend="${language == 'en' ? 'selected' : ''}"
+                    >
+                        <img th:src="@{/img/flag_united_kingdom.svg}">&nbsp;&nbsp;English</img>
+                    </div>
+                    <div style="background-color: #494462;"
+                         class="lang_icons p-4 text-white flex justify-center capitalize"
+                         id="fr_lang"
+                         hx-get="/patient/closed?language=fr"
+                         hx-target="#main_container"
+                         hx-trigger="click"
+                         th:classappend="${language == 'fr' ? 'selected' : ''}"
+                    >
+                        <img th:src="@{/img/flag_france.svg}">&nbsp;&nbsp;French</img>
+                    </div>
+                    <div style="background-color: #494462;"
+                         class="lang_icons p-4 text-white flex justify-center capitalize"
+                         id="fa_lang"
+                         hx-get="/patient/closed?language=fa"
+                         hx-target="#main_container"
+                         hx-trigger="click"
+                         th:classappend="${language == 'fa' ? 'selected' : ''}"
+                    >
+                        <img th:src="@{/img/flag_iran.svg}">&nbsp;&nbsp;Persian</img>
+                    </div>
+                </div>
+            </footer>
+        </section>
+    </th:block>
+</body>
+</html>

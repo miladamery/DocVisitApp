@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Blocked</title>
+</head>
+<body>
+<section th:fragment="appointment-arrived">
+    <div class="d-flex align-items-center justify-content-center m-5" style="background-color: #494462;">
+        <p class="m-3 p-3" style="font-family: Poppins, serif;color: #FFF;border: 2px solid #C5A470;">
+            <span th:text="#{its.your.turn}">It’s Your Turn!</span><br/>
+            <span th:text="#{token.number}">Token Number</span><br/>
+            <span th:text="${turnNumber}"></span>
+        </p>
+    </div>
+</section>
+</body>
+</html>

@@ -1,60 +1,100 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Appointment Info</title>
+</head>
 <body>
-    <th:block th:fragment="appointment">
-        <div hx-get="/patient/load/appointment"
-             hx-include="input[type='hidden']"
-             hx-trigger="every 10s"
-        >
-            <div class="d-flex align-items-center text-center justify-content-center">
-                <div class="row">
-                    <div class="col-sm-12">
-                        <span style="font-family: Poppins, serif;font-size: 0.8em;" th:text="#{checkin.thanks}">Thank you for checking in</span>
+    <th:block th:fragment="appointment-info">
+        <main>
+            <div class="grid place-content-center mt-12">
+                <img th:src="@{/img/logo1.svg}" />
+            </div>
+            <div class="grid place-content-center mt-5">
+            <span th:text="#{checkin.thanks}" style="color: #323232;text-align: center;font-family: Poppins;font-size: 1.25rem;font-style: normal;font-weight: 400;line-height: 1.625rem;letter-spacing: -0.01875rem;">
+                Thank you for checking in
+            </span>
+            </div>
+            <div class="grid place-content-center mt-3 mb-6">
+            <span   th:text="${appointment.firstName} + ' ' + ${appointment.lastName}"
+                    style="color: #494462;text-align: center;font-family: Poppins;font-size: 1.25rem;font-style: normal;font-weight: 600;line-height: 1.625rem;letter-spacing: -0.01875rem;">
+                Raya Sa’afi
+            </span>
+            </div>
+            <div class="mt-4 px-6">
+                <div class="grid place-content-center mx-3 rounded-xl" style="background-color: #494462;color: #FFF;text-align: center;font-family: Poppins;font-size: 1.125rem;font-style: normal;font-weight: 400;line-height: 1.625rem;letter-spacing: -0.01875rem;">
+                <span class="mt-3" th:text="#{your.ticket.number}">
+                    Your Ticket Number
+                </span>
+                    <div class="grid place-content-center text-white mt-4 mb-8" style="border-color: #C5A470;">
+                        <span class="numberCircle p-4"><span th:text="${appointment.turnNumber}">234</span></span>
                     </div>
-                    <div class="col-sm-12">
-                        <span style="font-family: Poppins, serif;font-weight: bold;" th:text="${appointment.firstName} + ' ' + ${appointment.lastName}"></span>
+                    <div class="grid place-content-center mt-8">
+                        <div class="flex text-white"><img th:src="@{/img/clock.svg}">&nbsp&nbsp;<span th:text="#{waiting.time}">Approximate Waiting Time:</span></div>
+                    </div>
+                    <div class="grid place-content-center mb-6">
+                        <span class="text-xl font-bold" style="color: #C5A470;" th:text="${appointment.waitingTime} + ' Minutes'">40 Minutes</span>
                     </div>
                 </div>
             </div>
-            <div class="d-flex align-items-center text-center justify-content-center m-5" style="background-color: #494462; border-radius: 0.625rem;">
-                <div class="row">
-                    <div class="col-sm-12">
-                        <span style="color: #FFF; font-family: Poppins, serif;font-size: 0.8em;" th:text="#{your.ticket.number}">Your Ticket Number</span>
-                    </div>
-                    <div class="col-sm-12 mt-3 mb-3">
-                        <span class="numberCircle"><span th:text="${appointment.turnNumber}"></span></span>
-                    </div>
-                    <div class="col-sm-12">
-                        <img th:src="@{/images/line.png}" />
-                    </div>
-                    <div class="col-sm-12 mt-3 mb-1">
-                        <i class="fa-regular fa-clock" style="color: #ffffff;"></i>
-                        <span style="color: #FFF; font-family: Poppins, serif;font-size: 0.8em;" th:text="#{waiting.time}">Waiting Time</span>
-                    </div>
-                    <div class="col-sm-12 mb-4">
-                        <span style="color: #FFF; font-family: Poppins, serif;font-weight: bolder; color: #C5A470;" th:text="${waitingTime} + ' Minutes'"></span>
-                    </div>
+            <div class="grid place-content-center mt-8">
+                <span th:text="#{num.of.people}" class="text-xl" style="color: #494462;">Number of People ahead of you:</span>
+                <div class="grid place-content-center"><span th:text="${appointment.turnsToAwait}" class="text-4xl font-bold" style="color: #494462;">25</span></div>
+            </div>
+            <div class="grid place-content-center mt-4" >
+                <input type="submit" th:value="#{cancel.check.in}" class="text-white py-2 px-4 rounded" value="Cancel CHECK-IN"
+                       hx-delete="/patient/cancel/appointment"
+                       hx-include="input[type='hidden']"
+                       hx-swap="none"
+                       th:attr="hx-confirm=#{cancel.confirm.message}" hx-confirm="Are you sure about cancelling appointment?"
+                />
+            </div>
+            <input id="appointmentId" type="hidden" name="id" th:value="${appointment.id}">
+            <div
+                    hx-get="/patient/load/appointment"
+                    hx-include="input[type='hidden']"
+                    hx-trigger="every 10s"
+                    hx-target="#main_container"
+            ></div>
+        </main>
+        <footer class="fixed bottom-0 left-0 z-20 w-full">
+            <div class="grid grid-cols-3 place-content-center">
+                <div style="background-color: #494462;"
+                     class="lang_icons p-4 text-white flex justify-center capitalize"
+                     id="en_lang"
+                     hx-get="/patient/appointment/info?language=en"
+                     hx-target="#main_container"
+                     hx-trigger="click"
+                     hx-include="#appointmentId"
+                     th:classappend="${language == 'en' ? 'selected' : ''}"
+                >
+                    <img th:src="@{/img/flag_united_kingdom.svg}">&nbsp;&nbsp;English</img>
+                </div>
+                <div style="background-color: #494462;"
+                     class="lang_icons p-4 text-white flex justify-center capitalize"
+                     id="fr_lang"
+                     hx-get="/patient/appointment/info?language=fr"
+                     hx-target="#main_container"
+                     hx-trigger="click"
+                     hx-include="#appointmentId"
+                     th:classappend="${language == 'fr' ? 'selected' : ''}"
+                >
+                    <img th:src="@{/img/flag_france.svg}">&nbsp;&nbsp;French</img>
+                </div>
+                <div style="background-color: #494462;"
+                     class="lang_icons p-4 text-white flex justify-center capitalize"
+                     id="fa_lang"
+                     hx-get="/patient/appointment/info?language=fa"
+                     hx-target="#main_container"
+                     hx-trigger="click"
+                     hx-include="#appointmentId"
+                     th:classappend="${language == 'fa' ? 'selected' : ''}"
+                >
+                    <img th:src="@{/img/flag_iran.svg}">&nbsp;&nbsp;Persian</img>
                 </div>
             </div>
-            <div class="d-flex align-items-center text-center justify-content-center">
-                <div class="row">
-                    <div class="col-sm-12">
-                        <span style="font-family: Poppins, serif;font-size: 0.8em;" th:text="#{num.of.people}">Number of People ahead of you:</span>
-                    </div>
-                    <div class="col-sm-12">
-                        <span style="font-family: Poppins, serif;font-size: 2em;color: #494462;" th:text="${appointment.turnsToAwait}"></span>
-                    </div>
-                    <div class="col-sm-6 offset-sm-6 mt-3">
-                        <input id="take_turn" class="btn btn-primary" type="button"
-                               th:value="#{cancel.check.in}" value="Cancel CHECK-IN" style="background-color: #C5A470; height: 60px; width: 100%;"
-                               hx-delete="/patient/cancel/appointment"
-                               hx-swap="none"
-                               th:attr="hx-confirm=#{cancel.confirm.message}" hx-confirm="Are you sure about cancelling appointment?"
-                        />
-                    </div>
-                </div>
-            </div>
-            <input type="hidden" name="id" th:value="${appointment.id}">
-        </div>
+        </footer>
     </th:block>
 </body>
+</html>

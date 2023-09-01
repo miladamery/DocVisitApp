@@ -35,7 +35,10 @@ public class PatientController {
             GetActiveVisitSessionService getActiveVisitSessionService,
             LoadPatientAppointmentService loadPatientAppointmentService,
             CancelPatientAppointmentService cancelPatientAppointmentService,
-            LoadPatientHistoryService loadPatientHistoryService, BlockPatientService blockPatientService, PatientAppointmentCheckInService patientAppointmentCheckInService, PatientAppointmentDoneService patientAppointmentDoneService) {
+            LoadPatientHistoryService loadPatientHistoryService,
+            BlockPatientService blockPatientService,
+            PatientAppointmentCheckInService patientAppointmentCheckInService,
+            PatientAppointmentDoneService patientAppointmentDoneService) {
         this.takeAppointmentService = takeAppointmentService;
         this.getActiveVisitSessionService = getActiveVisitSessionService;
         this.loadPatientAppointmentService = loadPatientAppointmentService;
@@ -51,11 +54,15 @@ public class PatientController {
         model.addAttribute("language", language);
         return getActiveVisitSessionService.findActiveSessionForTodayAndNow()
                 .map(__ -> "patient/index")
-                .orElse("patient/no-active-visit-session");
+                .orElseGet(() -> "patient/office-closed");
     }
 
     @PostMapping(value = "/get/appointment")
-    public String getAppointment(@Valid @RequestBody PatientRequestModel request, Model model) {
+    public String getAppointment(
+            @Valid @RequestBody PatientRequestModel request,
+            @RequestParam(defaultValue = "fr") String language,
+            Model model) {
+        model.addAttribute("language", language);
         return Try.of(() -> {
                     var patient = getPatientFromRequest(request);
                     return takeAppointmentService.takeAppointment(patient, LocalTime.now().withSecond(0).withNano(0));
@@ -63,9 +70,9 @@ public class PatientController {
                 .map(appointment -> appointmentInfo(model, appointment))
                 .recover(throwable -> {
                     if (throwable instanceof ApplicationException) {
-                        return "patient/no-active-visit-session";
+                        return "patient/office-closed :: office-closed";
                     } else if (throwable instanceof PatientIsBlockedException) {
-                        return "patient/blocked-by-doctor";
+                        return "patient/blocked :: blocked";
                     } else {
                         model.addAttribute(ERROR_500_ATTRIBUTE_NAME, throwable.getMessage());
                         return "500";
@@ -81,7 +88,8 @@ public class PatientController {
                 .map(appointment -> {
                     if (appointment.status == AppointmentStatus.VISITING) {
                         model.addAttribute("turnNumber", appointment.turnNumber);
-                        return "patient/appointment-arrived.html :: appointment-arrived";
+                        model.addAttribute("appointmentId", id);
+                        return "patient/appointment-arrived :: appointment-arrived";
                     } else
                         return appointmentInfo(model, appointment);
 
@@ -93,13 +101,11 @@ public class PatientController {
     }
 
     @DeleteMapping("/cancel/appointment")
-    public String cancelAppointment(
-            @RequestParam String id, HttpServletResponse response,
-            Model model) {
+    public String cancelAppointment(@RequestParam String id, HttpServletResponse response, Model model) {
         return Try.run(() -> cancelPatientAppointmentService.cancel(id))
                 .map(__ -> {
                     response.setHeader(HTMX_REDIRECT_HEADER, "/patient/index");
-                    return "";
+                    return "/patient/index";
                 })
                 .recover(throwable -> {
                     model.addAttribute(ERROR_500_ATTRIBUTE_NAME, throwable.getMessage());
@@ -139,6 +145,24 @@ public class PatientController {
         patientAppointmentDoneService.done(id);
     }
 
+    @GetMapping("/blocked")
+    public String blocked(@RequestParam(defaultValue = "fr") String language, Model model) {
+        model.addAttribute("language", language);
+        return "patient/blocked :: blocked";
+    }
+
+    @GetMapping("/closed")
+    public String closed(@RequestParam(defaultValue = "fr") String language, Model model) {
+        model.addAttribute("language", language);
+        return "patient/office-closed :: office-closed";
+    }
+
+    @GetMapping("/appointment/info")
+    public String appointmentInfo(@RequestParam(defaultValue = "fr") String language, String id, Model model) {
+        model.addAttribute("language", language);
+        return appointmentInfo(model, loadPatientAppointmentService.loadPatientAppointment(id).get());
+    }
+
     private Patient getPatientFromRequest(PatientRequestModel request) {
         return new Patient(
                 request.phoneNumber.trim(),
@@ -151,7 +175,7 @@ public class PatientController {
     private String appointmentInfo(Model model, AppointmentData appointment) {
         model.addAttribute("appointment", appointment);
         model.addAttribute("waitingTime", appointment.waitingTime);
-        return "patient/appointment-info :: appointment";
+        return "patient/appointment-info :: appointment-info";
     }
 
 }

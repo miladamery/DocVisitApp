@@ -15,6 +15,6 @@ public class GetActiveVisitSessionService {
     }
 
     public Optional<VisitSession> findActiveSessionForTodayAndNow() {
-        return visitSessionRepository.findActiveSessionForToday();
+        return visitSessionRepository.findActiveSessionForTodayAndNow();
     }
 }

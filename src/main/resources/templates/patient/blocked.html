@@ -2,58 +2,56 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>It's Your Turn</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>You are Blocked!</title>
 </head>
 <body>
-    <th:block th:fragment="appointment-arrived">
-        <main>
+    <th:block th:fragment="blocked">
+        <main >
             <div class="grid place-content-center mt-12">
                 <img th:src="@{/img/logo1.svg}" />
             </div>
             <div class="mt-8 px-6">
-                <div class="grid place-content-center mx-3  rounded-xl" style="background-color: #494462;color: #FFF;text-align: center;font-family: Poppins;font-size: 1.125rem;font-style: normal;font-weight: 400;line-height: 1.625rem;letter-spacing: -0.01875rem;">
-                    <div class="manager-textbox border-2 p-10 pt-4 mx-3 mb-5 mt-8 rounded-lg" style="border-color: #C5A470;">
-                        <p class=" mb-4 text-3xl" th:text="#{its.your.turn}">It's Your Turn!</p>
-                        <p class="mb-4 text-2xl" th:text="#{token.number}">Token Number</p>
-                        <p class="text-6xl" th:text="${turnNumber}">234</p>
+                <div class="grid place-content-center mx-3 rounded-xl" style="background-color: #494462;color: #FFF;text-align: center;font-family: Poppins;font-size: 1.125rem;font-style: normal;font-weight: 400;line-height: 1.625rem;letter-spacing: -0.01875rem;">
+                    <div class="border-2 p-10 pt-4 mx-3 mb-5 mt-8 rounded-lg" style="border-color: #C5A470;">
+                        <p class="mb-4 text-2xl" th:text="#{blocked.title}">Blocked!</p>
+                        <p class="text-lg" th:text="#{blocked.message}">
+                            You have been blocked by the doctor due to multiple cancellations. You are not allowed to book an appointment!
+                        </p>
+                        <br/>
                     </div>
                 </div>
             </div>
-            <input type="hidden" name="id" id="appointmentId" th:value="${appointmentId}">
         </main>
         <footer class="fixed bottom-0 left-0 z-20 w-full">
             <div class="grid grid-cols-3 place-content-center">
                 <div style="background-color: #494462;"
                      class="lang_icons p-4 text-white flex justify-center capitalize"
                      id="en_lang"
-                     hx-get="/patient/load/appointment?language=en"
+                     hx-get="/patient/blocked?language=en"
                      hx-target="#main_container"
                      hx-trigger="click"
-                     hx-include="#appointmentId"
-                     th:classappend="${language == 'en' ? 'selected' : ''}"
+                     th:classappend="${language == 'en'} ? 'selected' : ''"
                 >
                     <img th:src="@{/img/flag_united_kingdom.svg}">&nbsp;&nbsp;English</img>
                 </div>
                 <div style="background-color: #494462;"
                      class="lang_icons p-4 text-white flex justify-center capitalize"
                      id="fr_lang"
-                     hx-get="/patient/load/appointment?language=fr"
+                     hx-get="/patient/blocked?language=fr"
                      hx-target="#main_container"
                      hx-trigger="click"
-                     hx-include="#appointmentId"
-                     th:classappend="${language == 'fr' ? 'selected' : ''}"
+                     th:classappend="${language == 'fr'} ? 'selected' : ''"
                 >
                     <img th:src="@{/img/flag_france.svg}">&nbsp;&nbsp;French</img>
                 </div>
                 <div style="background-color: #494462;"
                      class="lang_icons p-4 text-white flex justify-center capitalize"
                      id="fa_lang"
-                     hx-get="/patient/load/appointment?language=fa"
+                     hx-get="/patient/blocked?language=fa"
                      hx-target="#main_container"
                      hx-trigger="click"
-                     hx-include="#appointmentId"
-                     th:classappend="${language == 'fa' ? 'selected' : ''}"
+                     th:classappend="${language == 'fa'} ? 'selected' : ''"
                 >
                     <img th:src="@{/img/flag_iran.svg}">&nbsp;&nbsp;Persian</img>
                 </div>
