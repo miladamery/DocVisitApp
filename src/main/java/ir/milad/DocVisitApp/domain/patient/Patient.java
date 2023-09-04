@@ -2,8 +2,6 @@ package ir.milad.DocVisitApp.domain.patient;
 
 import lombok.Data;
 
-import java.time.LocalDate;
-import java.time.Period;
 import java.util.Objects;
 
 @Data
@@ -27,6 +25,6 @@ public class Patient {
     }
 
     public int age() {
-        return Period.between(LocalDate.parse(dateOfBirth), LocalDate.now()).getYears();
+        return 0/*Period.between(LocalDate.parse(dateOfBirth), LocalDate.now()).getYears()*/;
     }
 }
