@@ -97,7 +97,8 @@
                                      _="on click if #session_duration.value =='undefined' then set #session_duration.value to 1 end
                                      on click increment #session_duration.value"
                                 >
-                                    <img style="border-radius: 0.25rem;background: #494462;" th:src="@{/images/ic_round-plus2.png}"></div>
+                                    <img style="border-radius: 0.25rem;background: #494462;" th:src="@{/images/ic_round-plus2.png}">
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -114,7 +115,7 @@
                                 _="
                                     on htmx:afterRequest(elt, xhr, target, requestConfig, successful)
                                             if successful is true then send click to #visit_session_modal_closer
-                                            else call alert('Sorry! Saving visit session failed.')
+                                            else call requestFailedAlert('Visit Session Operation Failed.', xhr)
                                         end
                                     "
                         >Save</button>

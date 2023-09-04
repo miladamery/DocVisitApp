@@ -13,7 +13,7 @@
             <div class="col-4 mt-5 text-truncate">
                 <th:block th:switch="${history.status}">
                     <th:block th:case="${T(ir.milad.DocVisitApp.domain.patient.PatientHistoryStatus).VISITED}">
-                <span class="badge badge-light-success fs-7 fw-bold text-capitalize">Waiting</span>
+                <span class="badge badge-light-success fs-7 fw-bold text-capitalize">VISITED</span>
                     </th:block>
                     <th:block th:case="${T(ir.milad.DocVisitApp.domain.patient.PatientHistoryStatus).CANCELLED}">
                         <span class="badge badge-light-danger fs-7 fw-bold text-capitalize">CANCELLED</span>

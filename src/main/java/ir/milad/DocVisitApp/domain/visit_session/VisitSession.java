@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.LinkedList;
 import java.util.Objects;
@@ -15,38 +16,38 @@ import java.util.Optional;
 @Getter
 @Setter
 public class VisitSession {
-
-    private final static int APPOINTMENT_BEGIN_NUMBER = 99;
-
     private final String id;
     private LocalDate date;
-    private LocalTime fromTime;
-    private LocalTime toTime;
+    private LocalDateTime fromTime;
+    private LocalDateTime toTime;
     private Integer sessionLength;
-    private LocalTime lastAppointmentTime;
+    private LocalDateTime lastAppointmentTime;
     private final LinkedList<Appointment> appointments;
 
     public VisitSession(LocalDate date, LocalTime fromTime, LocalTime toTime, Integer sessionLength) {
         this.id = TsidCreator.getTsid().toString();
         this.date = date;
-        this.fromTime = fromTime;
-        this.toTime = toTime;
+        this.fromTime = LocalDateTime.of(LocalDate.now(), fromTime);
+        this.toTime = LocalDateTime.of(LocalDate.now(), toTime);
         this.sessionLength = sessionLength;
 
         if (fromTime.isAfter(toTime))
             throw new ApplicationException("Start time cant be after end time.");
 
-        lastAppointmentTime = fromTime;
+        lastAppointmentTime = this.fromTime;
         appointments = new LinkedList<>();
     }
 
-    public Appointment giveAppointment(Patient patient, LocalTime entryTime) {
+    public Appointment giveAppointment(Patient patient, LocalTime entryTime, int numOfPersons) {
+        var patientAppointment = findActiveAppointmentByPatient(patient);
+        if (patientAppointment.isPresent())
+            return patientAppointment.get();
+
         // TODO: 8/14/2023 What if last session is lower than session length
-        if (visitSessionIsOver(entryTime))
+        if (visitSessionIsOver(LocalDateTime.of(LocalDate.now(), entryTime)))
             throw new ApplicationException("Session time is over. can't give new turns.");
 
-        return findActiveAppointmentByPatient(patient)
-                .orElseGet(() -> giveNewAppointment(patient, entryTime));
+        return giveNewAppointment(patient, entryTime, numOfPersons);
     }
 
     public Patient cancelAppointment(String id) {
@@ -58,12 +59,11 @@ public class VisitSession {
 
         appointment.status = AppointmentStatus.CANCELED;
         var index = appointments.indexOf(appointment);
-        for (int i = appointments.size() - 1; i > index; i--) {
-            var reference = appointments.get(i - 1);
-            var toChange = appointments.get(i);
-            toChange.turnNumber = reference.turnNumber;
-            toChange.turnsToAwait = reference.turnsToAwait;
-            toChange.visitTime = reference.visitTime;
+        for (int i = index + 1; i < appointments.size(); i++) {
+            var _appointment = appointments.get(i);
+            _appointment.setTurnNumber(_appointment.turnNumber - 1);
+            _appointment.setTurnsToAwait(_appointment.turnsToAwait - 1);
+            _appointment.setVisitTime(_appointment.visitTime.minusMinutes((long) appointment.numOfPersons * sessionLength));
         }
 
         lastAppointmentTime = appointments.getLast().visitTime.plusMinutes(sessionLength);
@@ -87,12 +87,13 @@ public class VisitSession {
         appointment.setStatus(AppointmentStatus.VISITED);
         var index = appointments.indexOf(appointment);
         var count = 0;
-        var refTime = doneTime.withSecond(0);
+        var refTime = LocalDateTime.of(LocalDate.now(), doneTime.withSecond(0));
         for (int i = index + 1; i < appointments.size(); i++) {
-            appointments.get(i).visitTime = refTime.plusMinutes(count * sessionLength);
-            count++;
+            var _appointment = appointments.get(i);
+            _appointment.visitTime = refTime.plusMinutes((long) count * sessionLength);
+            count += _appointment.numOfPersons;
         }
-        lastAppointmentTime = refTime.plusMinutes(count * sessionLength);
+        lastAppointmentTime = refTime.plusMinutes((long) count * sessionLength);
     }
 
     public Optional<Appointment> findAppointmentById(String id) {
@@ -116,8 +117,8 @@ public class VisitSession {
             throw new ApplicationException("Can't change session from time/session length. Reason: Patients are in waiting.");
 
         this.date = date;
-        this.fromTime = fromTime;
-        this.toTime = toTime;
+        this.fromTime = LocalDateTime.of(LocalDate.now(), fromTime);
+        this.toTime = LocalDateTime.of(LocalDate.now(), toTime);
         this.sessionLength = sessionLength;
     }
 
@@ -131,17 +132,18 @@ public class VisitSession {
                 .orElseGet(() -> (long) appointments.size());
     }
 
-    private Appointment giveNewAppointment(Patient patient, LocalTime entryTime) {
-        LocalTime visitTime;
-        if (entryTime.isAfter(lastAppointmentTime)) {
-            visitTime = entryTime;
-            lastAppointmentTime = entryTime.plusMinutes(sessionLength);
+    private Appointment giveNewAppointment(Patient patient, LocalTime entryTime, int numOfPersons) {
+        var entryDateTime = LocalDateTime.of(LocalDate.now(), entryTime);
+        LocalDateTime visitTime;
+        if (entryDateTime.isAfter(lastAppointmentTime)) {
+            visitTime = entryDateTime;
+            lastAppointmentTime = entryDateTime.plusMinutes((long) sessionLength * numOfPersons);
         } else {
             visitTime = lastAppointmentTime;
-            lastAppointmentTime = lastAppointmentTime.plusMinutes(sessionLength);
+            lastAppointmentTime = lastAppointmentTime.plusMinutes((long) sessionLength * numOfPersons);
         }
 
-        var appointment = new Appointment(appointments.size() + 1 + APPOINTMENT_BEGIN_NUMBER, appointments.size(), visitTime, patient);
+        var appointment = new Appointment(appointments.size() + 1, appointments.size(), visitTime, patient, numOfPersons);
         appointments.offer(appointment);
         return appointment;
     }
@@ -153,7 +155,7 @@ public class VisitSession {
                 .findFirst();
     }
 
-    private boolean visitSessionIsOver(LocalTime entryTime) {
+    public boolean visitSessionIsOver(LocalDateTime entryTime) {
         return entryTime.isAfter(toTime) || lastAppointmentTime.isAfter(toTime);
     }
 

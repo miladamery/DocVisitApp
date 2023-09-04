@@ -49,8 +49,8 @@ public class Database {
     public Optional<VisitSession> getActiveSession(LocalDateTime dateTime) {
         return getActiveSession(dateTime.toLocalDate())
                 .filter(vs ->
-                        dateTime.toLocalTime().equals(vs.getFromTime()) || dateTime.toLocalTime().isAfter(vs.getFromTime()) &&
-                                dateTime.toLocalTime().equals(vs.getToTime()) || dateTime.toLocalTime().isBefore(vs.getToTime())
+                        dateTime.toLocalTime().equals(vs.getFromTime()) || dateTime.toLocalTime().isAfter(vs.getFromTime().toLocalTime()) &&
+                                dateTime.toLocalTime().equals(vs.getToTime()) || dateTime.toLocalTime().isBefore(vs.getToTime().toLocalTime())
                 );
     }
 

@@ -107,8 +107,8 @@ public class DoctorController {
             var res = dates.stream().map(ld ->
                     visitSessionRepository.getVisitSessionHistories().stream().anyMatch(vs ->
                             vs.getDate().equals(ld) &&
-                                    ((vs.getFromTime().equals(time) || vs.getFromTime().isBefore(time)) &&
-                                            (vs.getToTime().isAfter(time) || vs.getToTime().equals(time))
+                                    ((vs.getFromTime().equals(time) || vs.getFromTime().toLocalTime().isBefore(time)) &&
+                                            (vs.getToTime().toLocalTime().isAfter(time) || vs.getToTime().equals(time))
                                     )
                     )
             ).toList();

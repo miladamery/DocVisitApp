@@ -22,7 +22,7 @@ public class TakeAppointmentService {
         this.patientRepository = patientRepository;
     }
 
-    public synchronized AppointmentData takeAppointment(Patient patient, LocalTime entryTime) {
+    public synchronized AppointmentData takeAppointment(Patient patient, LocalTime entryTime, int numOfPersons) {
         var vs = visitSessionRepository.getActiveSession(LocalDateTime.of(LocalDate.now(), entryTime))
                 .orElseThrow(() -> new ApplicationException("Active session not found."));
 
@@ -31,7 +31,7 @@ public class TakeAppointmentService {
             throw new PatientIsBlockedException("Patient is blocked");
         }
 
-        var appointment = vs.giveAppointment(patient, entryTime);
+        var appointment = vs.giveAppointment(patient, entryTime, numOfPersons);
         var visited = vs.numberOfAppointmentsByStatus(Optional.of(AppointmentStatus.VISITED));
         visitSessionRepository.updateActiveVisitSession();
         return new AppointmentData(appointment, appointment.getTurnsToAwait() - visited);

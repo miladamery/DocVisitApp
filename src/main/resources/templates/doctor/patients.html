@@ -85,6 +85,7 @@
                                 </i>
                             </th>
                             <th>Action</th>
+                            <th>NO</th>
                         </tr>
                         </thead>
                         <!--end::Thead-->
@@ -102,7 +103,7 @@
                             <td th:text="${appointment.patient.firstName}"></td>
                             <td th:text="${appointment.patient.lastName}"></td>
                             <td th:text="${appointment.patient.age()}"></td>
-                            <td th:text="${appointment.visitTime.withSecond(0).withNano(0)}"></td>
+                            <td th:text="${appointment.visitTime.toLocalTime().withSecond(0).withNano(0)}"></td>
                             <td th:text="${appointment.patient.phoneNumber}"></td>
                             <td th:text="${appointment.turnNumber}"></td>
                             <th:block th:switch="${appointment.status}">
@@ -121,13 +122,14 @@
                                 <td th:case="${T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).EXPIRED}"
                                 ><span class="badge badge-light-danger fs-7 fw-bold text-capitalize">EXPIRED</span></td>
                             </th:block>
-                            <td th:if="
+                            <td >
+                                <span th:if="
                                 ${
                                     appointment.status == T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).WAITING &&
                                     !data.isVisiting() &&
                                     data.summary.nextAppointmentId.equals(appointment.id)
-                                }">
-                                <span class="badge badge-light-primary fs-7 fw-bold text-capitalize cursor-pointer"
+                                }"
+                                      class="badge badge-light-primary fs-7 fw-bold text-capitalize cursor-pointer"
                                       th:attr="hx-put='/patient/check/in/' + ${appointment.id}"
                                       hx-swap="none"
                                       hx-ext="json-enc"
@@ -137,9 +139,7 @@
                                             else call alert('Done Operation failed.')
                                         end"
                                 >Check-In</span>
-                            </td>
-                            <td th:if="${appointment.status == T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).VISITING}">
-                                <span class="badge badge-light-warning fs-7 fw-bold text-capitalize cursor-pointer"
+                                <span th:if="${appointment.status == T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).VISITING}" class="badge badge-light-warning fs-7 fw-bold text-capitalize cursor-pointer"
                                       th:attr="hx-put='/patient/done/' + ${appointment.id}"
                                       hx-swap="none"
                                       hx-ext="json-enc"
@@ -150,6 +150,7 @@
                                         end"
                                 >done</span>
                             </td>
+                            <td th:text="${appointment.numOfPersons}"></td>
                             <input type="hidden" name="firstName" th:class="'input-hidden-' + ${appointment.id}" th:value="${appointment.patient.firstName}"/>
                             <input type="hidden" name="lastName" th:class="'input-hidden-' + ${appointment.id}" th:value="${appointment.patient.lastName}"/>
                             <input type="hidden" name="dateOfBirth" th:class="'input-hidden-' + ${appointment.id}" th:value="${appointment.patient.dateOfBirth}"/>
@@ -217,7 +218,7 @@
                             if successful is true
                                 send click to #patients_modal_close
                                 send click to #refreshPage
-                            else call alert('Adding patient failed.')
+                            else call requestFailedAlert('Sorry Doctor. Adding Patient Failed.', xhr)
                             end
                         ">
                     <div class="modal-body">
@@ -310,7 +311,7 @@
                             hx-ext="json-enc"
                             _="on htmx:afterRequest(elt, xhr, target, requestConfig, successful)
                             if successful is true then send click to #patients_history_modal_close
-                            else call alert('Adding patient failed.')
+                            else call requestFailedAlert('Sorry Doctor. Blocking Patient Failed.', xhr)
                             end"
                     >Block</button>
                 </div>

@@ -85,6 +85,15 @@
             }
             document.documentElement.setAttribute("data-bs-theme", themeMode);
         }
+
+        function requestFailedAlert(title, xhr) {
+            Swal.fire({
+                title: title,
+                icon: 'error',
+                html: '<h2>' + xhr.responseText + '</h2>',
+                showCloseButton: true,
+            })
+        }
     </script>
     <section th:replace="doctor/layout/_default.html :: _default"></section>
 <!--layout-partial:partials/theme-mode/_init.html-->

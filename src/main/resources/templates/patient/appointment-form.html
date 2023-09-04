@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Please Fill The Form</title>
+</head>
+<body>
+<th:block th:fragment="appointment-form">
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        htmx.onLoad(function (elt) {
+            $('#date-picker').mobiscroll().date({
+                dateFormat: 'yyyy-mm-dd'
+            });
+
+            document.getElementById("get-appointment-form").addEventListener('htmx:confirm', function (evt) {
+                evt.preventDefault();
+                if (!$("#date-picker").val())
+                    alert("Please Fill in Date Of Birth!");
+                else
+                    evt.detail.issueRequest();
+            });
+
+            $("#num_of_persons_increment").off().click(function () {
+                var numOfPeople = $("#num_of_persons").val();
+                if (numOfPeople >= 9)
+                    return;
+                numOfPeople++
+                $("#num_of_persons").val(numOfPeople);
+            });
+
+            $("#num_of_persons_decrement").off().click(function () {
+                var numOfPeople = $("#num_of_persons").val();
+                if (numOfPeople <= 1)
+                    return;
+                numOfPeople--
+                $("#num_of_persons").val(numOfPeople);
+            });
+        })
+    </script>
+    <main id="appointment-form-main">
+        <div class="grid place-content-center mt-12">
+            <img th:src="@{/img/logo1.svg}" />
+        </div>
+        <div class="grid place-content-center fillform mb-6">
+            <span   class="text-2xl mt-8 px-5"
+                    style="color: #323232;text-align: center;font-family: Poppins;font-size: 1.25rem;font-style: normal;font-weight: 400;line-height: 1.625rem;letter-spacing: -0.01875rem;"
+                    th:text="#{form.request}">Please fill out the form to make an appointment.</span>
+        </div>
+        <form autocomplete="off" id="get-appointment-form" class="mt-6"
+              th:attr="hx-post='/patient/get/appointment?language=' + ${language}"
+              hx-ext="json-enc"
+              hx-target="#main_container">
+            <div class="grid place-content-center">
+                <input autocomplete="off" class="user" type="text" name="firstName" th:placeholder="#{first.name}"
+                       placeholder="First Name*" required/>
+            </div>
+            <div class="grid place-content-center mt-4">
+                <input autocomplete="off" class="user" type="text" name="lastName" th:placeholder="#{last.name}"
+                       placeholder="Last Name*" required/>
+            </div>
+            <div class="grid place-content-center mt-4">
+                <input autocomplete="off" class="calendar" type="text" name="dateOfBirth" th:placeholder="#{date.of.birth}"
+                       placeholder="Date of Birth*" id="date-picker" required/>
+            </div>
+            <div class="grid place-content-center mt-4">
+                <input autocomplete="off" class="phone" type="text" name="phoneNumber" th:placeholder="#{phone.number}"
+                       placeholder="Phone Number*" required/>
+            </div>
+            <div class="grid place-content-center mt-4">
+                <input th:value="#{take.turn.submit}" type="submit" class="text-white font-bold py-2 px-4 rounded"/>
+            </div>
+            <div class="grid place-content-center mt-4">
+                <span
+                 style="color: #323232;font-family: Poppins;font-size: 0.875rem;font-style: normal;font-weight: 400;line-height: 1.25rem;text-transform: capitalize;"
+                >number of persons</span>
+            </div>
+            <div class="flex justify-center">
+                <img id="num_of_persons_decrement" style="border-radius: 0.25rem;background: #494462;" th:src="@{/images/ic_round-plus.png}">
+                <input readonly id="num_of_persons" name="numOfPersons" class="text-center rounded-md" style="width: 25px;margin-right: 4px; margin-left: 4px;" value="1"/>
+                <img id="num_of_persons_increment" style="border-radius: 0.25rem;background: #494462;" th:src="@{/images/ic_round-plus2.png}">
+            </div>
+        </form>
+    </main>
+    <footer class="fixed bottom-0 left-0 z-20 w-full">
+        <div class="grid grid-cols-3 place-content-center">
+            <div style="background-color: #494462;"
+                 class="lang_icons p-4 text-white flex justify-center capitalize"
+                 id="en_lang"
+                 hx-get="/patient/form?language=en"
+                 hx-trigger="click"
+                 hx-target="#main_container"
+                 th:classappend="${language == 'en'} ? 'selected' : ''"
+            >
+                <img th:src="@{/img/flag_united_kingdom.svg}">&nbsp;&nbsp;English</img>
+            </div>
+            <div style="background-color: #494462;"
+                 class="lang_icons p-4 text-white flex justify-center capitalize"
+                 id="fr_lang"
+                 hx-get="/patient/form?language=fr"
+                 hx-trigger="click"
+                 hx-target="#main_container"
+                 th:classappend="${language == 'fr'} ? 'selected' : ''"
+            >
+                <img th:src="@{/img/flag_france.svg}">&nbsp;&nbsp;French</img>
+            </div>
+            <div style="background-color: #494462;"
+                 class="lang_icons p-4 text-white flex justify-center capitalize"
+                 id="fa_lang"
+                 hx-get="/patient/form?language=fa"
+                 hx-trigger="click"
+                 hx-target="#main_container"
+                 th:classappend="${language == 'fa'} ? 'selected' : ''"
+            >
+                <img th:src="@{/img/flag_iran.svg}">&nbsp;&nbsp;Persian</img>
+            </div>
+        </div>
+    </footer>
+</th:block>
+</body>
+</html>

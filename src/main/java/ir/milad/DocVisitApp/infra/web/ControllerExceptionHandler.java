@@ -13,7 +13,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
 
     public static final String ERROR_500_ATTRIBUTE_NAME = "errorMessage";
-    public static final String DEFAULT_ERROR_VIEW = "500";
+    public static final String DEFAULT_ERROR_VIEW = "500 :: error";
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(value = ApplicationException.class)
@@ -22,7 +22,7 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
         // the framework handle it
         // Otherwise setup and send the user to a default error-view.
         ModelAndView mav = new ModelAndView();
-        mav.addObject("errorMessage", e.getMessage());
+        mav.addObject(ERROR_500_ATTRIBUTE_NAME, e.getMessage());
         mav.setViewName(DEFAULT_ERROR_VIEW);
         return mav;
     }

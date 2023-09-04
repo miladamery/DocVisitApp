@@ -24,17 +24,17 @@ public class DoctorGivingAppointmentService {
 
         LocalTime realEntryTime;
         if (isDocGivingAppointmentBeforeSessionStart(entryTime, vs))
-            realEntryTime = vs.getLastAppointmentTime();
+            realEntryTime = vs.getLastAppointmentTime().toLocalTime();
         else
             realEntryTime = entryTime;
 
-        var turn = vs.giveAppointment(patient, realEntryTime);
+        var turn = vs.giveAppointment(patient, realEntryTime, 1);
         visitSessionRepository.updateActiveVisitSession();
 
         return turn;
     }
 
     private static boolean isDocGivingAppointmentBeforeSessionStart(LocalTime entryTime, VisitSession vs) {
-        return entryTime.isBefore(vs.getFromTime());
+        return entryTime.isBefore(vs.getFromTime().toLocalTime());
     }
 }

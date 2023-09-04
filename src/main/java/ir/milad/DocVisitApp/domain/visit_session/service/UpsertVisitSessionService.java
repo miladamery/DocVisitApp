@@ -1,5 +1,6 @@
 package ir.milad.DocVisitApp.domain.visit_session.service;
 
+import ir.milad.DocVisitApp.domain.ApplicationException;
 import ir.milad.DocVisitApp.domain.visit_session.VisitSession;
 import ir.milad.DocVisitApp.domain.visit_session.VisitSessionRepository;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,8 @@ public class UpsertVisitSessionService {
             vs.get().update(date, fromTime, toTime, sessionLength);
             this.visitSessionRepository.updateActiveVisitSession();
         } else {
+            if (fromTime.isBefore(LocalTime.now()))
+                throw new ApplicationException("Visit session 'fromTime' cant be before current time!");
             visitSessionRepository.setActiveVisitSession(new VisitSession(date, fromTime, toTime, sessionLength));
         }
     }

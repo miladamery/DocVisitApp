@@ -53,8 +53,14 @@ public class PatientController {
     public String index(@RequestParam(defaultValue = "fr") String language, Model model) {
         model.addAttribute("language", language);
         return getActiveVisitSessionService.findActiveSessionForTodayAndNow()
-                .map(__ -> "patient/index")
-                .orElseGet(() -> "patient/office-closed");
+                .map(vs -> "patient/index")
+                .orElse("patient/office-closed");
+    }
+
+    @GetMapping("/form")
+    public String form(@RequestParam(defaultValue = "fr") String language, Model model) {
+        model.addAttribute("language", language);
+        return "patient/appointment-form :: appointment-form";
     }
 
     @PostMapping(value = "/get/appointment")
@@ -65,7 +71,8 @@ public class PatientController {
         model.addAttribute("language", language);
         return Try.of(() -> {
                     var patient = getPatientFromRequest(request);
-                    return takeAppointmentService.takeAppointment(patient, LocalTime.now().withSecond(0).withNano(0));
+                    var entryTime = LocalTime.now().withSecond(0).withNano(0);
+                    return takeAppointmentService.takeAppointment(patient, entryTime, request.numOfPersons);
                 })
                 .map(appointment -> appointmentInfo(model, appointment))
                 .recover(throwable -> {

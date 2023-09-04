@@ -25,20 +25,6 @@
     <link th:href="@{/css/mobiscroll.scroller.css}" rel="stylesheet" type="text/css" />
 
     <script>
-        $(document).ready(function() {
-            $('#date-picker').mobiscroll().date({
-                dateFormat: 'yyyy-mm-dd'
-            });
-
-            document.getElementById("get-appointment-form").addEventListener('htmx:confirm', function(evt) {
-                evt.preventDefault();
-                if (!$("#date-picker").val())
-                    alert("Please Fill in Date Of Birth!");
-                else
-                    evt.detail.issueRequest();
-            });
-        })
-
         function reload(locationAddr) {
             location = locationAddr
         }
@@ -62,30 +48,18 @@
             <div class="grid place-content-center mt-4 welcome">
                 <span th:text="#{greeting}">Welcome to Dr Pak Check-in</span>
             </div>
-            <div class="grid place-content-center fillform mb-2">
-                <span th:text="#{form.request}">Please fill out the form to make an appointment.</span>
+            <div class="grid place-content-center">
+                <span class="text-center" th:text="#{please.start}">Press start to get an emergency appointment</span>
             </div>
-            <form autocomplete="off" id="get-appointment-form"
-                  th:attr="hx-post='/patient/get/appointment?language=' + ${language}"
-                  hx-ext="json-enc"
-                  hx-target="#main_container"
-            >
-                <div class="grid place-content-center">
-                    <input autocomplete="off" class="user" type="text" name="firstName" th:placeholder="#{first.name}" placeholder="First Name*" required/>
-                </div>
-                <div class="grid place-content-center mt-4">
-                    <input autocomplete="off" class="user" type="text" name="lastName" th:placeholder="#{last.name}" placeholder="Last Name*" required/>
-                </div>
-                <div class="grid place-content-center mt-4">
-                    <input autocomplete="off" class="calendar" type="text" name="dateOfBirth" th:placeholder="#{date.of.birth}" placeholder="Date of Birth*" id="date-picker" required />
-                </div>
-                <div class="grid place-content-center mt-4">
-                    <input autocomplete="off" class="phone" type="text" name="phoneNumber" th:placeholder="#{phone.number}" placeholder="Phone Number*" required/>
-                </div>
-                <div class="grid place-content-center mt-4">
-                    <input th:value="#{take.turn.submit}" type="submit" class="text-white font-bold py-2 px-4 rounded" />
-                </div>
-            </form>
+            <div class="grid place-content-center">
+                <input th:value="#{start.button.text}" type="button" class="text-white font-bold py-2 px-4 mt-4 rounded start-button"
+                       hx-get="/patient/form"
+                       hx-ext="json-enc"
+                       hx-include="#language"
+                       hx-target="#main_container"
+                />
+                <input type="hidden" id="language" name="language" th:value="${language}">
+            </div>
         </main>
         <footer class="fixed bottom-0 left-0 z-20 w-full">
             <div class="grid grid-cols-3 place-content-center">

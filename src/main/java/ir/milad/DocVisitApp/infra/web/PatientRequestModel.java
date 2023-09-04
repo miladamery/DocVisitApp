@@ -16,4 +16,9 @@ public class PatientRequestModel {
     public String phoneNumber = "";
     @NotBlank(message = "date Of Birth is blank")
     public String dateOfBirth;
+    public Integer numOfPersons;
+
+    {
+        numOfPersons = 1;
+    }
 }

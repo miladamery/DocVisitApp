@@ -31,10 +31,14 @@
                         <span class="numberCircle p-4"><span th:text="${appointment.turnNumber}">234</span></span>
                     </div>
                     <div class="grid place-content-center mt-8">
-                        <div class="flex text-white"><img th:src="@{/img/clock.svg}">&nbsp&nbsp;<span th:text="#{waiting.time}">Approximate Waiting Time:</span></div>
+                        <span th:text="#{waiting.time}">Approximate Waiting Time:</span>
                     </div>
                     <div class="grid place-content-center mb-6">
-                        <span class="text-xl font-bold" style="color: #C5A470;" th:text="${appointment.waitingTime} + ' Minutes'">40 Minutes</span>
+                        <div class="flex text-white">
+                            <img th:src="@{/img/clock.svg}"/>&nbsp;
+                            <span class="text-xl font-bold" style="color: #C5A470;" th:text="${appointment.waitingTime} + ' Minutes'">40 Minutes</span>
+                        </div>
+
                     </div>
                 </div>
             </div>
