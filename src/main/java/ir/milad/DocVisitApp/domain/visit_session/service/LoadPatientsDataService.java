@@ -32,7 +32,7 @@ public class LoadPatientsDataService {
         var visitSession = vs.get();
         var appointments = visitSession
                 .getAppointments()
-                .subList((pageNum - 1) * PAGE_SIZE, Math.min(pageNum * PAGE_SIZE, visitSession.getAppointments().size()));
+                /*.subList((pageNum - 1) * PAGE_SIZE, Math.min(pageNum * PAGE_SIZE, visitSession.getAppointments().size()))*/;
         return new PatientsData(visitSession.summary(), appointments, pageNum, PAGE_SIZE);
     }
 
