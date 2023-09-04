@@ -33,7 +33,8 @@ public class TakeAppointmentService {
 
         var appointment = vs.giveAppointment(patient, entryTime, numOfPersons);
         var visited = vs.numberOfAppointmentsByStatus(Optional.of(AppointmentStatus.VISITED));
+        var cancelled = vs.numberOfAppointmentsByStatus(Optional.of(AppointmentStatus.CANCELED));
         visitSessionRepository.updateActiveVisitSession();
-        return new AppointmentData(appointment, appointment.getTurnsToAwait() - visited);
+        return new AppointmentData(appointment, appointment.getTurnsToAwait() - visited - cancelled);
     }
 }
