@@ -8,6 +8,5 @@ public class VisitSessionSummary {
     public final long waiting;
     public final long visited;
     public final long cancelled;
-    public final long expired;
     public final String nextAppointmentId;
 }

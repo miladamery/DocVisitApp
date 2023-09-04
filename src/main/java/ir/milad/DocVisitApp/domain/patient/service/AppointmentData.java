@@ -3,10 +3,12 @@ package ir.milad.DocVisitApp.domain.patient.service;
 import ir.milad.DocVisitApp.domain.visit_session.Appointment;
 import ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus;
 
+import java.time.format.DateTimeFormatter;
+
 public class AppointmentData {
     public String id;
     public int turnNumber;
-    public Long waitingTime;
+    public String time;
     public Long turnsToAwait;
     public AppointmentStatus status;
     public String firstName;
@@ -15,7 +17,7 @@ public class AppointmentData {
     public AppointmentData(Appointment appointment, Long turnsToAwait) {
         this.id = appointment.getId();
         this.turnNumber = appointment.getTurnNumber();
-        this.waitingTime = appointment.waitingTimeFromNow();
+        this.time = appointment.getVisitTime().format(DateTimeFormatter.ofPattern("HH:mm"));
         this.turnsToAwait = turnsToAwait;
         this.status = appointment.getStatus();
         this.firstName = appointment.getPatient().getFirstName();

@@ -89,7 +89,7 @@ public class PatientController {
     }
 
     @GetMapping("/load/appointment")
-    public String loadTurn(@RequestParam(defaultValue = "fr") String language, @RequestParam String id, Model model) {
+    public String loadAppointment(@RequestParam(defaultValue = "fr") String language, @RequestParam String id, Model model) {
         model.addAttribute("language", language);
         return loadPatientAppointmentService.loadPatientAppointment(id)
                 .map(appointment -> {
@@ -181,7 +181,6 @@ public class PatientController {
 
     private String appointmentInfo(Model model, AppointmentData appointment) {
         model.addAttribute("appointment", appointment);
-        model.addAttribute("waitingTime", appointment.waitingTime);
         return "patient/appointment-info :: appointment-info";
     }
 

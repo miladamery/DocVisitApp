@@ -1,10 +1,14 @@
 package ir.milad.DocVisitApp.domain.patient;
 
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 
+import java.time.LocalDate;
+import java.time.Period;
 import java.util.Objects;
 
 @Data
+@Slf4j
 public class Patient {
     private final String phoneNumber;
     private final String firstName;
@@ -25,6 +29,11 @@ public class Patient {
     }
 
     public int age() {
-        return 0/*Period.between(LocalDate.parse(dateOfBirth), LocalDate.now()).getYears()*/;
+        try {
+            return Period.between(LocalDate.parse(dateOfBirth), LocalDate.now()).getYears();
+        } catch (Exception e) {
+            log.error("Couldnt detect age", e);
+            return 0;
+        }
     }
 }

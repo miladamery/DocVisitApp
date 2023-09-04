@@ -11,7 +11,7 @@
 </head>
 <body>
 <th:block th:fragment="patients">
-    <div id="patients_container" hx-get="/doctor/patients" hx-include="#pageNum" hx-trigger="every 30s" style="font-family: Poppins, serif;">
+    <div id="patients_container" hx-get="/doctor/patients" hx-trigger="every 30s" style="font-family: Poppins, serif;">
         <div class="container-fluid p-5 rounded mt-5"
              style="background-color: #494462; font-style: normal;">
             <div class="row" style="color: white;">
@@ -36,9 +36,6 @@
                             <span class="numberCircle"><span style="font-size: large;"
                                                              th:text="${data.summary.cancelled}"></span></span><span
                                 style="font-size: medium;">&nbsp;&nbsp;Canceled&nbsp;&nbsp;</span>
-                            <span class="numberCircle"><span style="font-size: large;"
-                                                             th:text="${data.summary.expired}"></span></span><span
-                                style="font-size: medium;">&nbsp;&nbsp;Expired&nbsp;&nbsp;</span>
                         </div>
                     </div>
                 </div>
@@ -103,9 +100,9 @@
                             <td th:text="${appointment.patient.firstName}"></td>
                             <td th:text="${appointment.patient.lastName}"></td>
                             <td th:text="${appointment.patient.age()}"></td>
-                            <td th:text="${appointment.visitTime.toLocalTime().withSecond(0).withNano(0)}"></td>
+                            <td th:text="${(appointment.status != T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).CANCELED) ? appointment.visitTime.toLocalTime().withSecond(0).withNano(0) : '-'}"></td>
                             <td th:text="${appointment.patient.phoneNumber}"></td>
-                            <td th:text="${appointment.turnNumber}"></td>
+                            <td th:text="${(appointment.status != T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).CANCELED) ? appointment.turnNumber: '-'}"></td>
                             <th:block th:switch="${appointment.status}">
                                 <td th:case="${T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).WAITING}"
                                 ><span class="badge badge-light-primary fs-7 fw-bold text-capitalize">Waiting</span>
@@ -135,8 +132,8 @@
                                       hx-ext="json-enc"
                                       hx-trigger="click"
                                       _="on htmx:afterRequest(elt, xhr, target, requestConfig, successful)
-                                            if successful is true then send click to #pageNum
-                                            else call alert('Done Operation failed.')
+                                            if successful is true then send click to #refreshPage
+                                            else call requestFailedAlert('CheckIn Operation failed.', xhr)
                                         end"
                                 >Check-In</span>
                                 <span th:if="${appointment.status == T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).VISITING}" class="badge badge-light-warning fs-7 fw-bold text-capitalize cursor-pointer"
@@ -145,8 +142,8 @@
                                       hx-ext="json-enc"
                                       hx-trigger="click"
                                       _="on htmx:afterRequest(elt, xhr, target, requestConfig, successful)
-                                            if successful is true then send click to #pageNum
-                                            else call alert('Done Operation failed.')
+                                            if successful is true then send click to #refreshPage
+                                            else call requestFailedAlert('Done Operation failed.', xhr)
                                         end"
                                 >done</span>
                             </td>
@@ -157,40 +154,11 @@
                         </tr>
                         </tbody>
                         <!--end::Tbody-->
-                        <tfoot>
-                            <tr>
-                                <td colspan="10" class="text-center fs-6">
-                                    <i style="color: #494462;" class="fs-4 fa-solid fa-less-than cursor-pointer"
-                                       th:classappend="${data.hasPrevious() ? '' : 'd-none'}"
-                                       hx-get="/doctor/patients"
-                                       hx-include="#previousPage"
-                                       hx-trigger="click"
-                                       hx-target="#patients_container"
-                                    ></i>
-                                    &nbsp;&nbsp;
-                                    <span class="fs-2" style="color: #494462"
-                                          th:text="${data.pagination()}"
-                                    >1 -- 98</span>
-                                    &nbsp;&nbsp;
-                                    <i style="color: #494462;" class="fs-4 fa-solid fa-greater-than cursor-pointer"
-                                       th:classappend="${data.hasNextPage() ? '' : 'd-none'}"
-                                       hx-get="/doctor/patients"
-                                       hx-include="#nextPage"
-                                       hx-trigger="click"
-                                       hx-target="#patients_container"
-                                    ></i>
-                                </td>
-                            </tr>
-                            <input type="hidden" id="pageNum" name="pageNum" th:value="${data.pageNum}"
-                                   hx-get="/doctor/patients"
-                                   hx-include="#pageNum"
-                                   hx-trigger="click"
-                                   hx-target="#patients_container"
-                            />
-                            <input type="hidden" id="nextPage" name="pageNum" th:value="${data.pageNum + 1}" />
-                            <input type="hidden" id="previousPage" name="pageNum" th:value="${data.pageNum - 1}" />
-                            <input type="hidden" id="pageSize" name="pageSize" th:value="${data.pageSize}" />
-                        </tfoot>
+                        <input type="hidden" id="refresh"
+                               hx-get="/doctor/patients"
+                               hx-trigger="click"
+                               hx-target="#patients_container"
+                        />
                     </table>
                     <!--end::Table-->
                 </div>
@@ -271,7 +239,7 @@
                         </button>
                         <input type="submit" class="btn btn-primary" />
                     </div>
-                    <input id="refreshPage" type="hidden" hx-get="/doctor/patients" hx-include="#pageNum" hx-trigger="click"
+                    <input id="refreshPage" type="hidden" hx-get="/doctor/patients" hx-trigger="click"
                            hx-target="#patients_container" hx-swap="outerHTML"
                     >
                 </form>

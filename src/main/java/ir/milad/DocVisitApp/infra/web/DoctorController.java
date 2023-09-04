@@ -79,11 +79,8 @@ public class DoctorController {
     }
 
     @GetMapping("/patients")
-    public String patients(
-            @RequestParam(required = false, defaultValue = "1") Integer pageNum,
-            Model model
-    ) {
-        var patientsData = loadPatientsDataService.load(pageNum);
+    public String patients(Model model) {
+        var patientsData = loadPatientsDataService.load();
         model.addAttribute("data", patientsData);
         return "/doctor/patients :: patients";
     }

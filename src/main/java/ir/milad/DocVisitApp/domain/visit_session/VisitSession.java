@@ -10,6 +10,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.LinkedList;
+import java.util.Objects;
 import java.util.Optional;
 
 @Getter
@@ -60,6 +61,8 @@ public class VisitSession {
         var index = appointments.indexOf(appointment);
         for (int i = index + 1; i < appointments.size(); i++) {
             var _appointment = appointments.get(i);
+            if (_appointment.getStatus() != AppointmentStatus.WAITING)
+                continue;
             _appointment.setTurnNumber(_appointment.turnNumber - 1);
             _appointment.setTurnsToAwait(_appointment.turnsToAwait - 1);
             _appointment.setVisitTime(_appointment.visitTime.minusMinutes((long) appointment.numOfPersons * sessionLength));
@@ -89,6 +92,8 @@ public class VisitSession {
         var refTime = LocalDateTime.of(LocalDate.now(), doneTime.withSecond(0));
         for (int i = index + 1; i < appointments.size(); i++) {
             var _appointment = appointments.get(i);
+            if (_appointment.getStatus() != AppointmentStatus.WAITING)
+                continue;
             _appointment.visitTime = refTime.plusMinutes((long) count * sessionLength);
             count += _appointment.numOfPersons;
         }
@@ -107,13 +112,12 @@ public class VisitSession {
                 numberOfAppointmentsAwaiting(),
                 numberOfAppointmentsByStatus(Optional.of(AppointmentStatus.VISITED)),
                 numberOfAppointmentsByStatus(Optional.of(AppointmentStatus.CANCELED)),
-                numberOfAppointmentsByStatus(Optional.of(AppointmentStatus.EXPIRED)),
                 nextAppointmentId);
     }
 
     public void update(LocalDate date, LocalTime fromTime, LocalTime toTime, Integer sessionLength) {
-        /*if (appointments.size() > 0 && ( !fromTime.equals(this.fromTime) || !Objects.equals(sessionLength, this.sessionLength)))
-            throw new ApplicationException("Can't change session from time/session length. Reason: Patients are in waiting.");*/
+        if (appointments.size() > 0 && ( !fromTime.equals(this.fromTime.toLocalTime()) || !Objects.equals(sessionLength, this.sessionLength)))
+            throw new ApplicationException("Can't change session 'from time'/'session length'. Reason: Patients are waiting.");
 
         this.date = date;
         this.fromTime = LocalDateTime.of(LocalDate.now(), fromTime);
@@ -129,6 +133,22 @@ public class VisitSession {
         return status
                 .map(appointmentStatus -> appointments.stream().filter(appointment -> appointment.status == appointmentStatus).count())
                 .orElseGet(() -> (long) appointments.size());
+    }
+
+    public boolean visitSessionIsOver(LocalDateTime entryTime) {
+        return entryTime.isAfter(toTime) || lastAppointmentTime.isAfter(toTime);
+    }
+
+    public Long appointmentTurnsToAwait(String appointmentId) {
+        var turnsToAwait = 0L;
+        for (int i = 0; i < appointments.size(); i++) {
+            var a = appointments.get(i);
+            if (Objects.equals(a.getId(), appointmentId))
+                break;
+            if (a.getStatus() == AppointmentStatus.WAITING || a.getStatus() == AppointmentStatus.VISITING)
+                turnsToAwait++;
+        }
+        return turnsToAwait;
     }
 
     private Appointment giveNewAppointment(Patient patient, LocalTime entryTime, int numOfPersons) {
@@ -152,10 +172,6 @@ public class VisitSession {
                 .stream()
                 .filter(t -> t.isSamePatient(patient) && t.status == AppointmentStatus.WAITING)
                 .findFirst();
-    }
-
-    public boolean visitSessionIsOver(LocalDateTime entryTime) {
-        return entryTime.isAfter(toTime) || lastAppointmentTime.isAfter(toTime);
     }
 
 }
