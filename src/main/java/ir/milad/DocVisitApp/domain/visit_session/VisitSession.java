@@ -6,6 +6,7 @@ import ir.milad.DocVisitApp.domain.patient.Patient;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -58,14 +59,15 @@ public class VisitSession {
             throw new ApplicationException("Cant cancel turn");
 
         appointment.status = AppointmentStatus.CANCELED;
+        var remainingTime = ((long) appointment.numOfPersons * sessionLength) -
+                Duration.between(appointment.visitTime.toLocalTime(), LocalTime.now()).toMinutes();
         var index = appointments.indexOf(appointment);
         for (int i = index + 1; i < appointments.size(); i++) {
             var _appointment = appointments.get(i);
             if (_appointment.getStatus() != AppointmentStatus.WAITING)
                 continue;
-            _appointment.setTurnNumber(_appointment.turnNumber - 1);
             _appointment.setTurnsToAwait(_appointment.turnsToAwait - 1);
-            _appointment.setVisitTime(_appointment.visitTime.minusMinutes((long) appointment.numOfPersons * sessionLength));
+            _appointment.setVisitTime(_appointment.visitTime.minusMinutes(remainingTime));
         }
 
         lastAppointmentTime = appointments.getLast().visitTime.plusMinutes(sessionLength);
