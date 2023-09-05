@@ -4,6 +4,7 @@ import ir.milad.DocVisitApp.domain.ApplicationException;
 import ir.milad.DocVisitApp.domain.patient.PatientHistory;
 import ir.milad.DocVisitApp.domain.patient.PatientHistoryStatus;
 import ir.milad.DocVisitApp.domain.patient.PatientRepository;
+import ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus;
 import ir.milad.DocVisitApp.domain.visit_session.VisitSessionRepository;
 import org.springframework.stereotype.Service;
 
@@ -19,11 +20,19 @@ public class CancelPatientAppointmentService {
         this.patientRepository = patientRepository;
     }
 
-    public synchronized void cancel(String appointmentId) {
+    public synchronized void cancelByPatient(String appointmentId) {
+        cancel(appointmentId, AppointmentStatus.CANCELED, PatientHistoryStatus.CANCELLED);
+    }
+
+    public synchronized void cancelByDoctor(String appointmentId) {
+        cancel(appointmentId, AppointmentStatus.CANCELED_BY_DOCTOR, PatientHistoryStatus.CANCELED_BY_DOCTOR);
+    }
+
+    private void cancel(String appointmentId, AppointmentStatus appointmentStatus, PatientHistoryStatus historyStatus) {
         var patient = visitSessionRepository.findActiveSessionForToday()
                 .orElseThrow(() -> new ApplicationException("Active session not found."))
-                .cancelAppointment(appointmentId);
-        patientRepository.addPatientHistory(patient, new PatientHistory(LocalDate.now(), PatientHistoryStatus.CANCELLED));
+                .cancelAppointment(appointmentId, appointmentStatus);
+        patientRepository.addPatientHistory(patient, new PatientHistory(LocalDate.now(), historyStatus));
         visitSessionRepository.updateActiveVisitSession();
     }
 }

@@ -1,6 +1,7 @@
 package ir.milad.DocVisitApp.infra.web;
 
 import ir.milad.DocVisitApp.domain.patient.Patient;
+import ir.milad.DocVisitApp.domain.patient.service.CancelPatientAppointmentService;
 import ir.milad.DocVisitApp.domain.visit_session.VisitSessionRepository;
 import ir.milad.DocVisitApp.domain.visit_session.service.DoctorGivingAppointmentService;
 import ir.milad.DocVisitApp.domain.visit_session.service.LoadDashboardDataService;
@@ -32,20 +33,21 @@ public class DoctorController {
     private final LoadDashboardDataService loadDashboardDataService;
     private final LoadPatientsDataService loadPatientsDataService;
     private final DoctorGivingAppointmentService doctorGivingAppointmentService;
-
     private final VisitSessionRepository visitSessionRepository;
-
+    private final CancelPatientAppointmentService cancelPatientAppointmentService;
     public DoctorController(
             UpsertVisitSessionService upsertVisitSessionService,
             LoadDashboardDataService loadDashboardDataService,
             LoadPatientsDataService loadPatientsDataService,
             DoctorGivingAppointmentService doctorGivingAppointmentService,
-            VisitSessionRepository visitSessionRepository) {
+            VisitSessionRepository visitSessionRepository,
+            CancelPatientAppointmentService cancelPatientAppointmentService) {
         this.upsertVisitSessionService = upsertVisitSessionService;
         this.loadDashboardDataService = loadDashboardDataService;
         this.loadPatientsDataService = loadPatientsDataService;
         this.doctorGivingAppointmentService = doctorGivingAppointmentService;
         this.visitSessionRepository = visitSessionRepository;
+        this.cancelPatientAppointmentService = cancelPatientAppointmentService;
     }
 
     @PostMapping(value = "/create/visit_session")
@@ -159,6 +161,12 @@ public class DoctorController {
         model.addAttribute("y", y);
         model.addAttribute("today", LocalDate.now().toString().formatted(DateTimeFormatter.ofPattern("yyyyMMdd")));
         return "/doctor/calendar.html :: calendar";
+    }
+
+    @DeleteMapping("/cancel/appointment/{appointmentId}")
+    @ResponseBody
+    public void cancelAppointment(@PathVariable String appointmentId) {
+        cancelPatientAppointmentService.cancelByDoctor(appointmentId);
     }
 
     private void loadDashboardInfo(Model model) {

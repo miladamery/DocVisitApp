@@ -89,7 +89,12 @@ public class PatientController {
     }
 
     @GetMapping("/load/appointment")
-    public String loadAppointment(@RequestParam(defaultValue = "fr") String language, @RequestParam String id, Model model) {
+    public String loadAppointment(
+            @RequestParam(defaultValue = "fr") String language,
+            @RequestParam String id,
+            Model model,
+            HttpServletResponse response
+    ) {
         model.addAttribute("language", language);
         return loadPatientAppointmentService.loadPatientAppointment(id)
                 .map(appointment -> {
@@ -97,6 +102,9 @@ public class PatientController {
                         model.addAttribute("turnNumber", appointment.turnNumber);
                         model.addAttribute("appointmentId", id);
                         return "patient/appointment-arrived :: appointment-arrived";
+                    } else if (appointment.status == AppointmentStatus.CANCELED_BY_DOCTOR) {
+                        response.setHeader(HTMX_REDIRECT_HEADER, "/patient/index");
+                        return "/patient/index";
                     } else
                         return appointmentInfo(model, appointment);
 
@@ -109,7 +117,7 @@ public class PatientController {
 
     @DeleteMapping("/cancel/appointment")
     public String cancelAppointment(@RequestParam String id, HttpServletResponse response, Model model) {
-        return Try.run(() -> cancelPatientAppointmentService.cancel(id))
+        return Try.run(() -> cancelPatientAppointmentService.cancelByPatient(id))
                 .map(__ -> {
                     response.setHeader(HTMX_REDIRECT_HEADER, "/patient/index");
                     return "/patient/index";
@@ -151,6 +159,8 @@ public class PatientController {
     public void done(@PathVariable String id) {
         patientAppointmentDoneService.done(id);
     }
+
+
 
     @GetMapping("/blocked")
     public String blocked(@RequestParam(defaultValue = "fr") String language, Model model) {

@@ -51,14 +51,14 @@ public class VisitSession {
         return giveNewAppointment(patient, entryTime, numOfPersons);
     }
 
-    public Patient cancelAppointment(String id) {
+    public Patient cancelAppointment(String id, AppointmentStatus appointmentStatus) {
         // TODO: 8/25/2023 Use manifold String interpolation
         var appointment = findAppointmentById(id)
                 .orElseThrow(() -> new ApplicationException("Turn with id: " + id + " Not Found"));
         if (appointment.status != AppointmentStatus.WAITING)
             throw new ApplicationException("Cant cancel turn");
 
-        appointment.status = AppointmentStatus.CANCELED;
+        appointment.status = appointmentStatus;
         var remainingTime = ((long) appointment.numOfPersons * sessionLength) -
                 Duration.between(appointment.visitTime.toLocalTime(), LocalTime.now()).toMinutes();
         var index = appointments.indexOf(appointment);
@@ -70,7 +70,8 @@ public class VisitSession {
             _appointment.setVisitTime(_appointment.visitTime.minusMinutes(remainingTime));
         }
 
-        lastAppointmentTime = appointments.getLast().visitTime.plusMinutes(sessionLength);
+        var lastAppointment = appointments.getLast();
+        lastAppointmentTime = lastAppointment.visitTime.plusMinutes((long) lastAppointment.numOfPersons * sessionLength);
         return appointment.getPatient();
     }
 

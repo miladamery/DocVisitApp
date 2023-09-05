@@ -4,5 +4,6 @@ public enum PatientHistoryStatus {
     VISITED,
     CANCELLED,
     BLOCKED,
-    EXPIRED
+    EXPIRED,
+    CANCELED_BY_DOCTOR
 }

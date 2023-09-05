@@ -130,7 +130,7 @@ class VisitSessionTest {
             time = time.plusMinutes(1);
         }
 
-        vs.cancelAppointment(turns.get(3).getId());
+        vs.cancelAppointment(turns.get(3).getId(), AppointmentStatus.CANCELED);
 
         assertEquals(turns.get(3).getStatus(), AppointmentStatus.CANCELED);
         assertEquals(turns.get(4).getTurnNumber(), 4);

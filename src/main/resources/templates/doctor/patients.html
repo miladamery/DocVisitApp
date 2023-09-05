@@ -67,7 +67,8 @@
                     <table class="table align-middle table-row-bordered table-row-solid gy-4 gs-9 text-center">
                         <!--begin::Thead-->
                         <thead class="border-gray-200 fs-5 fw-semibold bg-lighten">
-                            <tr>
+                        <tr>
+                            <th>Cancel</th>
                             <th>History</th>
                             <th>First Name</th>
                             <th>Last Name</th>
@@ -88,7 +89,27 @@
                         <!--end::Thead-->
                         <!--begin::Tbody-->
                         <tbody class="fw-6 fw-semibold text-gray-600">
-                            <tr th:each="appointment: ${data.appointments}">
+                        <tr th:each="appointment: ${data.appointments}">
+                            <td>
+                                <i th:if="${appointment.status == T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).WAITING}"
+                                   class="fa-regular fa-times-circle fs-2x cursor-pointer"
+                                   th:attr="hx-delete='/doctor/cancel/appointment/' + ${appointment.id}"
+                                   hx-swap="none"
+                                   _="on htmx:afterRequest(elt, xhr, target, requestConfig, successful)
+                                            if successful is true then send click to #refreshPage
+                                            else call requestFailedAlert('Cancellation Failed.', xhr)
+                                        end"
+                                >
+                                    <span class="path1"></span>
+                                    <span class="path2"></span>
+                                </i>
+
+                                <i th:if="${appointment.status == T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).CANCELED_BY_DOCTOR}"
+                                   class="fa fa-times-circle text-danger fs-2x">
+                                    <span class="path1"></span>
+                                    <span class="path2"></span>
+                                </i>
+                            </td>
                             <td><i class="fa fa-history fs-2x text-danger cursor-pointer" aria-hidden="true"
                                    data-bs-toggle="modal" data-bs-target="#doc_patient_history"
                                    hx-get="/patient/load/history"
@@ -104,22 +125,23 @@
                             <td th:text="${appointment.patient.phoneNumber}"></td>
                             <td th:text="${(appointment.status != T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).CANCELED) ? appointment.turnNumber: '-'}"></td>
                             <th:block th:switch="${appointment.status}">
-                                <td th:case="${T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).WAITING}"
-                                ><span class="badge badge-light-primary fs-7 fw-bold text-capitalize">Waiting</span>
+                                <td th:case="${T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).WAITING}">
+                                    <span class="badge badge-light-primary fs-7 fw-bold text-capitalize">Waiting</span>
                                 </td>
-                                <td th:case="${T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).VISITING}"
-                                ><span class="badge badge-light-warning fs-7 fw-bold text-capitalize">In Progress</span>
+                                <td th:case="${T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).VISITING}">
+                                    <span class="badge badge-light-warning fs-7 fw-bold text-capitalize">In Progress</span>
                                 </td>
-                                <td th:case="${T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).VISITED}"
-                                ><span class="badge badge-light-success fs-7 fw-bold text-capitalize">VISITED</span>
+                                <td th:case="${T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).VISITED}">
+                                    <span class="badge badge-light-success fs-7 fw-bold text-capitalize">VISITED</span>
                                 </td>
-                                <td th:case="${T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).CANCELED}"
-                                ><span class="badge badge-light-danger fs-7 fw-bold text-capitalize">CANCELED</span>
+                                <td th:case="${T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).CANCELED}">
+                                    <span class="badge badge-light-danger fs-7 fw-bold text-capitalize">CANCELED</span>
                                 </td>
-                                <td th:case="${T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).EXPIRED}"
-                                ><span class="badge badge-light-danger fs-7 fw-bold text-capitalize">EXPIRED</span></td>
+                                <td th:case="${T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).CANCELED_BY_DOCTOR}">
+                                    <span class="badge badge-light-danger fs-7 fw-bold text-capitalize">Cancelled Dr</span>
+                                </td>
                             </th:block>
-                            <td >
+                            <td>
                                 <span th:if="
                                 ${
                                     appointment.status == T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).WAITING &&
@@ -136,7 +158,8 @@
                                             else call requestFailedAlert('CheckIn Operation failed.', xhr)
                                         end"
                                 >Check-In</span>
-                                <span th:if="${appointment.status == T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).VISITING}" class="badge badge-light-warning fs-7 fw-bold text-capitalize cursor-pointer"
+                                <span th:if="${appointment.status == T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).VISITING}"
+                                      class="badge badge-light-warning fs-7 fw-bold text-capitalize cursor-pointer"
                                       th:attr="hx-put='/patient/done/' + ${appointment.id}"
                                       hx-swap="none"
                                       hx-ext="json-enc"
@@ -148,9 +171,12 @@
                                 >done</span>
                             </td>
                             <td th:text="${appointment.numOfPersons}"></td>
-                            <input type="hidden" name="firstName" th:class="'input-hidden-' + ${appointment.id}" th:value="${appointment.patient.firstName}"/>
-                            <input type="hidden" name="lastName" th:class="'input-hidden-' + ${appointment.id}" th:value="${appointment.patient.lastName}"/>
-                            <input type="hidden" name="dateOfBirth" th:class="'input-hidden-' + ${appointment.id}" th:value="${appointment.patient.dateOfBirth}"/>
+                            <input type="hidden" name="firstName" th:class="'input-hidden-' + ${appointment.id}"
+                                   th:value="${appointment.patient.firstName}"/>
+                            <input type="hidden" name="lastName" th:class="'input-hidden-' + ${appointment.id}"
+                                   th:value="${appointment.patient.lastName}"/>
+                            <input type="hidden" name="dateOfBirth" th:class="'input-hidden-' + ${appointment.id}"
+                                   th:value="${appointment.patient.dateOfBirth}"/>
                         </tr>
                         </tbody>
                         <!--end::Tbody-->
@@ -237,7 +263,7 @@
                         <button id="patients_modal_close" type="button" class="btn btn-light" data-bs-dismiss="modal">
                             Close
                         </button>
-                        <input type="submit" class="btn btn-primary" />
+                        <input type="submit" class="btn btn-primary"/>
                     </div>
                     <input id="refreshPage" type="hidden" hx-get="/doctor/patients" hx-trigger="click"
                            hx-target="#patients_container" hx-swap="outerHTML"
@@ -267,7 +293,8 @@
                 </div>
 
                 <div class="modal-footer">
-                    <button id="patients_history_modal_close" type="button" class="btn btn-light" data-bs-dismiss="modal"
+                    <button id="patients_history_modal_close" type="button" class="btn btn-light"
+                            data-bs-dismiss="modal"
                             _="on click remove .block-patient">
                         Close
                     </button>
@@ -281,7 +308,8 @@
                             if successful is true then send click to #patients_history_modal_close
                             else call requestFailedAlert('Sorry Doctor. Blocking Patient Failed.', xhr)
                             end"
-                    >Block</button>
+                    >Block
+                    </button>
                 </div>
             </div>
         </div>
