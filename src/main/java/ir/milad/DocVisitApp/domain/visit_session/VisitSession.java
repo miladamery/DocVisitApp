@@ -126,14 +126,6 @@ public class VisitSession {
                 }
         );
 
-        var index = appointments.indexOf(appointment);
-        for (int i = index + 1; i < appointments.size(); i++) {
-            var _appointment = appointments.get(i);
-            if (_appointment.getStatus() == AppointmentStatus.WAITING) {
-                _appointment.setVisitTime(appointments.get(i-1).getVisitTime().plusMinutes((long) _appointment.numOfPersons * sessionLength));
-            }
-        }
-
         if (appointments.indexOf(appointment) == appointments.indexOf(appointments.getLast()))
             lastAppointmentTime = appointment.visitTime;
     }
