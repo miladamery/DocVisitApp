@@ -1,6 +1,7 @@
 package ir.milad.DocVisitApp.domain.patient.service;
 
 import ir.milad.DocVisitApp.domain.ApplicationException;
+import ir.milad.DocVisitApp.domain.UnitTestRequired;
 import ir.milad.DocVisitApp.domain.patient.PatientHistory;
 import ir.milad.DocVisitApp.domain.patient.PatientHistoryStatus;
 import ir.milad.DocVisitApp.domain.patient.PatientRepository;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
+@UnitTestRequired
 @Service
 public class PatientAppointmentDoneService {
 

@@ -1,10 +1,12 @@
 package ir.milad.DocVisitApp.domain.visit_session.service;
 
+import ir.milad.DocVisitApp.domain.UnitTestRequired;
 import ir.milad.DocVisitApp.domain.visit_session.VisitSessionRepository;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.stereotype.Service;
 
+@UnitTestRequired
 @Service
 public class LoadDashboardDataService {
 

@@ -1,5 +1,6 @@
 package ir.milad.DocVisitApp.domain.visit_session.service;
 
+import ir.milad.DocVisitApp.domain.UnitTestRequired;
 import ir.milad.DocVisitApp.domain.visit_session.VisitSession;
 import ir.milad.DocVisitApp.domain.visit_session.VisitSessionRepository;
 import org.springframework.stereotype.Service;
@@ -7,6 +8,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
+@UnitTestRequired
 @Service
 public class UpsertVisitSessionService {
 

@@ -1,6 +1,7 @@
 package ir.milad.DocVisitApp.domain.visit_session.service;
 
 import ir.milad.DocVisitApp.domain.ApplicationException;
+import ir.milad.DocVisitApp.domain.UnitTestRequired;
 import ir.milad.DocVisitApp.domain.patient.Patient;
 import ir.milad.DocVisitApp.domain.visit_session.Appointment;
 import ir.milad.DocVisitApp.domain.visit_session.VisitSession;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalTime;
 
+@UnitTestRequired
 @Service
 public class DoctorGivingAppointmentService {
 

@@ -1,5 +1,6 @@
 package ir.milad.DocVisitApp.domain.patient.service;
 
+import ir.milad.DocVisitApp.domain.UnitTestRequired;
 import ir.milad.DocVisitApp.domain.patient.Patient;
 import ir.milad.DocVisitApp.domain.patient.PatientHistory;
 import ir.milad.DocVisitApp.domain.patient.PatientHistoryStatus;
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 
+@UnitTestRequired
 @Service
 public class BlockPatientService {
     private final PatientRepository patientRepository;

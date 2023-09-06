@@ -94,6 +94,7 @@ public class VisitSession {
         appointment.setStatus(AppointmentStatus.VISITING);
     }
 
+    @UnitTestRequired
     public void done(String appointmentId, LocalTime doneTime) {
         var errorMsg = "Wrong appointment to done! Doctor is not visiting this patient.";
         var appointment = loadAppointmentAndCheckItsStatus(appointmentId, AppointmentStatus.VISITING, errorMsg);
@@ -157,10 +158,12 @@ public class VisitSession {
         appointment.visitTime = LocalDateTime.of(LocalDate.now(), LocalTime.now().withSecond(0).withNano(0));
     }
 
+    @UnitTestRequired
     public Optional<Appointment> findAppointmentById(String id) {
         return appointments.stream().filter(t -> t.id.equals(id)).findFirst();
     }
 
+    @UnitTestRequired
     public VisitSessionSummary summary() {
         var nextAppointmentId = appointments.stream().filter(appointment -> appointment.status == AppointmentStatus.WAITING)
                 .findFirst().map(Appointment::getId).orElse("-1");
@@ -172,6 +175,7 @@ public class VisitSession {
                 nextAppointmentId);
     }
 
+    @UnitTestRequired
     public void update(LocalDate date, LocalTime fromTime, LocalTime toTime, Integer sessionLength) {
         if (appointments.size() > 0 && ( !fromTime.equals(this.fromTime.toLocalTime()) || !Objects.equals(sessionLength, this.sessionLength)))
             throw new ApplicationException("Can't change session 'from time'/'session length'. Reason: Patients are waiting.");
@@ -182,20 +186,24 @@ public class VisitSession {
         this.sessionLength = sessionLength;
     }
 
+    @UnitTestRequired
     public long numberOfAppointmentsAwaiting() {
         return numberOfAppointmentsByStatus(Optional.of(AppointmentStatus.WAITING));
     }
 
+    @UnitTestRequired
     public Long numberOfAppointmentsByStatus(Optional<AppointmentStatus> status) {
         return status
                 .map(appointmentStatus -> appointments.stream().filter(appointment -> appointment.status == appointmentStatus).count())
                 .orElseGet(() -> (long) appointments.size());
     }
 
+    @UnitTestRequired
     public boolean visitSessionIsOver(LocalDateTime entryTime) {
         return entryTime.isAfter(toTime) || lastAppointmentTime.isAfter(toTime);
     }
 
+    @UnitTestRequired
     public Long appointmentTurnsToAwait(String appointmentId) {
         var turnsToAwait = 0L;
         for (int i = 0; i < appointments.size(); i++) {

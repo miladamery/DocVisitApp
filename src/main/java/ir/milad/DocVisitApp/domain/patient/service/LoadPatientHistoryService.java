@@ -1,5 +1,6 @@
 package ir.milad.DocVisitApp.domain.patient.service;
 
+import ir.milad.DocVisitApp.domain.UnitTestRequired;
 import ir.milad.DocVisitApp.domain.patient.Patient;
 import ir.milad.DocVisitApp.domain.patient.PatientHistory;
 import ir.milad.DocVisitApp.domain.patient.PatientHistoryStatus;
@@ -10,6 +11,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
 
+@UnitTestRequired
 @Service
 public class LoadPatientHistoryService {
     private final PatientRepository patientRepository;
