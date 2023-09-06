@@ -56,7 +56,11 @@ public class VisitSession {
 
     public Patient cancelAppointment(String id, AppointmentStatus appointmentStatus, LocalTime entryTime) {
         var errorMsg = "Cant cancel Appointment. Appointment status should be (WAITING OR ON_HOLD)";
-        var appointment = loadAppointmentAndCheckItsStatus(id, Set.of(AppointmentStatus.WAITING, AppointmentStatus.ON_HOLD), errorMsg);
+        var appointment = loadAppointmentAndCheckItsStatus(
+                id,
+                Set.of(AppointmentStatus.WAITING, AppointmentStatus.ON_HOLD, AppointmentStatus.VISITING),
+                errorMsg
+        );
 
         if (appointment.getStatus() == AppointmentStatus.ON_HOLD) {
             appointment.setStatus(appointmentStatus);

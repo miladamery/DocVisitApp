@@ -92,7 +92,11 @@
                         <tbody class="fw-6 fw-semibold text-gray-600">
                         <tr th:each="appointment: ${data.appointments}">
                             <td>
-                                <i th:if="${appointment.status == T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).WAITING || appointment.status == T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).ON_HOLD}"
+                                <i th:if="
+                                ${appointment.status == T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).WAITING ||
+                                 appointment.status == T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).ON_HOLD ||
+                                 appointment.status == T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).VISITING
+                                 }"
                                    class="fa-regular fa-times-circle fs-2x cursor-pointer"
                                    th:attr="hx-delete='/doctor/cancel/appointment/' + ${appointment.id}"
                                    hx-swap="none"
