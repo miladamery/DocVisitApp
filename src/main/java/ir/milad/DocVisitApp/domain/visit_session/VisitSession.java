@@ -90,12 +90,23 @@ public class VisitSession {
         return appointment.getPatient();
     }
 
-    public void checkIn(String appointmentId) {
+    @UnitTestRequired
+    public void checkIn(String appointmentId, LocalTime entryTime) {
         String errorMsg = "Wrong appointment to check-in! This patient status is not WAITING.";
         var appointment = loadAppointmentAndCheckItsStatus(appointmentId, AppointmentStatus.WAITING, errorMsg);
-
-        // TODO: 8/29/2023 Check first waiting person can check in?
-        appointment.setStatus(AppointmentStatus.VISITING);
+        if (Objects.equals(appointment.getVisitTime().toLocalTime(), entryTime)) {
+            appointment.setStatus(AppointmentStatus.VISITING);
+        } else if (appointment.getVisitTime().toLocalTime().isBefore(entryTime)) {
+            var timeToIncrease = Duration.between(appointment.getVisitTime(), LocalDateTime.now()).toMinutes();
+            appointment.setVisitTime(LocalDateTime.of(LocalDate.now(), entryTime));
+            updateAppointmentStatusThenRescheduleSubsequentAppointments(
+                    appointment,
+                    AppointmentStatus.VISITING,
+                    (integer, _appointment) -> {
+                        _appointment.increaseVisitTime(timeToIncrease);
+                    }
+            );
+        }
     }
 
     @UnitTestRequired

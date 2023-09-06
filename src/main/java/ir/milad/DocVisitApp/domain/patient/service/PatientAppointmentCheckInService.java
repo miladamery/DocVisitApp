@@ -5,6 +5,8 @@ import ir.milad.DocVisitApp.domain.UnitTestRequired;
 import ir.milad.DocVisitApp.domain.visit_session.VisitSessionRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalTime;
+
 @UnitTestRequired
 @Service
 public class PatientAppointmentCheckInService {
@@ -18,7 +20,7 @@ public class PatientAppointmentCheckInService {
     public synchronized void checkIn(String appointmentId) {
         visitSessionRepository.findActiveSessionForToday()
                 .orElseThrow(() -> new ApplicationException("Active session not found."))
-                .checkIn(appointmentId);
+                .checkIn(appointmentId, LocalTime.now().withNano(0));
         visitSessionRepository.updateActiveVisitSession();
     }
 }

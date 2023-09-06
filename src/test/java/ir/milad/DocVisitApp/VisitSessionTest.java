@@ -167,15 +167,15 @@ class VisitSessionTest {
         }
 
         var doneTime = LocalTime.of(9, 8);
-        vs.checkIn(turns.get(0).getId());
-        vs.done(turns.get(0).getId(), doneTime);
+        vs.checkIn(turns.get(0).getId(), doneTime);
+        vs.done(turns.get(0).getId(), LocalTime.of(9, 0, 0));
 
         doneTime = LocalTime.of(9, 18);
-        vs.checkIn(turns.get(1).getId());
+        vs.checkIn(turns.get(1).getId(), LocalTime.of(9, 8, 0));
         vs.done(turns.get(1).getId(), doneTime);
 
         doneTime = LocalTime.of(9, 23);
-        vs.checkIn(turns.get(2).getId());
+        vs.checkIn(turns.get(2).getId(), LocalTime.of(9, 23, 0));
         vs.done(turns.get(2).getId(), doneTime);
 
         System.out.println();
