@@ -116,7 +116,7 @@
                             <td><i class="fa fa-history fs-2x text-danger cursor-pointer" aria-hidden="true"
                                    data-bs-toggle="modal" data-bs-target="#doc_patient_history"
                                    hx-get="/patient/load/history"
-                                   hx-target="#patient_history_modal_body"
+                                   hx-target="#history_modal"
                                    hx-ext="json-enc"
                                    hx-trigger="click"
                                    th:hx-include="'.input-hidden-' + ${appointment.id}"
@@ -124,7 +124,11 @@
                             <td th:text="${appointment.patient.firstName}"></td>
                             <td th:text="${appointment.patient.lastName}"></td>
                             <td th:text="${appointment.patient.age()}"></td>
-                            <td th:text="${(appointment.status != T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).CANCELED && appointment.status != T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).CANCELED_BY_DOCTOR ) ? appointment.visitTime.toLocalTime().withSecond(0).withNano(0) : '-'}"></td>
+                            <td th:text="${(
+                            appointment.status != T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).CANCELED &&
+                             appointment.status != T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).CANCELED_BY_DOCTOR &&
+                             appointment.status != T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).ON_HOLD
+                             ) ? appointment.visitTime.toLocalTime().withSecond(0).withNano(0) : '-'}"></td>
                             <td th:text="${appointment.patient.phoneNumber}"></td>
                             <td th:text="${appointment.turnNumber}"></td>
                             <th:block th:switch="${appointment.status}">
@@ -331,43 +335,8 @@
     </div>
 
     <div class="modal fade" tabindex="-1" id="doc_patient_history">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3 class="modal-title" style="color: #494462;">Patient History</h3>
-
-                    <!--begin::Close-->
-                    <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal"
-                         aria-label="Close">
-                        <i class="ki-duotone ki-cross fs-1"
-                           _="on click remove .block-patient"
-                        ><span class="path1"></span><span class="path2"></span></i>
-                    </div>
-                    <!--end::Close-->
-                </div>
-                <div class="modal-body" id="patient_history_modal_body">
-
-                </div>
-
-                <div class="modal-footer">
-                    <button id="patients_history_modal_close" type="button" class="btn btn-light"
-                            data-bs-dismiss="modal"
-                            _="on click remove .block-patient">
-                        Close
-                    </button>
-                    <button class="btn" style="background-color: #C5A470;color: white;"
-                            hx-put="/patient/block"
-                            hx-trigger="click"
-                            hx-swap="none"
-                            hx-include=".block-patient"
-                            hx-ext="json-enc"
-                            _="on htmx:afterRequest(elt, xhr, target, requestConfig, successful)
-                            if successful is true then send click to #patients_history_modal_close
-                            else call requestFailedAlert('Sorry Doctor. Blocking Patient Failed.', xhr)
-                            end"
-                    >Block
-                    </button>
-                </div>
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" id="history_modal">
             </div>
         </div>
     </div>

@@ -6,27 +6,64 @@
 </head>
 <body>
 <th:block th:fragment="patient-history">
-    <div class="row text-center">
-        <th:block th:each="history,iter : ${histories}">
-            <div class="col-4 mt-5" th:text="${iter.index + 1}"></div>
-            <div class="col-4 mt-5" th:text="${history.date}"></div>
-            <div class="col-4 mt-5 text-truncate">
-                <th:block th:switch="${history.status}">
-                    <th:block th:case="${T(ir.milad.DocVisitApp.domain.patient.PatientHistoryStatus).VISITED}">
-                <span class="badge badge-light-success fs-7 fw-bold text-capitalize">VISITED</span>
-                    </th:block>
-                    <th:block th:case="${T(ir.milad.DocVisitApp.domain.patient.PatientHistoryStatus).CANCELLED}">
-                        <span class="badge badge-light-danger fs-7 fw-bold text-capitalize">CANCELLED</span>
-                    </th:block>
-                    <th:block th:case="${T(ir.milad.DocVisitApp.domain.patient.PatientHistoryStatus).BLOCKED}">
-                        <span class="badge badge-light-danger fs-7 fw-bold text-capitalize">BLOCKED</span>
-                    </th:block>
-                    <th:block th:case="${T(ir.milad.DocVisitApp.domain.patient.PatientHistoryStatus).EXPIRED}">
-                        <span class="badge badge-light-warning fs-7 fw-bold text-capitalize">EXPIRED</span>
-                    </th:block>
-                </th:block>
+    <div class="row no-gutters text-center">
+        <div class="modal-header">
+            <h3 class="modal-title" style="color: #494462;" th:text="${patient.firstName + ' ' + patient.lastName} + '\'s History'">Patient History</h3>
+
+            <!--begin::Close-->
+            <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal"
+                 aria-label="Close">
+                <i class="ki-duotone ki-cross fs-1"
+                   _="on click remove .block-patient"
+                ><span class="path1"></span><span class="path2"></span></i>
             </div>
-        </th:block>
+            <!--end::Close-->
+        </div>
+        <div class="modal-body">
+            <th:block th:each="history,iter : ${histories}">
+                <div class="col-sm-12 d-flex justify-content-center">
+                    <div class="mt-5 badge text-center py-1 px-4 mx-1" style="width: 10%;color: white;background-color: #615A83;font-size: 1.25rem;align-content: center;" th:text="${iter.index + 1}"></div>
+                    <div class="mt-5 text-center py-1 px-4 mx-1" style="width:40%;color: #494462;background-color: #F8F5FF;"
+                         th:text="${history.month + ' / ' + history.day + ' / ' + history.year}">
+                    </div>
+                    <div class="mt-5 text-truncate text-center" style="width: 20%;font-family: Poppins;">
+                        <th:block th:switch="${history.status}">
+                            <th:block th:case="${T(ir.milad.DocVisitApp.domain.patient.PatientHistoryStatus).VISITED}">
+                                <span class="text-center badge badge-light-success fs-7 fw-bold text-capitalize w-100 py-2 mx-1">VISITED</span>
+                            </th:block>
+                            <th:block th:case="${T(ir.milad.DocVisitApp.domain.patient.PatientHistoryStatus).CANCELLED}">
+                                <span class="badge badge-light-danger fs-7 fw-bold text-capitalize w-100 text-center">CANCELLED</span>
+                            </th:block>
+                            <th:block th:case="${T(ir.milad.DocVisitApp.domain.patient.PatientHistoryStatus).CANCELED_BY_DOCTOR}">
+                                <span class="badge badge-light-danger fs-7 fw-bold text-capitalize w-100 text-center">Cancelled Dr</span>
+                            </th:block>
+                            <th:block th:case="${T(ir.milad.DocVisitApp.domain.patient.PatientHistoryStatus).BLOCKED}">
+                                <span class="badge badge-light-danger fs-7 fw-bold text-capitalize w-100 text-center">BLOCKED</span>
+                            </th:block>
+                        </th:block>
+                    </div>
+                </div>
+            </th:block>
+        </div>
+        <div class="modal-footer">
+            <button id="patients_history_modal_close" type="button" class="btn btn-light"
+                    data-bs-dismiss="modal"
+                    _="on click remove .block-patient">
+                Close
+            </button>
+            <button class="btn" style="background-color: #C5A470;color: white;"
+                    hx-put="/patient/block"
+                    hx-trigger="click"
+                    hx-swap="none"
+                    hx-include=".block-patient"
+                    hx-ext="json-enc"
+                    _="on htmx:afterRequest(elt, xhr, target, requestConfig, successful)
+                            if successful is true then send click to #patients_history_modal_close
+                            else call requestFailedAlert('Sorry Doctor. Blocking Patient Failed.', xhr)
+                            end"
+            >Block
+            </button>
+        </div>
     </div>
     <input type="hidden" name="firstName" th:class="'block-patient'" th:value="${patient.firstName}"/>
     <input type="hidden" name="lastName" th:class="'block-patient'" th:value="${patient.lastName}"/>

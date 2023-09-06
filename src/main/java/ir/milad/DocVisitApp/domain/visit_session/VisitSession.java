@@ -109,8 +109,10 @@ public class VisitSession {
                 appointment,
                 AppointmentStatus.ON_HOLD,
                 _appointment -> {
-                    _appointment.decrementTurnsToAwait();
-                    _appointment.decreaseVisitTime(appointment.numOfPersons * sessionLength);
+                    if (_appointment.status == AppointmentStatus.WAITING) {
+                        _appointment.decrementTurnsToAwait();
+                        _appointment.decreaseVisitTime(appointment.numOfPersons * sessionLength);
+                    }
                 }
         );
     }
@@ -126,6 +128,7 @@ public class VisitSession {
                     _appointment.increaseVisitTime(appointment.numOfPersons * sessionLength);
                 }
         );
+        appointment.visitTime = LocalDateTime.of(LocalDate.now(), LocalTime.now().withSecond(0).withNano(0));
     }
 
     public Optional<Appointment> findAppointmentById(String id) {
