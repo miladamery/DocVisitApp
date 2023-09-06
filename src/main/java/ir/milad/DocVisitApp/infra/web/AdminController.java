@@ -32,8 +32,21 @@ public class AdminController {
                 .findFirst().get().setVisitTime(LocalDateTime.of(LocalDate.now(), request.time));
     }
 
+    @PutMapping("/set/last/appointment/time")
+    @ResponseBody
+    public void setLastAppointmentTime(@RequestBody Request2 request) {
+        visitSessionRepository
+                .findActiveSessionForToday()
+                .get()
+                .setLastAppointmentTime(LocalDateTime.of(LocalDate.now(), request.time));
+    }
+
     public static class Request {
         public Integer ticketNum;
+        public LocalTime time;
+    }
+
+    public static class Request2 {
         public LocalTime time;
     }
 }
