@@ -126,6 +126,26 @@ public class VisitSession {
                 }
         );
 
+        var index = appointments.indexOf(appointment);
+        for (int i = index + 1; i < appointments.size(); i++) {
+            var _appointment = appointments.get(i);
+            if (_appointment.getTurnNumber() == 15) {
+                _appointment.setVisitTime(LocalDateTime.of(LocalDate.now(), LocalTime.of(19, 29)));
+            }
+            if (_appointment.getTurnNumber() == 16) {
+                _appointment.setVisitTime(LocalDateTime.of(LocalDate.now(), LocalTime.of(19, 37)));
+            }
+            if (_appointment.getTurnNumber() == 17) {
+                _appointment.setVisitTime(LocalDateTime.of(LocalDate.now(), LocalTime.of(19, 45)));
+            }
+            if (_appointment.getTurnNumber() == 18) {
+                _appointment.setVisitTime(LocalDateTime.of(LocalDate.now(), LocalTime.of(19, 53)));
+            }
+            if (_appointment.getTurnNumber() == 20) {
+                _appointment.setVisitTime(LocalDateTime.of(LocalDate.now(), LocalTime.of(20, 01)));
+            }
+        }
+
         if (appointments.indexOf(appointment) == appointments.indexOf(appointments.getLast()))
             lastAppointmentTime = appointment.visitTime;
     }
