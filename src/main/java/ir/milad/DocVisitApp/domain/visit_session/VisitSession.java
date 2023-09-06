@@ -85,7 +85,7 @@ public class VisitSession {
         );
 
         if (appointments.indexOf(appointment) == appointments.indexOf(appointments.getLast()))
-            lastAppointmentTime = LocalDateTime.now();
+            lastAppointmentTime = appointment.visitTime;
 
         return appointment.getPatient();
     }
@@ -127,7 +127,7 @@ public class VisitSession {
         );
 
         if (appointments.indexOf(appointment) == appointments.indexOf(appointments.getLast()))
-            lastAppointmentTime = LocalDateTime.now();
+            lastAppointmentTime = appointment.visitTime;
     }
 
     @UnitTestRequired
