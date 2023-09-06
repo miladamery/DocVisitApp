@@ -106,7 +106,9 @@ public class PatientController {
                         model.addAttribute("turnNumber", appointment.turnNumber);
                         model.addAttribute("appointmentId", id);
                         return "patient/appointment-arrived :: appointment-arrived";
-                    } else if (appointment.status == AppointmentStatus.CANCELED_BY_DOCTOR) {
+                    } else if (appointment.status == AppointmentStatus.CANCELED_BY_DOCTOR ||
+                        appointment.status == AppointmentStatus.VISITED
+                    ) {
                         response.setHeader(HTMX_REDIRECT_HEADER, "/patient/index");
                         return "/patient/index";
                     } else
