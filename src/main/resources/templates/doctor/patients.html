@@ -83,6 +83,7 @@
                                 </i>
                             </th>
                             <th>Action</th>
+                            <th>On-Hold</th>
                             <th>NO</th>
                         </tr>
                         </thead>
@@ -91,11 +92,13 @@
                         <tbody class="fw-6 fw-semibold text-gray-600">
                         <tr th:each="appointment: ${data.appointments}">
                             <td>
-                                <i th:if="${appointment.status == T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).WAITING}"
+                                <i th:if="${appointment.status == T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).WAITING || appointment.status == T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).ON_HOLD}"
                                    class="fa-regular fa-times-circle fs-2x cursor-pointer"
                                    th:attr="hx-delete='/doctor/cancel/appointment/' + ${appointment.id}"
                                    hx-swap="none"
-                                   _="on htmx:afterRequest(elt, xhr, target, requestConfig, successful)
+
+                                   _="
+                                        on htmx:afterRequest(elt, xhr, target, requestConfig, successful)
                                             if successful is true then send click to #refreshPage
                                             else call requestFailedAlert('Cancellation Failed.', xhr)
                                         end"
@@ -121,24 +124,27 @@
                             <td th:text="${appointment.patient.firstName}"></td>
                             <td th:text="${appointment.patient.lastName}"></td>
                             <td th:text="${appointment.patient.age()}"></td>
-                            <td th:text="${(appointment.status != T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).CANCELED) ? appointment.visitTime.toLocalTime().withSecond(0).withNano(0) : '-'}"></td>
+                            <td th:text="${(appointment.status != T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).CANCELED && appointment.status != T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).CANCELED_BY_DOCTOR ) ? appointment.visitTime.toLocalTime().withSecond(0).withNano(0) : '-'}"></td>
                             <td th:text="${appointment.patient.phoneNumber}"></td>
-                            <td th:text="${(appointment.status != T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).CANCELED) ? appointment.turnNumber: '-'}"></td>
+                            <td th:text="${appointment.turnNumber}"></td>
                             <th:block th:switch="${appointment.status}">
                                 <td th:case="${T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).WAITING}">
-                                    <span class="badge badge-light-primary fs-7 fw-bold text-capitalize">Waiting</span>
+                                    <span style="color: #3B82F6" class="fs-7 fw-bold text-capitalize">Waiting</span>
                                 </td>
                                 <td th:case="${T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).VISITING}">
-                                    <span class="badge badge-light-warning fs-7 fw-bold text-capitalize">In Progress</span>
+                                    <span style="color: #F59E0B" class="fs-7 fw-bold text-capitalize">In Progress</span>
                                 </td>
                                 <td th:case="${T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).VISITED}">
-                                    <span class="badge badge-light-success fs-7 fw-bold text-capitalize">VISITED</span>
+                                    <span style="color: #16A34A" class="fs-7 fw-bold text-capitalize">VISITED</span>
                                 </td>
                                 <td th:case="${T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).CANCELED}">
-                                    <span class="badge badge-light-danger fs-7 fw-bold text-capitalize">CANCELED</span>
+                                    <span style="color:#E00047;" class="fs-7 fw-bold text-capitalize">CANCELED</span>
+                                </td>
+                                <td th:case="${T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).ON_HOLD}">
+                                    <span style="color: #A855F7" class="fs-7 fw-bold text-capitalize">ON_HOLD</span>
                                 </td>
                                 <td th:case="${T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).CANCELED_BY_DOCTOR}">
-                                    <span class="badge badge-light-danger fs-7 fw-bold text-capitalize">Cancelled Dr</span>
+                                    <span style="color: #E00047" class="fs-7 fw-bold text-capitalize">Cancelled Dr</span>
                                 </td>
                             </th:block>
                             <td>
@@ -148,7 +154,8 @@
                                     !data.isVisiting() &&
                                     data.summary.nextAppointmentId.equals(appointment.id)
                                 }"
-                                      class="badge badge-light-primary fs-7 fw-bold text-capitalize cursor-pointer"
+                                      class="badge fs-7 fw-bold text-capitalize cursor-pointer"
+                                      style="color: white; background-color: #3B82F6;"
                                       th:attr="hx-put='/patient/check/in/' + ${appointment.id}"
                                       hx-swap="none"
                                       hx-ext="json-enc"
@@ -159,7 +166,8 @@
                                         end"
                                 >Check-In</span>
                                 <span th:if="${appointment.status == T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).VISITING}"
-                                      class="badge badge-light-warning fs-7 fw-bold text-capitalize cursor-pointer"
+                                      class="badge fs-7 fw-bold text-capitalize cursor-pointer"
+                                      style="color: white; background-color: #F59E0B;"
                                       th:attr="hx-put='/patient/done/' + ${appointment.id}"
                                       hx-swap="none"
                                       hx-ext="json-enc"
@@ -169,6 +177,55 @@
                                             else call requestFailedAlert('Done Operation failed.', xhr)
                                         end"
                                 >done</span>
+                                <span th:if="${appointment.status == T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).ON_HOLD}"
+                                      class="badge fs-7 fw-bold text-capitalize cursor-pointer"
+                                      style="color: white; background-color: #A855F7;"
+                                      th:attr="hx-put='/patient/resume/' + ${appointment.id}"
+                                      hx-swap="none"
+                                      hx-ext="json-enc"
+                                      hx-trigger="click"
+                                      _="on htmx:afterRequest(elt, xhr, target, requestConfig, successful)
+                                            if successful is true then send click to #refreshPage
+                                            else call requestFailedAlert('Done Operation failed.', xhr)
+                                        end"
+                                >Resume</span>
+                            </td>
+                            <td>
+                                <svg
+                                        th:if="${appointment.status == T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).ON_HOLD}"
+                                        width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <g clip-path="url(#clip0_414_4119)">
+                                        <path d="M19.3166 3.0585V2.0255H20.5441C20.6141 2.0255 20.6706 1.969 20.6706 1.899V0.1265C20.6706 0.0565 20.6141 0 20.5441 0H3.45609C3.38609 0 3.32959 0.0565 3.32959 0.1265V1.899C3.32959 1.969 3.38609 2.0255 3.45609 2.0255H4.68359V3.0585C4.68359 6.4485 6.29409 9.5375 8.79559 10.9625C8.96659 11.185 9.36959 11.772 9.31259 12.3125C9.28659 12.5575 9.16409 12.7685 8.93809 12.9575C6.35159 14.344 4.68359 17.471 4.68359 20.9415V21.9745H3.45609C3.38609 21.9745 3.32959 22.031 3.32959 22.1005V23.8735C3.32959 23.9435 3.38609 24 3.45609 24H20.5441C20.6141 24 20.6706 23.9435 20.6706 23.8735V22.1005C20.6706 22.031 20.6141 21.9745 20.5441 21.9745H19.3166V20.9415C19.3166 17.472 17.6486 14.3445 15.0616 12.957C14.8361 12.768 14.7136 12.557 14.6876 12.3125C14.6311 11.774 15.0341 11.185 15.2056 10.962C17.7066 9.5375 19.3166 6.4495 19.3166 3.0585ZM13.6826 12.4185C13.7386 12.951 14.0031 13.408 14.4676 13.777C14.4921 13.796 14.5186 13.8135 14.5456 13.828C16.8296 15.03 18.3056 17.822 18.3056 20.942V21.5965H5.69459V20.942C5.69459 17.8225 7.17009 15.0305 9.45409 13.8285C9.48159 13.8145 9.50759 13.797 9.53159 13.7775C9.99709 13.4095 10.2616 12.952 10.3176 12.4185C10.4191 11.453 9.79209 10.5785 9.51759 10.2475C9.47659 10.1975 9.42709 10.157 9.37159 10.1265C7.13709 8.9005 5.69459 6.1265 5.69459 3.0585V2.4045H18.3061V3.059C18.3061 6.1275 16.8631 8.9015 14.6296 10.1265C14.5741 10.158 14.5241 10.1985 14.4836 10.247C14.2086 10.5795 13.5811 11.4555 13.6826 12.4185Z" fill="#A855F7"/>
+                                        <path d="M15.9391 6.20109C15.9581 6.15559 15.9496 6.10309 15.9161 6.06609C15.8831 6.03059 15.8321 6.01559 15.7836 6.03209L9.51663 8.06709C9.47413 8.08009 9.44213 8.11559 9.43213 8.15909C9.42213 8.20259 9.43613 8.24858 9.46863 8.27858C9.75063 8.54659 10.0431 8.76459 10.3376 8.92559L10.7071 9.12909L10.9631 9.43759C11.3871 9.94859 11.6951 10.4881 11.8796 11.0391C11.8971 11.0911 11.9456 11.1256 11.9996 11.1256C12.0536 11.1256 12.1021 11.0911 12.1196 11.0391C12.3041 10.4876 12.6126 9.94809 13.0381 9.43559L13.2936 9.12809L13.6626 8.92559C14.5891 8.41759 15.4186 7.42459 15.9391 6.20109Z" fill="#A855F7"/>
+                                        <path d="M13.4285 14.9506L13.2565 14.8146C12.716 14.3876 12.333 13.8751 12.118 13.2926C12.082 13.1941 11.918 13.1941 11.8815 13.2926C11.6665 13.8741 11.2835 14.3866 10.742 14.8156L10.59 14.9391L10.392 15.0431C8.88603 15.8361 7.75003 17.7861 7.49803 20.0121C7.49353 20.0481 7.50503 20.0836 7.52953 20.1106C7.55353 20.1371 7.58753 20.1526 7.62353 20.1526H16.377C16.413 20.1526 16.4475 20.1371 16.471 20.1106C16.4955 20.0831 16.5065 20.0481 16.5025 20.0121C16.25 17.7846 15.1135 15.8346 13.608 15.0426L13.4285 14.9506Z" fill="#A855F7"/>
+                                    </g>
+                                    <defs>
+                                        <clipPath id="clip0_414_4119">
+                                            <rect width="24" height="24" fill="white"/>
+                                        </clipPath>
+                                    </defs>
+                                </svg>
+                                <svg th:if="${appointment.status == T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).VISITING}"
+                                     class="cursor-pointer"
+                                     th:attr="hx-put='/patient/on-hold/' + ${appointment.id}"
+                                     hx-swap="none"
+                                     hx-ext="json-enc"
+                                     _="on htmx:afterRequest(elt, xhr, target, requestConfig, successful)
+                                            if successful is true then send click to #refreshPage
+                                            else call requestFailedAlert('On-Hold Operation failed.', xhr)
+                                        end"
+                                        width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <g clip-path="url(#clip0_414_3230)">
+                                        <path d="M19.3166 3.0585V2.0255H20.5441C20.6141 2.0255 20.6706 1.969 20.6706 1.899V0.1265C20.6706 0.0565 20.6141 0 20.5441 0H3.45609C3.38609 0 3.32959 0.0565 3.32959 0.1265V1.899C3.32959 1.969 3.38609 2.0255 3.45609 2.0255H4.68359V3.0585C4.68359 6.4485 6.29409 9.5375 8.79559 10.9625C8.96659 11.185 9.36959 11.772 9.31259 12.3125C9.28659 12.5575 9.16409 12.7685 8.93809 12.9575C6.35159 14.344 4.68359 17.471 4.68359 20.9415V21.9745H3.45609C3.38609 21.9745 3.32959 22.031 3.32959 22.1005V23.8735C3.32959 23.9435 3.38609 24 3.45609 24H20.5441C20.6141 24 20.6706 23.9435 20.6706 23.8735V22.1005C20.6706 22.031 20.6141 21.9745 20.5441 21.9745H19.3166V20.9415C19.3166 17.472 17.6486 14.3445 15.0616 12.957C14.8361 12.768 14.7136 12.557 14.6876 12.3125C14.6311 11.774 15.0341 11.185 15.2056 10.962C17.7066 9.5375 19.3166 6.4495 19.3166 3.0585ZM13.6826 12.4185C13.7386 12.951 14.0031 13.408 14.4676 13.777C14.4921 13.796 14.5186 13.8135 14.5456 13.828C16.8296 15.03 18.3056 17.822 18.3056 20.942V21.5965H5.69459V20.942C5.69459 17.8225 7.17009 15.0305 9.45409 13.8285C9.48159 13.8145 9.50759 13.797 9.53159 13.7775C9.99709 13.4095 10.2616 12.952 10.3176 12.4185C10.4191 11.453 9.79209 10.5785 9.51759 10.2475C9.47659 10.1975 9.42709 10.157 9.37159 10.1265C7.13709 8.9005 5.69459 6.1265 5.69459 3.0585V2.4045H18.3061V3.059C18.3061 6.1275 16.8631 8.9015 14.6296 10.1265C14.5741 10.158 14.5241 10.1985 14.4836 10.247C14.2086 10.5795 13.5811 11.4555 13.6826 12.4185Z" fill="#C9C7C5"/>
+                                        <path d="M15.9391 6.20109C15.9581 6.15559 15.9496 6.10309 15.9161 6.06609C15.8831 6.03059 15.8321 6.01559 15.7836 6.03209L9.51663 8.06709C9.47413 8.08009 9.44213 8.11559 9.43213 8.15909C9.42213 8.20259 9.43613 8.24858 9.46863 8.27858C9.75063 8.54659 10.0431 8.76459 10.3376 8.92559L10.7071 9.12909L10.9631 9.43759C11.3871 9.94859 11.6951 10.4881 11.8796 11.0391C11.8971 11.0911 11.9456 11.1256 11.9996 11.1256C12.0536 11.1256 12.1021 11.0911 12.1196 11.0391C12.3041 10.4876 12.6126 9.94809 13.0381 9.43559L13.2936 9.12809L13.6626 8.92559C14.5891 8.41759 15.4186 7.42459 15.9391 6.20109Z" fill="#C9C7C5"/>
+                                        <path d="M13.4285 14.9506L13.2565 14.8146C12.716 14.3876 12.333 13.8751 12.118 13.2926C12.082 13.1941 11.918 13.1941 11.8815 13.2926C11.6665 13.8741 11.2835 14.3866 10.742 14.8156L10.59 14.9391L10.392 15.0431C8.88603 15.8361 7.75003 17.7861 7.49803 20.0121C7.49353 20.0481 7.50503 20.0836 7.52953 20.1106C7.55353 20.1371 7.58753 20.1526 7.62353 20.1526H16.377C16.413 20.1526 16.4475 20.1371 16.471 20.1106C16.4955 20.0831 16.5065 20.0481 16.5025 20.0121C16.25 17.7846 15.1135 15.8346 13.608 15.0426L13.4285 14.9506Z" fill="#C9C7C5"/>
+                                    </g>
+                                    <defs>
+                                        <clipPath id="clip0_414_3230">
+                                            <rect width="24" height="24" fill="white"/>
+                                        </clipPath>
+                                    </defs>
+                                </svg>
                             </td>
                             <td th:text="${appointment.numOfPersons}"></td>
                             <input type="hidden" name="firstName" th:class="'input-hidden-' + ${appointment.id}"

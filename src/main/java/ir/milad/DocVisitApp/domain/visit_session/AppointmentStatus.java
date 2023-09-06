@@ -5,5 +5,6 @@ public enum AppointmentStatus {
     VISITING,
     VISITED,
     CANCELED,
-    CANCELED_BY_DOCTOR
+    CANCELED_BY_DOCTOR,
+    ON_HOLD
 }

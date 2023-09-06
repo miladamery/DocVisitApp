@@ -13,6 +13,8 @@ import java.time.LocalTime;
 import java.util.LinkedList;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
+import java.util.function.Consumer;
 
 @Getter
 @Setter
@@ -51,56 +53,79 @@ public class VisitSession {
         return giveNewAppointment(patient, entryTime, numOfPersons);
     }
 
-    public Patient cancelAppointment(String id, AppointmentStatus appointmentStatus) {
-        // TODO: 8/25/2023 Use manifold String interpolation
-        var appointment = findAppointmentById(id)
-                .orElseThrow(() -> new ApplicationException("Turn with id: " + id + " Not Found"));
-        if (appointment.status != AppointmentStatus.WAITING)
-            throw new ApplicationException("Cant cancel turn");
+    public Patient cancelAppointment(String id, AppointmentStatus appointmentStatus, LocalTime entryTime) {
+        var errorMsg = "Cant cancel Appointment. Appointment status should be (WAITING OR ON_HOLD)";
+        var appointment = loadAppointmentAndCheckItsStatus(id, Set.of(AppointmentStatus.WAITING, AppointmentStatus.ON_HOLD), errorMsg);
 
-        appointment.status = appointmentStatus;
-        var remainingTime = ((long) appointment.numOfPersons * sessionLength) -
-                Duration.between(appointment.visitTime.toLocalTime(), LocalTime.now()).toMinutes();
-        var index = appointments.indexOf(appointment);
-        for (int i = index + 1; i < appointments.size(); i++) {
-            var _appointment = appointments.get(i);
-            if (_appointment.getStatus() != AppointmentStatus.WAITING)
-                continue;
-            _appointment.setTurnsToAwait(_appointment.turnsToAwait - 1);
-            _appointment.setVisitTime(_appointment.visitTime.minusMinutes(remainingTime));
-        }
+        var remainingTime = ((long) appointment.numOfPersons * sessionLength);
+        var visitToEntryTimeDiff = Duration.between(appointment.visitTime.toLocalTime(), entryTime).toMinutes();
+        if (visitToEntryTimeDiff > 0)
+            remainingTime -= Duration.between(appointment.visitTime.toLocalTime(), entryTime).toMinutes();
+        long finalRemainingTime = remainingTime;
 
-        var lastAppointment = appointments.getLast();
-        lastAppointmentTime = lastAppointment.visitTime.plusMinutes((long) lastAppointment.numOfPersons * sessionLength);
+        updateAppointmentStatusThenRescheduleSubsequentAppointments(
+                appointment,
+                appointmentStatus,
+                _appointment -> {
+                    if (_appointment.getStatus() == AppointmentStatus.WAITING) {
+                        _appointment.decrementTurnsToAwait();
+                        _appointment.decreaseVisitTime(finalRemainingTime);
+                    }
+                }
+        );
+
         return appointment.getPatient();
     }
 
     public void checkIn(String appointmentId) {
-        var appointment = findAppointmentById(appointmentId)
-                .orElseThrow(() -> new ApplicationException("Appointment didnt found:" + id));
-        if (appointment.status != AppointmentStatus.WAITING)
-            throw new ApplicationException("Wrong appointment to check-in! This patient status is not WAITING.");
+        String errorMsg = "Wrong appointment to check-in! This patient status is not WAITING.";
+        var appointment = loadAppointmentAndCheckItsStatus(appointmentId, AppointmentStatus.WAITING, errorMsg);
+
         // TODO: 8/29/2023 Check first waiting person can check in?
         appointment.setStatus(AppointmentStatus.VISITING);
     }
 
     public void done(String appointmentId, LocalTime doneTime) {
-        var appointment = findAppointmentById(appointmentId)
-                .orElseThrow(() -> new ApplicationException("Appointment didnt found:" + id));
-        if (appointment.status != AppointmentStatus.VISITING)
-            throw new ApplicationException("Wrong appointment to done! Doctor is not visiting this patient.");
-        appointment.setStatus(AppointmentStatus.VISITED);
-        var index = appointments.indexOf(appointment);
-        var count = 0;
-        var refTime = LocalDateTime.of(LocalDate.now(), doneTime.withSecond(0));
-        for (int i = index + 1; i < appointments.size(); i++) {
-            var _appointment = appointments.get(i);
-            if (_appointment.getStatus() != AppointmentStatus.WAITING)
-                continue;
-            _appointment.visitTime = refTime.plusMinutes((long) count * sessionLength);
-            count += _appointment.numOfPersons;
-        }
-        lastAppointmentTime = refTime.plusMinutes((long) count * sessionLength);
+        var errorMsg = "Wrong appointment to done! Doctor is not visiting this patient.";
+        var appointment = loadAppointmentAndCheckItsStatus(appointmentId, AppointmentStatus.VISITING, errorMsg);
+        var timeDiff = Duration.between(
+                appointment.calculatedEndTime(sessionLength), LocalDateTime.of(LocalDate.now(), doneTime.withSecond(0))
+        ).toMinutes();
+
+        updateAppointmentStatusThenRescheduleSubsequentAppointments(
+                appointment,
+                AppointmentStatus.VISITED,
+                _appointment -> {
+                    if (_appointment.getStatus() == AppointmentStatus.WAITING)
+                        _appointment.increaseVisitTime(timeDiff);
+                }
+        );
+    }
+
+    public void onHold(String appointmentId) {
+        var errorMsg = "Can't pause appointment, Patient is not in `InProgress` Status";
+        var appointment = loadAppointmentAndCheckItsStatus(appointmentId, AppointmentStatus.VISITING, errorMsg);
+        updateAppointmentStatusThenRescheduleSubsequentAppointments(
+                appointment,
+                AppointmentStatus.ON_HOLD,
+                _appointment -> {
+                    _appointment.decrementTurnsToAwait();
+                    _appointment.decreaseVisitTime(appointment.numOfPersons * sessionLength);
+                }
+        );
+    }
+
+    public void resume(String appointmentId) {
+        var errorMsg = "Can't resume appointment, Patient is not in `On-Hold` Status";
+        var appointment = loadAppointmentAndCheckItsStatus(appointmentId, AppointmentStatus.ON_HOLD, errorMsg);
+        updateAppointmentStatusThenRescheduleSubsequentAppointments(
+                appointment,
+                AppointmentStatus.VISITING,
+                _appointment -> {
+                    _appointment.incrementTurnsToAwait();
+                    _appointment.increaseVisitTime(appointment.numOfPersons * sessionLength);
+                }
+        );
     }
 
     public Optional<Appointment> findAppointmentById(String id) {
@@ -175,6 +200,46 @@ public class VisitSession {
                 .stream()
                 .filter(t -> t.isSamePatient(patient) && t.status == AppointmentStatus.WAITING)
                 .findFirst();
+    }
+
+    private Appointment loadAppointmentAndCheckItsStatus(
+            String appointmentId,
+            AppointmentStatus status,
+            String errorMsg) {
+        var appointment = findAppointmentById(appointmentId)
+                .orElseThrow(() -> new ApplicationException("Appointment with id: " + id + " Not Found"));
+        if (appointment.status != status)
+            throw new ApplicationException(errorMsg);
+        return appointment;
+    }
+
+    private Appointment loadAppointmentAndCheckItsStatus(
+            String appointmentId,
+            Set<AppointmentStatus> statuses,
+            String errorMsg) {
+        var appointment = findAppointmentById(appointmentId)
+                .orElseThrow(() -> new ApplicationException("Appointment with id: " + id + " Not Found"));
+        if (!statuses.contains(appointment.status))
+            throw new ApplicationException(errorMsg);
+        return appointment;
+    }
+
+    private void updateAppointmentStatusThenRescheduleSubsequentAppointments(
+            Appointment appointment,
+            AppointmentStatus status,
+            Consumer<Appointment> rescheduler) {
+        appointment.setStatus(status);
+        var index = appointments.indexOf(appointment);
+        if (index == -1)
+            throw new ApplicationException("Appointment with id#" + appointment.getId() + "Not Found");
+
+        for (int i = index + 1; i < appointments.size(); i++) {
+            var _appointment = appointments.get(i);
+            rescheduler.accept(_appointment);
+        }
+
+        var lastAppointment = appointments.getLast();
+        lastAppointmentTime = lastAppointment.getVisitTime().plusMinutes((long) lastAppointment.numOfPersons * sessionLength);
     }
 
 }

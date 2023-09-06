@@ -31,4 +31,33 @@ public class Appointment {
     public boolean isSamePatient(Patient patient) {
         return this.patient.equals(patient);
     }
+
+    public void decrementTurnsToAwait() {
+        this.turnsToAwait--;
+    }
+
+    public void incrementTurnsToAwait() {
+        this.turnsToAwait++;
+    }
+
+    public void increaseVisitTime(Integer minutes) {
+        visitTime = visitTime.plusMinutes(minutes);
+    }
+
+    public void increaseVisitTime(Long minutes) {
+        visitTime = visitTime.plusMinutes(minutes);
+    }
+
+    public void decreaseVisitTime(Integer minutes) {
+        visitTime = visitTime.minusMinutes(minutes);
+    }
+
+    public void decreaseVisitTime(Long minutes) {
+        visitTime = visitTime.minusMinutes(minutes);
+    }
+
+    public LocalDateTime calculatedEndTime(int sessionLength){
+        return visitTime.plusMinutes((long) numOfPersons * sessionLength);
+    }
+
 }

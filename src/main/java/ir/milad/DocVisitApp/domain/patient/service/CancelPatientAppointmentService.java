@@ -9,6 +9,7 @@ import ir.milad.DocVisitApp.domain.visit_session.VisitSessionRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 
 @Service
 public class CancelPatientAppointmentService {
@@ -31,7 +32,7 @@ public class CancelPatientAppointmentService {
     private void cancel(String appointmentId, AppointmentStatus appointmentStatus, PatientHistoryStatus historyStatus) {
         var patient = visitSessionRepository.findActiveSessionForToday()
                 .orElseThrow(() -> new ApplicationException("Active session not found."))
-                .cancelAppointment(appointmentId, appointmentStatus);
+                .cancelAppointment(appointmentId, appointmentStatus, LocalTime.now());
         patientRepository.addPatientHistory(patient, new PatientHistory(LocalDate.now(), historyStatus));
         visitSessionRepository.updateActiveVisitSession();
     }

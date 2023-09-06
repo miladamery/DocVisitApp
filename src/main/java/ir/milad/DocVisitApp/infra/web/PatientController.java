@@ -30,6 +30,8 @@ public class PatientController {
     private final BlockPatientService blockPatientService;
     private final PatientAppointmentCheckInService patientAppointmentCheckInService;
     private final PatientAppointmentDoneService patientAppointmentDoneService;
+    private final PatientAppointmentOnHoldService patientAppointmentOnHoldService;
+    private final PatientAppointmentResumeService patientAppointmentResumeService;
     public PatientController(
             TakeAppointmentService takeAppointmentService,
             GetActiveVisitSessionService getActiveVisitSessionService,
@@ -38,7 +40,7 @@ public class PatientController {
             LoadPatientHistoryService loadPatientHistoryService,
             BlockPatientService blockPatientService,
             PatientAppointmentCheckInService patientAppointmentCheckInService,
-            PatientAppointmentDoneService patientAppointmentDoneService) {
+            PatientAppointmentDoneService patientAppointmentDoneService, PatientAppointmentOnHoldService patientAppointmentOnHoldService, PatientAppointmentResumeService patientAppointmentResumeService) {
         this.takeAppointmentService = takeAppointmentService;
         this.getActiveVisitSessionService = getActiveVisitSessionService;
         this.loadPatientAppointmentService = loadPatientAppointmentService;
@@ -47,6 +49,8 @@ public class PatientController {
         this.blockPatientService = blockPatientService;
         this.patientAppointmentCheckInService = patientAppointmentCheckInService;
         this.patientAppointmentDoneService = patientAppointmentDoneService;
+        this.patientAppointmentOnHoldService = patientAppointmentOnHoldService;
+        this.patientAppointmentResumeService = patientAppointmentResumeService;
     }
 
     @GetMapping("/index")
@@ -160,7 +164,17 @@ public class PatientController {
         patientAppointmentDoneService.done(id);
     }
 
+    @PutMapping("/on-hold/{appointmentId}")
+    @ResponseBody
+    public void onHold(@PathVariable String appointmentId) {
+        patientAppointmentOnHoldService.onHold(appointmentId);
+    }
 
+    @PutMapping("/resume/{appointmentId}")
+    @ResponseBody
+    public void resume(@PathVariable String appointmentId) {
+        patientAppointmentResumeService.resume(appointmentId);
+    }
 
     @GetMapping("/blocked")
     public String blocked(@RequestParam(defaultValue = "fr") String language, Model model) {
