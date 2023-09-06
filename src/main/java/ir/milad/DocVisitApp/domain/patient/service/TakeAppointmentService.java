@@ -2,14 +2,12 @@ package ir.milad.DocVisitApp.domain.patient.service;
 
 import ir.milad.DocVisitApp.domain.ApplicationException;
 import ir.milad.DocVisitApp.domain.patient.*;
-import ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus;
 import ir.milad.DocVisitApp.domain.visit_session.VisitSessionRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.Optional;
 
 @Service
 public class TakeAppointmentService {
@@ -32,9 +30,7 @@ public class TakeAppointmentService {
         }
 
         var appointment = vs.giveAppointment(patient, entryTime, numOfPersons);
-        var visited = vs.numberOfAppointmentsByStatus(Optional.of(AppointmentStatus.VISITED));
-        var cancelled = vs.numberOfAppointmentsByStatus(Optional.of(AppointmentStatus.CANCELED));
         visitSessionRepository.updateActiveVisitSession();
-        return new AppointmentData(appointment, appointment.getTurnsToAwait() - visited - cancelled);
+        return new AppointmentData(appointment, vs.appointmentTurnsToAwait(appointment.getId()));
     }
 }
