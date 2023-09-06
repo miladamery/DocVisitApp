@@ -30,6 +30,7 @@ public class AdminController {
                 .getAppointments()
                 .stream().filter(appointment -> appointment.getTurnNumber() == request.ticketNum)
                 .findFirst().get().setVisitTime(LocalDateTime.of(LocalDate.now(), request.time));
+        visitSessionRepository.updateActiveVisitSession();
     }
 
     @PutMapping("/set/last/appointment/time")
@@ -39,6 +40,7 @@ public class AdminController {
                 .findActiveSessionForToday()
                 .get()
                 .setLastAppointmentTime(LocalDateTime.of(LocalDate.now(), request.time));
+        visitSessionRepository.updateActiveVisitSession();
     }
 
     public static class Request {

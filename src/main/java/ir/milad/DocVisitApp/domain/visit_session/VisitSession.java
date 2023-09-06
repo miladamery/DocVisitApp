@@ -94,7 +94,8 @@ public class VisitSession {
     public void checkIn(String appointmentId, LocalTime entryTime) {
         String errorMsg = "Wrong appointment to check-in! This patient status is not WAITING.";
         var appointment = loadAppointmentAndCheckItsStatus(appointmentId, AppointmentStatus.WAITING, errorMsg);
-        if (Objects.equals(appointment.getVisitTime().toLocalTime(), entryTime)) {
+        appointment.setStatus(AppointmentStatus.VISITING);
+        /*if (Objects.equals(appointment.getVisitTime().toLocalTime(), entryTime)) {
             appointment.setStatus(AppointmentStatus.VISITING);
         } else if (appointment.getVisitTime().toLocalTime().isBefore(entryTime)) {
             var timeToIncrease = Duration.between(appointment.getVisitTime(), LocalDateTime.now()).toMinutes();
@@ -106,7 +107,7 @@ public class VisitSession {
                         _appointment.increaseVisitTime(timeToIncrease);
                     }
             );
-        }
+        }*/
     }
 
     @UnitTestRequired
