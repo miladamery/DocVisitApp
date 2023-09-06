@@ -2,6 +2,7 @@ package ir.milad.DocVisitApp.domain.visit_session;
 
 import com.github.f4b6a3.tsid.TsidCreator;
 import ir.milad.DocVisitApp.domain.ApplicationException;
+import ir.milad.DocVisitApp.domain.UnitTestRequired;
 import ir.milad.DocVisitApp.domain.patient.Patient;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,7 +15,7 @@ import java.util.LinkedList;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Consumer;
+import java.util.function.BiConsumer;
 
 @Getter
 @Setter
@@ -57,6 +58,11 @@ public class VisitSession {
         var errorMsg = "Cant cancel Appointment. Appointment status should be (WAITING OR ON_HOLD)";
         var appointment = loadAppointmentAndCheckItsStatus(id, Set.of(AppointmentStatus.WAITING, AppointmentStatus.ON_HOLD), errorMsg);
 
+        if (appointment.getStatus() == AppointmentStatus.ON_HOLD) {
+            appointment.setStatus(appointmentStatus);
+            return appointment.patient;
+        }
+
         var remainingTime = ((long) appointment.numOfPersons * sessionLength);
         var visitToEntryTimeDiff = Duration.between(appointment.visitTime.toLocalTime(), entryTime).toMinutes();
         if (visitToEntryTimeDiff > 0)
@@ -66,13 +72,16 @@ public class VisitSession {
         updateAppointmentStatusThenRescheduleSubsequentAppointments(
                 appointment,
                 appointmentStatus,
-                _appointment -> {
+                (index, _appointment) -> {
                     if (_appointment.getStatus() == AppointmentStatus.WAITING) {
                         _appointment.decrementTurnsToAwait();
                         _appointment.decreaseVisitTime(finalRemainingTime);
                     }
                 }
         );
+
+        if (appointments.indexOf(appointment) == appointments.indexOf(appointments.getLast()))
+            lastAppointmentTime = LocalDateTime.now();
 
         return appointment.getPatient();
     }
@@ -95,37 +104,54 @@ public class VisitSession {
         updateAppointmentStatusThenRescheduleSubsequentAppointments(
                 appointment,
                 AppointmentStatus.VISITED,
-                _appointment -> {
+                (index, _appointment) -> {
                     if (_appointment.getStatus() == AppointmentStatus.WAITING)
                         _appointment.increaseVisitTime(timeDiff);
                 }
         );
+
+        if (appointments.indexOf(appointment) == appointments.indexOf(appointments.getLast()))
+            lastAppointmentTime = LocalDateTime.now();
     }
 
+    @UnitTestRequired
     public void onHold(String appointmentId) {
         var errorMsg = "Can't pause appointment, Patient is not in `InProgress` Status";
         var appointment = loadAppointmentAndCheckItsStatus(appointmentId, AppointmentStatus.VISITING, errorMsg);
+
+        var remainingTime = ((long) appointment.numOfPersons * sessionLength);
+        var visitToEntryTimeDiff = Duration.between(appointment.visitTime.toLocalTime(), LocalDateTime.now()).toMinutes();
+        if (visitToEntryTimeDiff > 0)
+            remainingTime -= Duration.between(appointment.visitTime.toLocalTime(), LocalDateTime.now()).toMinutes();
+        long finalRemainingTime = remainingTime;
+
         updateAppointmentStatusThenRescheduleSubsequentAppointments(
                 appointment,
                 AppointmentStatus.ON_HOLD,
-                _appointment -> {
+                (index, _appointment) -> {
                     if (_appointment.status == AppointmentStatus.WAITING) {
                         _appointment.decrementTurnsToAwait();
-                        _appointment.decreaseVisitTime(appointment.numOfPersons * sessionLength);
+                        _appointment.decreaseVisitTime(finalRemainingTime);
                     }
                 }
         );
     }
 
+    @UnitTestRequired
     public void resume(String appointmentId) {
         var errorMsg = "Can't resume appointment, Patient is not in `On-Hold` Status";
         var appointment = loadAppointmentAndCheckItsStatus(appointmentId, AppointmentStatus.ON_HOLD, errorMsg);
+
+        var remainingTime = ((long) appointment.numOfPersons * sessionLength);
+
         updateAppointmentStatusThenRescheduleSubsequentAppointments(
                 appointment,
                 AppointmentStatus.VISITING,
-                _appointment -> {
-                    _appointment.incrementTurnsToAwait();
-                    _appointment.increaseVisitTime(appointment.numOfPersons * sessionLength);
+                (index, _appointment) -> {
+                    if (_appointment.getStatus() == AppointmentStatus.WAITING) {
+                        _appointment.incrementTurnsToAwait();
+                        _appointment.increaseVisitTime(remainingTime);
+                    }
                 }
         );
         appointment.visitTime = LocalDateTime.of(LocalDate.now(), LocalTime.now().withSecond(0).withNano(0));
@@ -185,7 +211,7 @@ public class VisitSession {
     private Appointment giveNewAppointment(Patient patient, LocalTime entryTime, int numOfPersons) {
         var entryDateTime = LocalDateTime.of(LocalDate.now(), entryTime);
         LocalDateTime visitTime;
-        if (entryDateTime.isAfter(lastAppointmentTime)) {
+        if (entryDateTime.isAfter(lastAppointmentTime) || entryDateTime.isEqual(lastAppointmentTime)) {
             visitTime = entryDateTime;
             lastAppointmentTime = entryDateTime.plusMinutes((long) sessionLength * numOfPersons);
         } else {
@@ -230,7 +256,7 @@ public class VisitSession {
     private void updateAppointmentStatusThenRescheduleSubsequentAppointments(
             Appointment appointment,
             AppointmentStatus status,
-            Consumer<Appointment> rescheduler) {
+            BiConsumer<Integer, Appointment> rescheduler) {
         appointment.setStatus(status);
         var index = appointments.indexOf(appointment);
         if (index == -1)
@@ -238,7 +264,7 @@ public class VisitSession {
 
         for (int i = index + 1; i < appointments.size(); i++) {
             var _appointment = appointments.get(i);
-            rescheduler.accept(_appointment);
+            rescheduler.accept(i, _appointment);
         }
 
         var lastAppointment = appointments.getLast();
