@@ -5,11 +5,13 @@ import ir.milad.DocVisitApp.domain.UnitTestRequired;
 import ir.milad.DocVisitApp.domain.visit_session.VisitSessionRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalTime;
+
 @UnitTestRequired
 @Service
 public class PatientAppointmentOnHoldService {
 
-    private VisitSessionRepository visitSessionRepository;
+    private final VisitSessionRepository visitSessionRepository;
 
     public PatientAppointmentOnHoldService(VisitSessionRepository visitSessionRepository) {
         this.visitSessionRepository = visitSessionRepository;
@@ -18,7 +20,7 @@ public class PatientAppointmentOnHoldService {
     public void onHold(String appointmentId) {
         visitSessionRepository.findActiveSessionForToday()
                 .orElseThrow(() -> new ApplicationException("Active session not found."))
-                .onHold(appointmentId);
+                .onHold(appointmentId, LocalTime.now().withNano(0));
         visitSessionRepository.updateActiveVisitSession();
     }
 }

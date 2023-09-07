@@ -90,24 +90,17 @@ public class VisitSession {
         return appointment.getPatient();
     }
 
-    @UnitTestRequired
     public void checkIn(String appointmentId, LocalTime entryTime) {
         String errorMsg = "Wrong appointment to check-in! This patient status is not WAITING.";
         var appointment = loadAppointmentAndCheckItsStatus(appointmentId, AppointmentStatus.WAITING, errorMsg);
         appointment.setStatus(AppointmentStatus.VISITING);
-        /*if (Objects.equals(appointment.getVisitTime().toLocalTime(), entryTime)) {
-            appointment.setStatus(AppointmentStatus.VISITING);
-        } else if (appointment.getVisitTime().toLocalTime().isBefore(entryTime)) {
-            var timeToIncrease = Duration.between(appointment.getVisitTime(), LocalDateTime.now()).toMinutes();
-            appointment.setVisitTime(LocalDateTime.of(LocalDate.now(), entryTime));
-            updateAppointmentStatusThenRescheduleSubsequentAppointments(
-                    appointment,
-                    AppointmentStatus.VISITING,
-                    (integer, _appointment) -> {
-                        _appointment.increaseVisitTime(timeToIncrease);
-                    }
-            );
-        }*/
+        var timeToIncrease = Duration.between(appointment.getVisitTime().toLocalTime(), entryTime).toMinutes();
+        appointment.setVisitTime(LocalDateTime.of(LocalDate.now(), entryTime));
+        updateAppointmentStatusThenRescheduleSubsequentAppointments(
+                appointment,
+                AppointmentStatus.VISITING,
+                (integer, _appointment) -> _appointment.increaseVisitTime(timeToIncrease)
+        );
     }
 
     @UnitTestRequired
@@ -132,14 +125,15 @@ public class VisitSession {
     }
 
     @UnitTestRequired
-    public void onHold(String appointmentId) {
+    public void onHold(String appointmentId, LocalTime entryTime) {
+        var entryDateTime = LocalDateTime.of(LocalDate.now(), entryTime);
         var errorMsg = "Can't pause appointment, Patient is not in `InProgress` Status";
         var appointment = loadAppointmentAndCheckItsStatus(appointmentId, AppointmentStatus.VISITING, errorMsg);
 
         var remainingTime = ((long) appointment.numOfPersons * sessionLength);
-        var visitToEntryTimeDiff = Duration.between(appointment.visitTime.toLocalTime(), LocalDateTime.now()).toMinutes();
+        var visitToEntryTimeDiff = Duration.between(appointment.visitTime.toLocalTime(), entryDateTime).toMinutes();
         if (visitToEntryTimeDiff > 0)
-            remainingTime -= Duration.between(appointment.visitTime.toLocalTime(), LocalDateTime.now()).toMinutes();
+            remainingTime -= Duration.between(appointment.visitTime.toLocalTime(), entryDateTime).toMinutes();
         long finalRemainingTime = remainingTime;
 
         updateAppointmentStatusThenRescheduleSubsequentAppointments(
@@ -155,7 +149,7 @@ public class VisitSession {
     }
 
     @UnitTestRequired
-    public void resume(String appointmentId) {
+    public void resume(String appointmentId, LocalTime entryTime) {
         var errorMsg = "Can't resume appointment, Patient is not in `On-Hold` Status";
         var appointment = loadAppointmentAndCheckItsStatus(appointmentId, AppointmentStatus.ON_HOLD, errorMsg);
 
@@ -171,7 +165,7 @@ public class VisitSession {
                     }
                 }
         );
-        appointment.visitTime = LocalDateTime.of(LocalDate.now(), LocalTime.now().withSecond(0).withNano(0));
+        appointment.visitTime = LocalDateTime.of(LocalDate.now(), entryTime);
     }
 
     @UnitTestRequired

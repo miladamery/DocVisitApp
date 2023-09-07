@@ -28,8 +28,7 @@ public class LoadPatientsDataService {
             throw new ApplicationException("No active session for seeing patients data.");
 
         var visitSession = vs.get();
-        var appointments = visitSession
-                .getAppointments();
+        var appointments = visitSession.getAppointments();
         return new PatientsData(visitSession.summary(), appointments);
     }
 
