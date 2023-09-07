@@ -39,7 +39,17 @@ public class WebSecurityConfig {
     public WebSecurityCustomizer webSecurityCustomizer() {
         return (web) -> web
                 .ignoring()
-                .requestMatchers("/fonts/**", "/metronic/**","/static/**", "/css/**", "/js/**", "/images/**", "/lib/**", "/favicon.ico");
+                .requestMatchers(
+                        "/fonts/**",
+                        "/metronic/**",
+                        "/static/**",
+                        "/css/**",
+                        "/js/**",
+                        "/images/**",
+                        "/img/**",
+                        "/lib/**",
+                        "/favicon.ico"
+                );
     }
 
     @Bean
