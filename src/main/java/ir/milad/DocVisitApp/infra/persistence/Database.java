@@ -34,12 +34,6 @@ public class Database {
         eagerStorer.commit();
     }
 
-    public boolean hasActiveVisitSession(LocalDate date) {
-        return activeVisitSession
-                .map(visitSession -> visitSession.getDate().equals(date))
-                .orElse(false);
-    }
-
     public void updateActiveVisitSession() {
         var eagerStorer = storageManager.createEagerStorer();
         eagerStorer.store(activeVisitSession);
@@ -76,6 +70,13 @@ public class Database {
         var blockedPatients = blockedPatientsRef.get();
         blockedPatients.add(patient);
         storageManager.store(blockedPatients);
+    }
+
+    public void clearActiveVisitSession() {
+        activeVisitSession = Optional.empty();
+        var eagerStorer = storageManager.createEagerStorer();
+        eagerStorer.store(this);
+        eagerStorer.commit();
     }
 
     @PreDestroy

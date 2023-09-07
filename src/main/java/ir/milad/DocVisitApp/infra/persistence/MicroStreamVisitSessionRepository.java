@@ -49,12 +49,12 @@ public class MicroStreamVisitSessionRepository implements VisitSessionRepository
     }
 
     @Override
-    public boolean exists(LocalDate date) {
-        lock.readLock().lock();
+    public void clearActiveVisitSession() {
+        lock.writeLock().lock();
         try {
-            return database.hasActiveVisitSession(date);
+            database.clearActiveVisitSession();
         } finally {
-            lock.readLock().unlock();
+            lock.writeLock().unlock();
         }
     }
 

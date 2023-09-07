@@ -2,10 +2,7 @@ package ir.milad.DocVisitApp.infra.web;
 
 import ir.milad.DocVisitApp.domain.visit_session.VisitSessionRepository;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -15,7 +12,7 @@ import java.time.LocalTime;
 @RequestMapping("/admin")
 public class AdminController {
 
-    private VisitSessionRepository visitSessionRepository;
+    private final VisitSessionRepository visitSessionRepository;
 
     public AdminController(VisitSessionRepository visitSessionRepository) {
         this.visitSessionRepository = visitSessionRepository;
@@ -41,6 +38,12 @@ public class AdminController {
                 .get()
                 .setLastAppointmentTime(LocalDateTime.of(LocalDate.now(), request.time));
         visitSessionRepository.updateActiveVisitSession();
+    }
+
+    @DeleteMapping("/clear/active/visit/session")
+    @ResponseBody
+    public void clearActiveVisitSession() {
+        visitSessionRepository.clearActiveVisitSession();
     }
 
     public static class Request {
