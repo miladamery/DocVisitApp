@@ -11,10 +11,7 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.LinkedList;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.function.BiConsumer;
 
 @Getter
@@ -27,6 +24,7 @@ public class VisitSession {
     private Integer sessionLength;
     private LocalDateTime lastAppointmentTime;
     private final LinkedList<Appointment> appointments;
+    private Map<String, Long> onHoldTimes = new HashMap<>();
 
     public VisitSession(LocalDate date, LocalTime fromTime, LocalTime toTime, Integer sessionLength) {
         this.id = TsidCreator.getTsid().toString();
@@ -128,43 +126,27 @@ public class VisitSession {
     public void onHold(String appointmentId, LocalTime entryTime) {
         var errorMsg = "Can't pause appointment, Patient is not in `InProgress` Status";
         var appointment = loadAppointmentAndCheckItsStatus(appointmentId, AppointmentStatus.VISITING, errorMsg);
+        appointment.setStatus(AppointmentStatus.ON_HOLD);
 
         var remainingTime = ((long) appointment.numOfPersons * sessionLength);
-
         var visitToEntryTimeDiff = appointment.visitTime.timeIntervalInMinutes(entryTime);
         if (visitToEntryTimeDiff > 0)
             remainingTime -= visitToEntryTimeDiff;
-        long finalRemainingTime = remainingTime;
 
-        updateAppointmentStatusThenRescheduleSubsequentAppointments(
-                appointment,
-                AppointmentStatus.ON_HOLD,
-                (index, _appointment) -> {
-                    if (_appointment.status == AppointmentStatus.WAITING) {
-                        _appointment.decrementTurnsToAwait();
-                        _appointment.decreaseVisitTime(finalRemainingTime);
-                    }
-                }
-        );
+        onHoldTimes.put(appointmentId, remainingTime);
+
+        var nextAppointment = appointments.get(appointments.indexOf(appointment) + 1);
+        nextAppointment.decreaseVisitTime(onHoldTimes.values().stream().mapToLong(value -> value).sum());
     }
 
     @UnitTestRequired
     public void resume(String appointmentId, LocalTime entryTime) {
         var errorMsg = "Can't resume appointment, Patient is not in `On-Hold` Status";
         var appointment = loadAppointmentAndCheckItsStatus(appointmentId, AppointmentStatus.ON_HOLD, errorMsg);
+        appointment.setStatus(AppointmentStatus.VISITING);
 
-        var remainingTime = ((long) appointment.numOfPersons * sessionLength);
+        onHoldTimes.remove(appointmentId);
 
-        updateAppointmentStatusThenRescheduleSubsequentAppointments(
-                appointment,
-                AppointmentStatus.VISITING,
-                (index, _appointment) -> {
-                    if (_appointment.getStatus() == AppointmentStatus.WAITING) {
-                        _appointment.incrementTurnsToAwait();
-                        _appointment.increaseVisitTime(remainingTime);
-                    }
-                }
-        );
         appointment.visitTime = LocalDateTime.of(entryTime);
     }
 
