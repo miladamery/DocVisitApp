@@ -4,10 +4,15 @@ import ir.milad.DocVisitApp.domain.ApplicationException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
@@ -29,5 +34,17 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
         mav.addObject(ERROR_500_ATTRIBUTE_NAME, e.getMessage());
         mav.setViewName(DEFAULT_ERROR_VIEW);
         return mav;
+    }
+
+
+    @Override
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(
+            MethodArgumentNotValidException ex,
+            HttpHeaders headers,
+            HttpStatusCode status,
+            WebRequest request) {
+        return ResponseEntity.badRequest().body("<div class=\"error-desc\">" +
+                ex.getBindingResult().getAllErrors().get(0).getDefaultMessage()
+                +"</div>");
     }
 }

@@ -178,13 +178,14 @@ public class DoctorController {
     @Getter
     @Setter
     public static class VisitSessionRequest {
-        @NotNull
+        @NotNull(message = "date cant be null")
         private LocalDate date;
-        @NotNull
+        @NotNull(message = "fromTime cant be null")
         private LocalTime fromTime;
-        @NotNull
+        @NotNull(message = "toTime cant be null")
         private LocalTime toTime;
         @Positive(message = "visit session length can't be lower than 0")
+        @NotNull(message = "Please provide session length")
         private Integer sessionLength;
     }
 

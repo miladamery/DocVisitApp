@@ -7,7 +7,6 @@
         <meta name="viewport" content="width=device-width, initial-scale=1"/>
         <link rel="shortcut icon" th:href="@{/metronic/assets/media/logos/favicon.ico}"/>
         <!--begin::Fonts(mandatory for all pages)-->
-        <link rel="stylesheet" href="https://uicdn.toast.com/calendar/latest/toastui-calendar.min.css">
         <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,400,500,600,700"/>        <!--end::Fonts-->
                     <!--begin::Vendor Stylesheets(used for this page only)-->
                             <link th:href="@{/metronic/assets/plugins/custom/fullcalendar/fullcalendar.bundle.css}" rel="stylesheet" type="text/css"/>
@@ -18,6 +17,12 @@
                             <link th:href="@{/metronic/assets/css/style.bundle.css}" rel="stylesheet" type="text/css"/>
                         <!--end::Global Stylesheets Bundle-->
         <link rel="stylesheet" th:href="@{/css/fonts.css}">
+
+        <link th:href="@{/css/mobiscroll.animation.css}" rel="stylesheet" type="text/css" />
+        <link th:href="@{/css/mobiscroll.icons.css}" rel="stylesheet" type="text/css" />
+        <link th:href="@{/css/mobiscroll.frame.css}" rel="stylesheet" type="text/css" />
+        <link th:href="@{/css/mobiscroll.scroller.css}" rel="stylesheet" type="text/css" />
+
         <style>
             .numberCircle {
                 display: inline-block;
@@ -52,17 +57,11 @@
                 window.top.location.replace(window.self.location.href);
             }
         </script>
-        <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
         <script src="https://unpkg.com/htmx.org@1.9.4"
                 integrity="sha384-zUfuhFKKZCbHTY6aRR46gxiqszMk5tcHjsVFxnUo8VMus4kHGVdIYVbOYYNlKmHV"
                 crossorigin="anonymous"></script>
         <script src="https://unpkg.com/htmx.org/dist/ext/json-enc.js"></script>
         <script src="https://unpkg.com/hyperscript.org@0.9.11"></script>
-
-        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.9.0/moment.min.js"></script>
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.37/css/bootstrap-datetimepicker.min.css" rel="stylesheet">
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.37/js/bootstrap-datetimepicker.min.js"></script>
     </head>
     <!--end::Head-->
     <!--begin::Body-->
@@ -87,14 +86,62 @@
         }
 
         function requestFailedAlert(title, xhr) {
+            swalAlert(title, xhr.responseText)            
+        }
+
+        function swalAlert(title, content) {
             Swal.fire({
                 title: title,
                 icon: 'error',
-                html: '<h2>' + xhr.responseText + '</h2>',
+                html: '<h2>' + content + '</h2>',
                 showCloseButton: true,
             })
         }
+
+		document.body.addEventListener('htmx:afterSettle', function(evt) {
+			if ($("#session_duration").val() !== undefined) {
+                $("#session_duration").val(8);
+            }
+
+            if($("#fromTime").val() !== undefined) {
+                $("#fromTime").mobiscroll().time({
+                    timeFormat: 'HH:ii',
+                    timeWheels: 'HHii'
+                });
+            }
+
+            if ($("#toTime").val() !== undefined) {
+                $("#toTime").mobiscroll().time({
+                    timeFormat: 'HH:ii',
+                    timeWheels: 'HHii'
+                });
+            }
+
+            if ($("#visit_session_creator_button").val() !== undefined) {
+                document.getElementById("visit_session_creator_button").addEventListener('htmx:confirm', function (evt) {
+					evt.preventDefault();
+                    
+                    if (!$("#fromTime").val()) {
+                        swalAlert("Validation Failed!", "Please select entrance time");
+                        return;
+                    }
+
+                    if (!$("#toTime").val()) {
+                        swalAlert("Validation Failed!", "Please select exit time");
+                        return;
+                    }
+
+                    if (!$("#session_duration").val()) {
+                        swalAlert("Validation Failed!", "Please select session duration");
+                        return;
+                    }
+
+                    evt.detail.issueRequest();
+                });
+            }
+		});
     </script>
+
     <section th:replace="doctor/layout/_default.html :: _default"></section>
 <!--layout-partial:partials/theme-mode/_init.html-->
 <!--layout-partial:layout/_default.html-->
@@ -117,28 +164,16 @@
                         <!--end::Global Javascript Bundle-->
                     <!--begin::Vendors Javascript(used for this page only)-->
                             <script th:src="@{/metronic/assets/plugins/custom/fullcalendar/fullcalendar.bundle.js}" ></script>
-                            <script src="https://cdn.amcharts.com/lib/5/index.js"></script>
-                            <script src="https://cdn.amcharts.com/lib/5/xy.js"></script>
-                            <script src="https://cdn.amcharts.com/lib/5/percent.js"></script>
-                            <script src="https://cdn.amcharts.com/lib/5/radar.js"></script>
-                            <script src="https://cdn.amcharts.com/lib/5/themes/Animated.js"></script>
-                            <script src="https://cdn.amcharts.com/lib/5/map.js"></script>
-                            <script src="https://cdn.amcharts.com/lib/5/geodata/worldLow.js"></script>
-                            <script src="https://cdn.amcharts.com/lib/5/geodata/continentsLow.js"></script>
-                            <script src="https://cdn.amcharts.com/lib/5/geodata/usaLow.js"></script>
-                            <script src="https://cdn.amcharts.com/lib/5/geodata/worldTimeZonesLow.js"></script>
-                            <script src="https://cdn.amcharts.com/lib/5/geodata/worldTimeZoneAreasLow.js"></script>
                             <script th:src="@{/metronic/assets/plugins/custom/datatables/datatables.bundle.js}"></script>
                         <!--end::Vendors Javascript-->
-                    <!--begin::Custom Javascript(used for this page only)-->
-                            <script th:src="@{/metronic/assets/js/widgets.bundle.js}"></script>
-                            <script th:src="@{/metronic/assets/js/custom/widgets.js}"></script>
-                            <script th:src="@{/metronic/assets/js/custom/apps/chat/chat.js}"></script>
-                            <script th:src="@{/metronic/assets/js/custom/utilities/modals/upgrade-plan.js}"></script>
-                            <script th:src="@{/metronic/assets/js/custom/utilities/modals/create-app.js}"></script>
-                            <script th:src="@{/metronic/assets/js/custom/utilities/modals/new-target.js}"></script>
-                            <script th:src="@{/metronic/assets/js/custom/utilities/modals/users-search.js}"></script>
-                        <!--end::Custom Javascript-->
+                        <script th:src="@{/js/mobiscroll.core.js}"></script>
+                        <script th:src="@{/js/mobiscroll.frame.js}"></script>
+                        <script th:src="@{/js/mobiscroll.scroller.js}"></script>
+
+                        <script th:src="@{/js/mobiscroll.util.datetime.js}"></script>
+                        <script th:src="@{/js/mobiscroll.datetimebase.js}"></script>
+                        <script th:src="@{/js/mobiscroll.datetime.js}"></script>
+                        <script th:src="@{/js/i18n/mobiscroll.i18n.fr.js}"></script>
                 <!--end::Javascript-->
             </body>
     <!--end::Body-->
