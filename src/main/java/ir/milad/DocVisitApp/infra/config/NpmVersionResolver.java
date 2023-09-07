@@ -1,4 +1,4 @@
-package ir.milad.DocVisitApp.infra.web;
+package ir.milad.DocVisitApp.infra.config;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
