@@ -185,7 +185,10 @@
                                             else call requestFailedAlert('Done Operation failed.', xhr)
                                         end"
                                 >done</span>
-                                <span th:if="${appointment.status == T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).ON_HOLD}"
+                                <span th:if="${
+                                    appointment.status == T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).ON_HOLD &&
+                                    !data.isVisiting()
+                                }"
                                       class="badge fs-7 fw-bold text-capitalize cursor-pointer"
                                       style="color: white; background-color: #A855F7;"
                                       th:attr="hx-put='/patient/resume/' + ${appointment.id}"
