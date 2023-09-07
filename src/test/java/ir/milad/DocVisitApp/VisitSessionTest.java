@@ -164,9 +164,9 @@ class VisitSessionTest {
             var ap1 = vs.giveAppointment(p1, nine_30_OClock, 1);
             var ap2 = vs.giveAppointment(p2, nine_30_OClock.plusMinutes(5), 2);
 
-            assertThat(ap1.getVisitTime()).isEqualTo(LocalDateTime.of(LocalDate.now(), LocalTime.of(9, 30)));
-            assertThat(ap2.getVisitTime()).isEqualTo(LocalDateTime.of(LocalDate.now(), LocalTime.of(9, 38)));
-            assertThat(vs.getLastAppointmentTime()).isEqualTo(LocalDateTime.of(LocalDate.now(), LocalTime.of(9, 54)));
+            assertThat(ap1.getVisitTime()).isEqualTo(LocalDateTime.of(LocalTime.of(9, 30)));
+            assertThat(ap2.getVisitTime()).isEqualTo(LocalDateTime.of(LocalTime.of(9, 38)));
+            assertThat(vs.getLastAppointmentTime()).isEqualTo(LocalDateTime.of(LocalTime.of(9, 54)));
         }
     }
 

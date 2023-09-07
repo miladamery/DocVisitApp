@@ -10,6 +10,10 @@
         /*<![CDATA[*/
         htmx.onLoad(function (elt) {
             $('#date-picker').mobiscroll().date({
+                setText: 'Terminer',
+                cancelText: 'Annuler',
+                monthNames: ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'],
+                monthNamesShort: ['Janv.', 'Févr.', 'Mars', 'Avril', 'Mai', 'Juin', 'Juil.', 'Août', 'Sept.', 'Oct.', 'Nov.', 'Déc.'],
                 dateFormat: 'yyyy-mm-dd'
             });
 
@@ -107,18 +111,18 @@
                        placeholder="Phone Number*" required/>
             </div>
             <div class="grid place-content-center mt-4">
-                <input th:value="#{take.turn.submit}" type="submit" class="text-white font-bold py-2 px-4 rounded"/>
-            </div>
-            <div class="grid place-content-center mt-4">
                 <span
-                 style="color: #323232;font-family: Poppins;font-size: 0.875rem;font-style: normal;font-weight: 400;line-height: 1.25rem;text-transform: capitalize;"
-                 th:text="#{number.of.persons}"
+                        style="color: #323232;font-family: Poppins;font-size: 0.875rem;font-style: normal;font-weight: 400;line-height: 1.25rem;text-transform: capitalize;"
+                        th:text="#{number.of.persons}"
                 >number of persons</span>
             </div>
             <div class="flex justify-center">
                 <img id="num_of_persons_decrement" style="border-radius: 0.25rem;background: #494462;" th:src="@{/images/ic_round-plus.png}">
                 <input readonly id="num_of_persons" name="numOfPersons" class="text-center rounded-md" style="width: 25px;margin-right: 4px; margin-left: 4px;" value="1"/>
                 <img id="num_of_persons_increment" style="border-radius: 0.25rem;background: #494462;" th:src="@{/images/ic_round-plus2.png}">
+            </div>
+            <div class="grid place-content-center mt-4">
+                <input th:value="#{take.turn.submit}" type="submit" class="text-white font-bold py-2 px-4 rounded"/>
             </div>
         </form>
     </main>

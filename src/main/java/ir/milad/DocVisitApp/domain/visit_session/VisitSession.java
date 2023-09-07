@@ -31,8 +31,8 @@ public class VisitSession {
     public VisitSession(LocalDate date, LocalTime fromTime, LocalTime toTime, Integer sessionLength) {
         this.id = TsidCreator.getTsid().toString();
         this.date = date;
-        this.fromTime = LocalDateTime.of(LocalDate.now(), fromTime);
-        this.toTime = LocalDateTime.of(LocalDate.now(), toTime);
+        this.fromTime = LocalDateTime.of(fromTime);
+        this.toTime = LocalDateTime.of(toTime);
         this.sessionLength = sessionLength;
 
         if (fromTime.isAfter(toTime))
@@ -48,7 +48,7 @@ public class VisitSession {
             return patientAppointment.get();
 
         // TODO: 8/14/2023 What if last session is lower than session length
-        if (visitSessionIsOver(LocalDateTime.of(LocalDate.now(), entryTime)))
+        if (visitSessionIsOver(LocalDateTime.of(entryTime)))
             throw new ApplicationException("Session time is over. can't give new turns.");
 
         return giveNewAppointment(patient, entryTime, numOfPersons);
@@ -68,9 +68,9 @@ public class VisitSession {
         }
 
         var remainingTime = ((long) appointment.numOfPersons * sessionLength);
-        var visitToEntryTimeDiff = Duration.between(appointment.visitTime.toLocalTime(), entryTime).toMinutes();
+        var visitToEntryTimeDiff = appointment.visitTime.timeIntervalInMinutes(entryTime);
         if (visitToEntryTimeDiff > 0)
-            remainingTime -= Duration.between(appointment.visitTime.toLocalTime(), entryTime).toMinutes();
+            remainingTime -= visitToEntryTimeDiff;
         long finalRemainingTime = remainingTime;
 
         updateAppointmentStatusThenRescheduleSubsequentAppointments(
@@ -94,8 +94,8 @@ public class VisitSession {
         String errorMsg = "Wrong appointment to check-in! This patient status is not WAITING.";
         var appointment = loadAppointmentAndCheckItsStatus(appointmentId, AppointmentStatus.WAITING, errorMsg);
         appointment.setStatus(AppointmentStatus.VISITING);
-        var timeToIncrease = Duration.between(appointment.getVisitTime().toLocalTime(), entryTime).toMinutes();
-        appointment.setVisitTime(LocalDateTime.of(LocalDate.now(), entryTime));
+        var timeToIncrease = appointment.getVisitTime().timeIntervalInMinutes(entryTime);
+        appointment.setVisitTime(LocalDateTime.of(entryTime));
         updateAppointmentStatusThenRescheduleSubsequentAppointments(
                 appointment,
                 AppointmentStatus.VISITING,
@@ -108,7 +108,7 @@ public class VisitSession {
         var errorMsg = "Wrong appointment to done! Doctor is not visiting this patient.";
         var appointment = loadAppointmentAndCheckItsStatus(appointmentId, AppointmentStatus.VISITING, errorMsg);
         var timeDiff = Duration.between(
-                appointment.calculatedEndTime(sessionLength), LocalDateTime.of(LocalDate.now(), doneTime.withSecond(0))
+                appointment.calculatedEndTime(sessionLength), LocalDateTime.of(doneTime.withSecond(0))
         ).toMinutes();
 
         updateAppointmentStatusThenRescheduleSubsequentAppointments(
@@ -126,14 +126,14 @@ public class VisitSession {
 
     @UnitTestRequired
     public void onHold(String appointmentId, LocalTime entryTime) {
-        var entryDateTime = LocalDateTime.of(LocalDate.now(), entryTime);
         var errorMsg = "Can't pause appointment, Patient is not in `InProgress` Status";
         var appointment = loadAppointmentAndCheckItsStatus(appointmentId, AppointmentStatus.VISITING, errorMsg);
 
         var remainingTime = ((long) appointment.numOfPersons * sessionLength);
-        var visitToEntryTimeDiff = Duration.between(appointment.visitTime.toLocalTime(), entryDateTime).toMinutes();
+
+        var visitToEntryTimeDiff = appointment.visitTime.timeIntervalInMinutes(entryTime);
         if (visitToEntryTimeDiff > 0)
-            remainingTime -= Duration.between(appointment.visitTime.toLocalTime(), entryDateTime).toMinutes();
+            remainingTime -= visitToEntryTimeDiff;
         long finalRemainingTime = remainingTime;
 
         updateAppointmentStatusThenRescheduleSubsequentAppointments(
@@ -165,7 +165,7 @@ public class VisitSession {
                     }
                 }
         );
-        appointment.visitTime = LocalDateTime.of(LocalDate.now(), entryTime);
+        appointment.visitTime = LocalDateTime.of(entryTime);
     }
 
     @UnitTestRequired
@@ -191,8 +191,8 @@ public class VisitSession {
             throw new ApplicationException("Can't change session 'from time'/'session length'. Reason: Patients are waiting.");
 
         this.date = date;
-        this.fromTime = LocalDateTime.of(LocalDate.now(), fromTime);
-        this.toTime = LocalDateTime.of(LocalDate.now(), toTime);
+        this.fromTime = LocalDateTime.of(fromTime);
+        this.toTime = LocalDateTime.of(toTime);
         this.sessionLength = sessionLength;
     }
 
@@ -227,9 +227,9 @@ public class VisitSession {
     }
 
     private Appointment giveNewAppointment(Patient patient, LocalTime entryTime, int numOfPersons) {
-        var entryDateTime = LocalDateTime.of(LocalDate.now(), entryTime);
+        var entryDateTime = LocalDateTime.of(entryTime);
         LocalDateTime visitTime;
-        if (entryDateTime.isAfter(lastAppointmentTime) || entryDateTime.isEqual(lastAppointmentTime)) {
+        if (entryDateTime.isAfterOrEqualTo(lastAppointmentTime)) {
             visitTime = entryDateTime;
             lastAppointmentTime = entryDateTime.plusMinutes((long) sessionLength * numOfPersons);
         } else {
