@@ -2,22 +2,18 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>You are Blocked!</title>
+    <title>Thank You</title>
 </head>
 <body>
-    <th:block th:fragment="blocked">
-        <main>
+    <th:block th:fragment="apponintment-done">
+	    <main >
             <div class="grid place-content-center mt-12">
                 <img th:src="@{/img/logo1.svg}" />
             </div>
             <div class="mt-8 px-6">
                 <div class="grid place-content-center mx-3 rounded-xl" style="background-color: #494462;color: #FFF;text-align: center;font-family: Poppins;font-size: 1.125rem;font-style: normal;font-weight: 400;line-height: 1.625rem;letter-spacing: -0.01875rem;">
                     <div class="border-2 p-10 pt-4 mx-3 mb-5 mt-8 rounded-lg" style="border-color: #C5A470;">
-                        <p class="mb-4 text-2xl" th:text="#{blocked.title}">Blocked!</p>
-                        <p class="text-lg" th:text="#{blocked.message}">
-                            You have been blocked by the doctor due to multiple cancellations. You are not allowed to book an appointment!
-                        </p>
+                        <p class="m-auto text-2xl" th:text="#{done.title}">Thank You!</p>
                         <br/>
                     </div>
                 </div>
@@ -28,7 +24,7 @@
                 <div style="background-color: #494462;"
                      class="lang_icons p-4 text-white flex justify-center capitalize"
                      id="en_lang"
-                     hx-get="/patient/blocked?language=en"
+                     hx-get="/patient/done?language=en"
                      hx-target="#main_container"
                      hx-trigger="click"
                      th:classappend="${language == 'en'} ? 'selected' : ''"
@@ -38,7 +34,7 @@
                 <div style="background-color: #494462;"
                      class="lang_icons p-4 text-white flex justify-center capitalize"
                      id="fr_lang"
-                     hx-get="/patient/blocked?language=fr"
+                     hx-get="/patient/done?language=fr"
                      hx-target="#main_container"
                      hx-trigger="click"
                      th:classappend="${language == 'fr'} ? 'selected' : ''"
@@ -48,7 +44,7 @@
                 <div style="background-color: #494462;"
                      class="lang_icons p-4 text-white flex justify-center capitalize"
                      id="fa_lang"
-                     hx-get="/patient/blocked?language=fa"
+                     hx-get="/patient/done?language=fa"
                      hx-target="#main_container"
                      hx-trigger="click"
                      th:classappend="${language == 'fa'} ? 'selected' : ''"

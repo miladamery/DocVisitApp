@@ -32,6 +32,7 @@ public class PatientController {
     private final PatientAppointmentDoneService patientAppointmentDoneService;
     private final PatientAppointmentOnHoldService patientAppointmentOnHoldService;
     private final PatientAppointmentResumeService patientAppointmentResumeService;
+
     public PatientController(
             TakeAppointmentService takeAppointmentService,
             GetActiveVisitSessionService getActiveVisitSessionService,
@@ -106,12 +107,11 @@ public class PatientController {
                         model.addAttribute("turnNumber", appointment.turnNumber);
                         model.addAttribute("appointmentId", id);
                         return "patient/appointment-arrived :: appointment-arrived";
-                    } else if (appointment.status == AppointmentStatus.CANCELED_BY_DOCTOR ||
-                        appointment.status == AppointmentStatus.VISITED
-                    ) {
-                        response.setHeader(HTMX_REDIRECT_HEADER, "/patient/index");
-                        return "/patient/index";
-                    } else
+                    } else if (appointment.status == AppointmentStatus.CANCELED_BY_DOCTOR)
+                        return "patient/appointment-cancel-by-doc :: appointment-cancel-by-doc";
+                    else if (appointment.status == AppointmentStatus.VISITED)
+                        return "patient/appointment-done :: apponintment-done";
+                    else
                         return appointmentInfo(model, appointment);
 
                 })
@@ -194,6 +194,18 @@ public class PatientController {
     public String appointmentInfo(@RequestParam(defaultValue = "fr") String language, String id, Model model) {
         model.addAttribute("language", language);
         return appointmentInfo(model, loadPatientAppointmentService.loadPatientAppointment(id).get());
+    }
+
+    @GetMapping("/done")
+    public String done(@RequestParam(defaultValue = "fr") String language, Model model) {
+        model.addAttribute("language", language);
+        return "patient/appointment-done :: apponintment-done";
+    }
+
+    @GetMapping("/cancelled/by/doc")
+    public String cancelledByDoc(@RequestParam(defaultValue = "fr") String language, Model model) {
+        model.addAttribute("language", language);
+        return "patient/appointment-cancel-by-doc :: appointment-cancel-by-doc";
     }
 
     private Patient getPatientFromRequest(PatientRequestModel request) {

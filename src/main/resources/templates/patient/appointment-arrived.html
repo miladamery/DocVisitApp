@@ -21,6 +21,12 @@
                 </div>
             </div>
             <input type="hidden" name="id" id="appointmentId" th:value="${appointmentId}">
+            <div
+                    hx-get="/patient/load/appointment"
+                    hx-include="#appointmentId"
+                    hx-trigger="every 10s"
+                    hx-target="#main_container"
+            ></div>
         </main>
         <footer class="fixed bottom-0 left-0 z-20 w-full">
             <div class="grid grid-cols-3 place-content-center">
