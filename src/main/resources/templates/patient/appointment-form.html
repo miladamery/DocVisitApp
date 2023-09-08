@@ -40,6 +40,25 @@
                 numOfPeople--
                 $("#num_of_persons").val(numOfPeople);
             });
+
+            $("#firstName").off().on("keydown", function(event) {
+                var ch = event.key;				                
+                if (isPersian(ch))
+                    event.preventDefault();
+            } );
+			
+			$("#lastName").off().on("keydown", function(event) {
+                var ch = event.key;				                
+                if (isPersian(ch))
+                    event.preventDefault();
+            } );
+			
+			$('#phoneNumber').inputmask("999-999-9999");
+			
+			function isPersian(ch) {
+				var frobiddenChars = "ابپتثجچحخدذرزژسشصضطظعغفقکگلمنوهیئ";
+                return ch == 'ا' || frobiddenChars.indexOf(ch) > 0;
+			}
         })
     </script>
     <main id="appointment-form-main">
@@ -56,11 +75,11 @@
               hx-ext="json-enc"
               hx-target="#main_container">
             <div class="grid place-content-center">
-                <input autocomplete="off" class="user" type="text" name="firstName" th:placeholder="#{first.name}"
+                <input id="firstName" autocomplete="off" class="user" type="text" name="firstName" th:placeholder="#{first.name}"
                        placeholder="First Name*" required/>
             </div>
             <div class="grid place-content-center mt-4">
-                <input autocomplete="off" class="user" type="text" name="lastName" th:placeholder="#{last.name}"
+                <input id="lastName" autocomplete="off" class="user" type="text" name="lastName" th:placeholder="#{last.name}"
                        placeholder="Last Name*" required/>
             </div>
             <div class="grid place-content-center mt-4">
@@ -68,7 +87,7 @@
                        placeholder="Date of Birth*" id="date-picker" required/>
             </div>
             <div class="grid place-content-center mt-4">
-                <input autocomplete="off" class="phone" type="text" name="phoneNumber" th:placeholder="#{phone.number}"
+                <input id="phoneNumber" autocomplete="off" class="phone" type="text" name="phoneNumber" th:placeholder="#{phone.number}"
                        placeholder="Phone Number*" required/>
             </div>
             <div class="grid place-content-center mt-4">
