@@ -90,8 +90,15 @@ public class DoctorController {
     @GetMapping("/calendar")
     public String calendar(Model model) {
         var today = LocalDate.now();
-        LocalDate previousMonday = today.with(TemporalAdjusters.previous(DayOfWeek.MONDAY));
-        var times = Arrays.asList("08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18");
+        LocalDate previousMonday;
+        if (today.getDayOfWeek() == DayOfWeek.MONDAY)
+            previousMonday = today;
+        else
+            previousMonday = today.with(TemporalAdjusters.previous(DayOfWeek.MONDAY));
+        var times = Arrays.asList(
+                "00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14",
+                "15", "16", "17", "18", "19", "20", "21", "22", "23");
+
         var dates = Arrays.asList(
                 previousMonday,
                 previousMonday.plusDays(1),

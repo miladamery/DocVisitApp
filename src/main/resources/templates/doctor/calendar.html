@@ -26,7 +26,7 @@
                 </tr>
             </thead>
             <tbody>
-            <tr class="text-center m-4" th:each="time: ${times}" style="border: 2px solid #C5A4701A;" th:id="${time}">
+            <tr class="text-center" th:each="time: ${times}" style="border: 2px solid #C5A4701A;" th:id="${time}">
                 <th scope="row" th:text="${time.time}" style="border: 1px solid #C5A4701A;"></th>
                 <td class="p-5" style="border: 1px solid #C5A4701A;"
                     th:classappend="${time.hasSessions.get(0) ? 'bg-light-yellow' : ''}"
