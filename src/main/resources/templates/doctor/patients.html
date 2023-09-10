@@ -16,9 +16,19 @@
              style="background-color: #494462; font-style: normal;">
             <div class="row" style="color: white;">
                 <div class="col-6 text-center mt-5" style="border-right: 5px solid #C5A470;">
-                    <span style="font-size: xxx-large;" th:text="${data.day}"></span>&nbsp;&nbsp;
-                    <span style="font-size: xx-large;" th:text="${data.month}"></span>&nbsp;&nbsp;
-                    <span style="font-size: xx-large;" th:text="${data.year}"></span>&nbsp;&nbsp;
+                    <div class="row">
+						<div class="col-12">
+							<span style="font-size: xxx-large;" th:text="${data.day}"></span>&nbsp;&nbsp;
+							<span style="font-size: xx-large;" th:text="${data.month}"></span>&nbsp;&nbsp;
+							<span style="font-size: xx-large;" th:text="${data.year}"></span>&nbsp;&nbsp;
+						</div>
+						<div class="col-6 offset-3" style="text-align: left;font-size: large;">
+							<span th:text="${'Today Office Hours: ' + data.summary.fromTime + ' - ' + data.summary.toTime}"></span>
+						</div>
+						<div class="col-6 offset-3" style="text-align: left;font-size: large;">
+							<span th:text="${'Session length: ' + data.summary.sessionLength + ' Minutes'}"></span>
+						</div>
+					</div>
                 </div>
                 <div class="col-6 text-center">
                     <div class="row">

@@ -164,7 +164,8 @@ public class VisitSession {
                 numberOfAppointmentsAwaiting(),
                 numberOfAppointmentsByStatus(Optional.of(AppointmentStatus.VISITED)),
                 numberOfAppointmentsByStatus(Optional.of(AppointmentStatus.CANCELED)),
-                nextAppointmentId);
+                nextAppointmentId,
+                fromTime, toTime, sessionLength);
     }
 
     @UnitTestRequired
