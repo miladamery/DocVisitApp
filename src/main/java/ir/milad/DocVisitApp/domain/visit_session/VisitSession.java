@@ -6,6 +6,7 @@ import ir.milad.DocVisitApp.domain.UnitTestRequired;
 import ir.milad.DocVisitApp.domain.patient.Patient;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 import java.time.Duration;
 import java.time.LocalDate;
@@ -16,6 +17,7 @@ import java.util.function.BiConsumer;
 
 @Getter
 @Setter
+@Slf4j
 public class VisitSession {
     private final String id;
     private LocalDate date;
@@ -63,6 +65,7 @@ public class VisitSession {
 
         if (appointment.getStatus() == AppointmentStatus.ON_HOLD) {
             appointment.setStatus(appointmentStatus);
+            onHoldTimes.remove(id);
             return appointment.patient;
         }
 
@@ -135,9 +138,11 @@ public class VisitSession {
             remainingTime -= visitToEntryTimeDiff;
 
         onHoldTimes.put(appointmentId, remainingTime);
-
-        var nextAppointment = appointments.get(appointments.indexOf(appointment) + 1);
-        nextAppointment.decreaseVisitTime(onHoldTimes.values().stream().mapToLong(value -> value).sum());
+        log.info("OnHolding appointment#{}, onHoldTimes: {}, remainingTime: {}", appointmentId, onHoldTimes, remainingTime);
+        if (appointments.indexOf(appointment) < appointments.size() -1) {
+            var nextAppointment = appointments.get(appointments.indexOf(appointment) + 1);
+            nextAppointment.decreaseVisitTime(onHoldTimes.values().stream().mapToLong(value -> value).sum());
+        }
     }
 
     @UnitTestRequired
@@ -146,8 +151,9 @@ public class VisitSession {
         var appointment = loadAppointmentAndCheckItsStatus(appointmentId, AppointmentStatus.ON_HOLD, errorMsg);
         appointment.setStatus(AppointmentStatus.VISITING);
 
+        log.info("Before Resuming appointment#{}, onHoldTimes: {}", appointmentId, onHoldTimes);
         onHoldTimes.remove(appointmentId);
-
+        log.info("After Resuming appointment#{}, onHoldTimes: {}", appointmentId, onHoldTimes);
         appointment.visitTime = LocalDateTime.of(entryTime);
     }
 
