@@ -59,6 +59,7 @@ public class VisitSession {
                 Set.of(AppointmentStatus.WAITING, AppointmentStatus.ON_HOLD, AppointmentStatus.VISITING),
                 errorMsg
         );
+        var isLastWaitingAppointment = isLastWaitingAppointmentInQueue(appointment);
 
         if (appointment.getStatus() == AppointmentStatus.ON_HOLD) {
             appointment.setStatus(appointmentStatus);
@@ -82,7 +83,7 @@ public class VisitSession {
                 }
         );
 
-        if (appointments.indexOf(appointment) == appointments.indexOf(appointments.getLast()))
+        if (isLastWaitingAppointment)
             lastAppointmentTime = appointment.visitTime;
 
         return appointment.getPatient();
@@ -170,8 +171,8 @@ public class VisitSession {
 
     @UnitTestRequired
     public void update(LocalDate date, LocalTime fromTime, LocalTime toTime, Integer sessionLength) {
-        if (appointments.size() > 0 && ( !fromTime.equals(this.fromTime.toLocalTime()) || !Objects.equals(sessionLength, this.sessionLength)))
-            throw new ApplicationException("Can't change session 'from time'/'session length'. Reason: Patients are waiting.");
+        if (appointments.isNotEmpty() && (!fromTime.equals(this.fromTime.toLocalTime()) || !Objects.equals(sessionLength, this.sessionLength)))
+            throw new ApplicationException("Can't change session 'from time'/'session length'.");
 
         this.date = date;
         this.fromTime = LocalDateTime.of(fromTime);
@@ -270,6 +271,21 @@ public class VisitSession {
 
         var lastAppointment = appointments.getLast();
         lastAppointmentTime = lastAppointment.getVisitTime().plusMinutes((long) lastAppointment.numOfPersons * sessionLength);
+    }
+
+    private boolean isLastWaitingAppointmentInQueue(Appointment appointment) {
+        int lastWaitingAppointmentIndex = -1;
+        for (int i = appointments.size() - 1; i >= 0; i--) {
+            if (appointments.get(i).getStatus() == AppointmentStatus.WAITING) {
+                lastWaitingAppointmentIndex = i;
+                break;
+            }
+        }
+
+        if (lastWaitingAppointmentIndex == -1)
+            return false;
+
+        return appointments.get(lastWaitingAppointmentIndex).getId().equals(appointment.getId());
     }
 
 }
