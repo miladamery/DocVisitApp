@@ -1,5 +1,7 @@
 package ir.milad.DocVisitApp.domain.visit_session;
 
+import ir.milad.DocVisitApp.domain.patient.Patient;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -17,6 +19,8 @@ public interface VisitSessionRepository {
     void updateActiveVisitSession();
 
     List<VisitSession> getVisitSessionHistories();
+
+    boolean hasHistory(Patient patient);
 
     default Optional<VisitSession> findActiveSessionForToday() {
         return getActiveSession(LocalDate.now());

@@ -66,6 +66,10 @@ public class Database {
         return patientsHistoryRef.get().getOrDefault(patient, new ArrayList<>());
     }
 
+    public Boolean existsHistoryFor(Patient patient) {
+        return patientsHistoryRef.get().containsKey(patient);
+    }
+
     public void addToBlocked(Patient patient) {
         var blockedPatients = blockedPatientsRef.get();
         blockedPatients.add(patient);
