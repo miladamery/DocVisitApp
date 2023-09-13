@@ -43,6 +43,7 @@ public class VisitSession {
     }
 
     public Appointment giveAppointment(Patient patient, LocalTime entryTime, int numOfPersons) {
+        log.info("Event: Tying to give appointment ....");
         var patientAppointment = findActiveAppointmentByPatient(patient);
         if (patientAppointment.isPresent())
             return patientAppointment.get();
@@ -50,20 +51,27 @@ public class VisitSession {
         // TODO: 8/14/2023 What if last session is lower than session length
         if (visitSessionIsOver(LocalDateTime.of(entryTime)))
             throw new ApplicationException("Session time is over. can't give new turns.");
-
-        return giveNewAppointment(patient, entryTime, numOfPersons);
+        var appointment = giveNewAppointment(patient, entryTime, numOfPersons);
+        log.info("Event: Appointment given: {}", appointment);
+        return appointment;
     }
 
     public Patient cancelAppointment(String id, AppointmentStatus appointmentStatus, LocalTime entryTime) {
+        log.info("Tying to cancel appointment with id {} .....", id);
         var errorMsg = "Cant cancel Appointment. Appointment status should be (WAITING OR ON_HOLD)";
         var appointment = loadAppointmentAndCheckItsStatus(
                 id,
                 Set.of(AppointmentStatus.WAITING, AppointmentStatus.ON_HOLD, AppointmentStatus.VISITING),
                 errorMsg
         );
+        logOperation("Before Cancellation", appointment);
+
         var isLastWaitingAppointment = isLastWaitingAppointmentInQueue(appointment);
+        if (isLastWaitingAppointment)
+            log.info("Appointment with ticket number:{} determined as last WAITING appointment", appointment.turnNumber);
 
         if (appointment.getStatus() == AppointmentStatus.ON_HOLD) {
+            log.info("Appointment with ticket number:{} is in ON_HOLD status", appointment.turnNumber);
             appointment.setStatus(appointmentStatus);
             onHoldTimes.remove(id);
             return appointment.patient;
@@ -89,12 +97,14 @@ public class VisitSession {
         if (isLastWaitingAppointment)
             lastAppointmentTime = appointment.visitTime;
 
+        logOperation("Cancellation Completed", appointment);
         return appointment.getPatient();
     }
 
     public void checkIn(String appointmentId, LocalTime entryTime) {
         String errorMsg = "Wrong appointment to check-in! This patient status is not WAITING.";
         var appointment = loadAppointmentAndCheckItsStatus(appointmentId, AppointmentStatus.WAITING, errorMsg);
+        logOperation("Before CheckIn", appointment);
         appointment.setStatus(AppointmentStatus.VISITING);
         var timeToIncrease = appointment.getVisitTime().timeIntervalInMinutes(entryTime);
         appointment.setVisitTime(LocalDateTime.of(entryTime));
@@ -103,12 +113,15 @@ public class VisitSession {
                 AppointmentStatus.VISITING,
                 (integer, _appointment) -> _appointment.increaseVisitTime(timeToIncrease)
         );
+        logOperation("CheckIn Completed", appointment);
     }
 
     @UnitTestRequired
     public void done(String appointmentId, LocalTime doneTime) {
         var errorMsg = "Wrong appointment to done! Doctor is not visiting this patient.";
         var appointment = loadAppointmentAndCheckItsStatus(appointmentId, AppointmentStatus.VISITING, errorMsg);
+        logOperation("Before Done", appointment);
+
         var timeDiff = Duration.between(
                 appointment.calculatedEndTime(sessionLength), LocalDateTime.of(doneTime.withSecond(0))
         ).toMinutes();
@@ -124,6 +137,8 @@ public class VisitSession {
 
         if (appointments.indexOf(appointment) == appointments.indexOf(appointments.getLast()))
             lastAppointmentTime = appointment.visitTime;
+
+        logOperation("Done Completed", appointment);
     }
 
     @UnitTestRequired
@@ -131,18 +146,20 @@ public class VisitSession {
         var errorMsg = "Can't pause appointment, Patient is not in `InProgress` Status";
         var appointment = loadAppointmentAndCheckItsStatus(appointmentId, AppointmentStatus.VISITING, errorMsg);
         appointment.setStatus(AppointmentStatus.ON_HOLD);
-
+        logOperation("Before OnHold", appointment);
         var remainingTime = ((long) appointment.numOfPersons * sessionLength);
-        var visitToEntryTimeDiff = appointment.visitTime.timeIntervalInMinutes(entryTime);
+        var visitToEntryTimeDiff = entryTime.timeIntervalInMinutes(appointment.visitTime.toLocalTime());
         if (visitToEntryTimeDiff > 0)
             remainingTime -= visitToEntryTimeDiff;
 
         onHoldTimes.put(appointmentId, remainingTime);
-        log.info("OnHolding appointment#{}, onHoldTimes: {}, remainingTime: {}", appointmentId, onHoldTimes, remainingTime);
-        if (appointments.indexOf(appointment) < appointments.size() -1) {
+        if (appointments.indexOf(appointment) < appointments.size() - 1) {
             var nextAppointment = appointments.get(appointments.indexOf(appointment) + 1);
             nextAppointment.decreaseVisitTime(onHoldTimes.values().stream().mapToLong(value -> value).sum());
+            if (nextAppointment.getVisitTime().toLocalTime().isBefore(LocalTime.now().withNano(0)))
+                nextAppointment.setVisitTime(LocalDateTime.now().withNano(0));
         }
+        logOperation("OnHold Completed", appointment);
     }
 
     @UnitTestRequired
@@ -150,11 +167,11 @@ public class VisitSession {
         var errorMsg = "Can't resume appointment, Patient is not in `On-Hold` Status";
         var appointment = loadAppointmentAndCheckItsStatus(appointmentId, AppointmentStatus.ON_HOLD, errorMsg);
         appointment.setStatus(AppointmentStatus.VISITING);
+        logOperation("Before Resume", appointment);
 
-        log.info("Before Resuming appointment#{}, onHoldTimes: {}", appointmentId, onHoldTimes);
         onHoldTimes.remove(appointmentId);
-        log.info("After Resuming appointment#{}, onHoldTimes: {}", appointmentId, onHoldTimes);
         appointment.visitTime = LocalDateTime.of(entryTime);
+        logOperation("Resume Completed", appointment);
     }
 
     @UnitTestRequired
@@ -276,23 +293,39 @@ public class VisitSession {
             rescheduler.accept(i, _appointment);
         }
 
-        var lastAppointment = appointments.getLast();
-        lastAppointmentTime = lastAppointment.getVisitTime().plusMinutes((long) lastAppointment.numOfPersons * sessionLength);
+        lastWaitingAppointmentInQueue().ifPresent(value ->
+                lastAppointmentTime = value.getVisitTime().plusMinutes((long) value.numOfPersons * sessionLength)
+        );
     }
 
     private boolean isLastWaitingAppointmentInQueue(Appointment appointment) {
-        int lastWaitingAppointmentIndex = -1;
+        return lastWaitingAppointmentInQueue()
+                .map(la -> la.getId().equals(appointment.getId()))
+                .orElse(false);
+    }
+
+    private Optional<Appointment> lastWaitingAppointmentInQueue() {
         for (int i = appointments.size() - 1; i >= 0; i--) {
             if (appointments.get(i).getStatus() == AppointmentStatus.WAITING) {
-                lastWaitingAppointmentIndex = i;
-                break;
+                return Optional.of(appointments.get(i));
             }
         }
+        return Optional.empty();
+    }
 
-        if (lastWaitingAppointmentIndex == -1)
-            return false;
-
-        return appointments.get(lastWaitingAppointmentIndex).getId().equals(appointment.getId());
+    private void logOperation(String operation, Appointment appointment) {
+        var message = new StringBuilder()
+                .append("Event: ")
+                .append(operation)
+                .append(", Ticket Number:")
+                .append(appointment.turnNumber)
+                .append(", Visit Time:")
+                .append(appointment.visitTime.toLocalTime())
+                .append(", lastAppointmentTime: ")
+                .append(lastAppointmentTime.toLocalTime())
+                .append(", onHoldTimes:")
+                .append(onHoldTimes);
+        log.info(message.toString());
     }
 
 }
