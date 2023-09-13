@@ -170,7 +170,8 @@ public class VisitSession {
                 numberOfAppointmentsByStatus(Optional.empty()),
                 numberOfAppointmentsAwaiting(),
                 numberOfAppointmentsByStatus(Optional.of(AppointmentStatus.VISITED)),
-                numberOfAppointmentsByStatus(Optional.of(AppointmentStatus.CANCELED)),
+                numberOfAppointmentsByStatus(Optional.of(AppointmentStatus.CANCELED)) +
+                        numberOfAppointmentsByStatus(Optional.of(AppointmentStatus.CANCELED_BY_DOCTOR)),
                 nextAppointmentId,
                 fromTime, toTime, sessionLength);
     }
