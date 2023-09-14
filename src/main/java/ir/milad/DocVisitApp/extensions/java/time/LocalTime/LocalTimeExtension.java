@@ -9,7 +9,12 @@ import java.time.LocalTime;
 @Extension
 public class LocalTimeExtension {
 
-    public static Long timeIntervalInMinutes(@This LocalTime thiz, LocalTime dest) {
+    public static Long minus(@This LocalTime thiz, LocalTime dest) {
         return Duration.between(thiz, dest).toMinutes();
+    }
+
+    @Extension
+    public static LocalTime nowHM() {
+        return LocalTime.now().withSecond(0).withNano(0);
     }
 }

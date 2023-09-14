@@ -8,12 +8,11 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
-import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
-import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 @Getter
 @Setter
@@ -107,7 +106,7 @@ public class VisitSession {
         updateAppointmentStatusThenRescheduleSubsequentAppointments(
                 appointment,
                 appointmentStatus,
-                (index, _appointment) -> {
+                _appointment -> {
                     if (_appointment.getStatus() == AppointmentStatus.WAITING) {
                         _appointment.decrementTurnsToAwait();
                         _appointment.decreaseVisitTime(finalRemainingTime);
@@ -132,7 +131,7 @@ public class VisitSession {
         updateAppointmentStatusThenRescheduleSubsequentAppointments(
                 appointment,
                 AppointmentStatus.VISITING,
-                (integer, _appointment) -> _appointment.increaseVisitTime(timeToIncrease)
+                _appointment -> _appointment.increaseVisitTime(timeToIncrease)
         );
         logOperation("CheckIn Completed", appointment);
     }
@@ -143,16 +142,16 @@ public class VisitSession {
         var appointment = loadAppointmentAndCheckItsStatus(appointmentId, AppointmentStatus.VISITING, errorMsg);
         logOperation("Before Done", appointment);
 
-        var timeDiff = Duration.between(
+        var timeDiff = appointment.calculatedEndTime(sessionLength) - LocalDateTime.of(doneTime.withSecond(0));
+        /*var timeDiff = Duration.between(
                 appointment.calculatedEndTime(sessionLength), LocalDateTime.of(doneTime.withSecond(0))
-        ).toMinutes();
+        ).toMinutes();*/
 
         updateAppointmentStatusThenRescheduleSubsequentAppointments(
                 appointment,
                 AppointmentStatus.VISITED,
-                (index, _appointment) -> {
-                    if (_appointment.getStatus() == AppointmentStatus.WAITING &&
-                            numberOfAppointmentsByStatus(Optional.of(AppointmentStatus.ON_HOLD)) == 0)
+                _appointment -> {
+                    if (_appointment.getStatus() == AppointmentStatus.WAITING)
                         _appointment.increaseVisitTime(timeDiff);
                 }
         );
@@ -170,7 +169,7 @@ public class VisitSession {
         logOperation("Before OnHold", appointment);
 
         var remainingTime = ((long) appointment.numOfPersons * sessionLength);
-        var visitToEntryTimeDiff = appointment.visitTime.toLocalTime().withSecond(0).withNano(0).timeIntervalInMinutes(entryTime);
+        var visitToEntryTimeDiff = appointment.visitTime.toLocalTime().withSecond(0).withNano(0) -entryTime;
         if (visitToEntryTimeDiff > 0)
             remainingTime -= visitToEntryTimeDiff;
         onHoldTimes.put(appointmentId, remainingTime);
@@ -178,17 +177,16 @@ public class VisitSession {
         if (appointments.indexOf(appointment) < appointments.size() - 1) {
             var nextAppointment = appointments.get(appointments.indexOf(appointment) + 1);
             nextAppointment.decreaseVisitTime(onHoldTimes.values().stream().mapToLong(value -> value).sum());
-            if (nextAppointment.getVisitTime().toLocalTime().isBefore(LocalTime.now().withNano(0)))
-                nextAppointment.setVisitTime(LocalDateTime.now().withSecond(0).withNano(0));
+            if (nextAppointment.getVisitTime().toLocalTime() < LocalTime.nowHM())
+                nextAppointment.setVisitTime(LocalDateTime.nowHM());
         }
 
         updateAppointmentStatusThenRescheduleSubsequentAppointments(
                 appointment,
                 AppointmentStatus.ON_HOLD,
-                (integer, appointment1) -> {
-                    if (appointment1.status == AppointmentStatus.WAITING) {
-                        appointment1.increaseVisitTime(visitToEntryTimeDiff);
-                    }
+                _appointment -> {
+                    if (_appointment.status == AppointmentStatus.WAITING)
+                        _appointment.increaseVisitTime(visitToEntryTimeDiff);
                 }
         );
 
@@ -209,12 +207,12 @@ public class VisitSession {
 
     @UnitTestRequired
     public Optional<Appointment> findAppointmentById(String id) {
-        return appointments.stream().filter(t -> t.id.equals(id)).findFirst();
+        return appointments.filter(t -> t.id.equals(id)).findFirst();
     }
 
     @UnitTestRequired
     public VisitSessionSummary summary() {
-        var nextAppointmentId = appointments.stream().filter(appointment -> appointment.status == AppointmentStatus.WAITING)
+        var nextAppointmentId = appointments.filter(appointment -> appointment.status == AppointmentStatus.WAITING)
                 .findFirst().map(Appointment::getId).orElse("-1");
         return new VisitSessionSummary(
                 numberOfAppointmentsByStatus(Optional.empty()),
@@ -245,13 +243,13 @@ public class VisitSession {
     @UnitTestRequired
     public Long numberOfAppointmentsByStatus(Optional<AppointmentStatus> status) {
         return status
-                .map(appointmentStatus -> appointments.stream().filter(appointment -> appointment.status == appointmentStatus).count())
+                .map(appointmentStatus -> appointments.filter(appointment -> appointment.status == appointmentStatus).count())
                 .orElseGet(() -> (long) appointments.size());
     }
 
     @UnitTestRequired
     public boolean visitSessionIsOver(LocalDateTime entryTime) {
-        return entryTime.isAfter(toTime) || lastAppointmentTime.isAfter(toTime);
+        return entryTime > toTime || lastAppointmentTime > toTime;
     }
 
     @UnitTestRequired
@@ -285,15 +283,11 @@ public class VisitSession {
 
     private Optional<Appointment> findActiveAppointmentByPatient(Patient patient) {
         return appointments
-                .stream()
                 .filter(t -> t.isSamePatient(patient) && t.status == AppointmentStatus.WAITING)
                 .findFirst();
     }
 
-    private Appointment loadAppointmentAndCheckItsStatus(
-            String appointmentId,
-            AppointmentStatus status,
-            String errorMsg) {
+    private Appointment loadAppointmentAndCheckItsStatus(String appointmentId, AppointmentStatus status, String errorMsg) {
         var appointment = findAppointmentById(appointmentId)
                 .orElseThrow(() -> new ApplicationException("Appointment with id: " + id + " Not Found"));
         if (appointment.status != status)
@@ -301,10 +295,7 @@ public class VisitSession {
         return appointment;
     }
 
-    private Appointment loadAppointmentAndCheckItsStatus(
-            String appointmentId,
-            Set<AppointmentStatus> statuses,
-            String errorMsg) {
+    private Appointment loadAppointmentAndCheckItsStatus(String appointmentId, Set<AppointmentStatus> statuses, String errorMsg) {
         var appointment = findAppointmentById(appointmentId)
                 .orElseThrow(() -> new ApplicationException("Appointment with id: " + id + " Not Found"));
         if (!statuses.contains(appointment.status))
@@ -315,7 +306,7 @@ public class VisitSession {
     private void updateAppointmentStatusThenRescheduleSubsequentAppointments(
             Appointment appointment,
             AppointmentStatus status,
-            BiConsumer<Integer, Appointment> rescheduler) {
+            Consumer<Appointment> rescheduler) {
         appointment.setStatus(status);
         var index = appointments.indexOf(appointment);
         if (index == -1)
@@ -323,7 +314,7 @@ public class VisitSession {
 
         for (int i = index + 1; i < appointments.size(); i++) {
             var _appointment = appointments.get(i);
-            rescheduler.accept(i, _appointment);
+            rescheduler.accept(_appointment);
         }
 
         lastWaitingAppointmentInQueue().ifPresent(value ->

@@ -20,6 +20,15 @@ public class LocalDateTimeExtension {
         return Duration.between(thiz.toLocalTime(), dest).toMinutes();
     }
 
+    @Extension
+    public static LocalDateTime nowHM() {
+        return LocalDateTime.of(LocalDate.now(), LocalTime.nowHM());
+    }
+
+    public static Long minus(@This LocalDateTime thiz, LocalDateTime other) {
+        return Duration.between(thiz, other).toMinutes();
+    }
+
     /**
      * Manifold Operator overloading capability for LocalDateTime.
      * Activates >, <, >=, <=, ==, != for LocalDateTime
