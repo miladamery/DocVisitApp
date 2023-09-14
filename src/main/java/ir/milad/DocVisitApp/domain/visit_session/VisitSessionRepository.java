@@ -16,7 +16,7 @@ public interface VisitSessionRepository {
 
     void clearActiveVisitSession();
 
-    void updateActiveVisitSession();
+    void updateActiveVisitSession(VisitSession visitSession);
 
     List<VisitSession> getVisitSessionHistories();
 

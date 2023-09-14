@@ -25,8 +25,8 @@ public class VisitSession {
     private LocalDateTime toTime;
     private Integer sessionLength;
     private LocalDateTime lastAppointmentTime;
-    private final LinkedList<Appointment> appointments;
-    private Map<String, Long> onHoldTimes = new HashMap<>();
+    private final List<Appointment> appointments;
+    private Map<String, Long> onHoldTimes;
 
     public VisitSession(LocalDate date, LocalTime fromTime, LocalTime toTime, Integer sessionLength) {
         this.id = TsidCreator.getTsid().toString();
@@ -39,8 +39,29 @@ public class VisitSession {
             throw new ApplicationException("Start time cant be after end time.");
 
         lastAppointmentTime = this.fromTime;
-        appointments = new LinkedList<>();
+        appointments = new ArrayList<>();
+        onHoldTimes = new HashMap<>();
     }
+
+    public VisitSession(
+            LocalDate date,
+            LocalTime fromTime,
+            LocalTime toTime,
+            Integer sessionLength,
+            LocalDateTime lastAppointmentTime,
+            List<Appointment> appointments,
+            Map<String, Long> onHoldTimes
+    ) {
+        this.id = TsidCreator.getTsid().toString();
+        this.date = date;
+        this.fromTime = LocalDateTime.of(fromTime);
+        this.toTime = LocalDateTime.of(toTime);
+        this.sessionLength = sessionLength;
+        this.lastAppointmentTime = lastAppointmentTime;
+        this.appointments = new ArrayList<>(appointments);
+        this.onHoldTimes = onHoldTimes;
+    }
+
 
     public Appointment giveAppointment(Patient patient, LocalTime entryTime, int numOfPersons) {
         log.info("Event: Tying to give appointment ....");
@@ -130,12 +151,13 @@ public class VisitSession {
                 appointment,
                 AppointmentStatus.VISITED,
                 (index, _appointment) -> {
-                    if (_appointment.getStatus() == AppointmentStatus.WAITING)
+                    if (_appointment.getStatus() == AppointmentStatus.WAITING &&
+                            numberOfAppointmentsByStatus(Optional.of(AppointmentStatus.ON_HOLD)) == 0)
                         _appointment.increaseVisitTime(timeDiff);
                 }
         );
 
-        if (appointments.indexOf(appointment) == appointments.indexOf(appointments.getLast()))
+        if (appointments.indexOf(appointment) == appointments.size() - 1)
             lastAppointmentTime = appointment.visitTime;
 
         logOperation("Done Completed", appointment);
@@ -145,20 +167,31 @@ public class VisitSession {
     public void onHold(String appointmentId, LocalTime entryTime) {
         var errorMsg = "Can't pause appointment, Patient is not in `InProgress` Status";
         var appointment = loadAppointmentAndCheckItsStatus(appointmentId, AppointmentStatus.VISITING, errorMsg);
-        appointment.setStatus(AppointmentStatus.ON_HOLD);
         logOperation("Before OnHold", appointment);
+
         var remainingTime = ((long) appointment.numOfPersons * sessionLength);
-        var visitToEntryTimeDiff = entryTime.timeIntervalInMinutes(appointment.visitTime.toLocalTime());
+        var visitToEntryTimeDiff = appointment.visitTime.toLocalTime().withSecond(0).withNano(0).timeIntervalInMinutes(entryTime);
         if (visitToEntryTimeDiff > 0)
             remainingTime -= visitToEntryTimeDiff;
-
         onHoldTimes.put(appointmentId, remainingTime);
+
         if (appointments.indexOf(appointment) < appointments.size() - 1) {
             var nextAppointment = appointments.get(appointments.indexOf(appointment) + 1);
             nextAppointment.decreaseVisitTime(onHoldTimes.values().stream().mapToLong(value -> value).sum());
             if (nextAppointment.getVisitTime().toLocalTime().isBefore(LocalTime.now().withNano(0)))
-                nextAppointment.setVisitTime(LocalDateTime.now().withNano(0));
+                nextAppointment.setVisitTime(LocalDateTime.now().withSecond(0).withNano(0));
         }
+
+        updateAppointmentStatusThenRescheduleSubsequentAppointments(
+                appointment,
+                AppointmentStatus.ON_HOLD,
+                (integer, appointment1) -> {
+                    if (appointment1.status == AppointmentStatus.WAITING) {
+                        appointment1.increaseVisitTime(visitToEntryTimeDiff);
+                    }
+                }
+        );
+
         logOperation("OnHold Completed", appointment);
     }
 
@@ -237,7 +270,7 @@ public class VisitSession {
     private Appointment giveNewAppointment(Patient patient, LocalTime entryTime, int numOfPersons) {
         var entryDateTime = LocalDateTime.of(entryTime);
         LocalDateTime visitTime;
-        if (entryDateTime.isAfterOrEqualTo(lastAppointmentTime)) {
+        if (entryDateTime >= lastAppointmentTime) {
             visitTime = entryDateTime;
             lastAppointmentTime = entryDateTime.plusMinutes((long) sessionLength * numOfPersons);
         } else {
@@ -245,8 +278,8 @@ public class VisitSession {
             lastAppointmentTime = lastAppointmentTime.plusMinutes((long) sessionLength * numOfPersons);
         }
 
-        var appointment = new Appointment(appointments.size() + 1, appointments.size(), visitTime, patient, numOfPersons);
-        appointments.offer(appointment);
+        var appointment = Appointment.newAppointment(appointments.size() + 1, appointments.size(), visitTime, patient, numOfPersons);
+        appointments.add(appointment);
         return appointment;
     }
 

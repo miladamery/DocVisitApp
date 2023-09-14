@@ -32,10 +32,10 @@ public class CancelPatientAppointmentService {
     }
 
     private void cancel(String appointmentId, AppointmentStatus appointmentStatus, PatientHistoryStatus historyStatus) {
-        var patient = visitSessionRepository.findActiveSessionForToday()
-                .orElseThrow(() -> new ApplicationException("Active session not found."))
-                .cancelAppointment(appointmentId, appointmentStatus, LocalTime.now());
+        var vs = visitSessionRepository.findActiveSessionForToday()
+                .orElseThrow(() -> new ApplicationException("Active session not found."));
+        var patient = vs.cancelAppointment(appointmentId, appointmentStatus, LocalTime.now().withSecond(0).withNano(0));
         patientRepository.addPatientHistory(patient, new PatientHistory(LocalDate.now(), historyStatus));
-        visitSessionRepository.updateActiveVisitSession();
+        visitSessionRepository.updateActiveVisitSession(vs);
     }
 }

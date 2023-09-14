@@ -18,9 +18,9 @@ public class PatientAppointmentOnHoldService {
     }
 
     public void onHold(String appointmentId) {
-        visitSessionRepository.findActiveSessionForToday()
-                .orElseThrow(() -> new ApplicationException("Active session not found."))
-                .onHold(appointmentId, LocalTime.now().withNano(0));
-        visitSessionRepository.updateActiveVisitSession();
+        var vs = visitSessionRepository.findActiveSessionForToday()
+                .orElseThrow(() -> new ApplicationException("Active session not found."));
+        vs.onHold(appointmentId, LocalTime.now().withSecond(0).withNano(0));
+        visitSessionRepository.updateActiveVisitSession(vs);
     }
 }

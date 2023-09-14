@@ -27,8 +27,8 @@ public class PatientAppointmentDoneService {
                 .orElseThrow(() -> new ApplicationException("Active session not found."));
         var appointment = visitSession.findAppointmentById(id)
                 .orElseThrow(() -> new ApplicationException("Appointment didnt found:" + id));
-        visitSession.done(appointment.getId(), LocalTime.now());
+        visitSession.done(appointment.getId(), LocalTime.now().withSecond(0).withNano(0));
         patientRepository.addPatientHistory(appointment.getPatient(), new PatientHistory(LocalDate.now(), PatientHistoryStatus.VISITED));
-        visitSessionRepository.updateActiveVisitSession();
+        visitSessionRepository.updateActiveVisitSession(visitSession);
     }
 }

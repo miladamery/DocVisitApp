@@ -3,21 +3,15 @@ package ir.milad.DocVisitApp.infra.persistence;
 import ir.milad.DocVisitApp.domain.patient.Patient;
 import ir.milad.DocVisitApp.domain.patient.PatientHistory;
 import ir.milad.DocVisitApp.domain.visit_session.VisitSession;
-import jakarta.annotation.PreDestroy;
-import one.microstream.integrations.spring.boot.types.Storage;
 import one.microstream.reference.Lazy;
 import one.microstream.storage.types.StorageManager;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
-@Storage
 public class Database {
 
-    // Constructor injection not supported for @Storage
-    @Autowired
     private transient StorageManager storageManager;
 
     Optional<VisitSession> activeVisitSession = Optional.empty();
@@ -83,8 +77,7 @@ public class Database {
         eagerStorer.commit();
     }
 
-    @PreDestroy
-    public void onDestroy() {
-        storageManager.shutdown();
+    public void setStorageManager(StorageManager storageManager) {
+        this.storageManager = storageManager;
     }
 }

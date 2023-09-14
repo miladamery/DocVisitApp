@@ -18,9 +18,9 @@ public class PatientAppointmentCheckInService {
     }
 
     public synchronized void checkIn(String appointmentId) {
-        visitSessionRepository.findActiveSessionForToday()
-                .orElseThrow(() -> new ApplicationException("Active session not found."))
-                .checkIn(appointmentId, LocalTime.now().withNano(0));
-        visitSessionRepository.updateActiveVisitSession();
+        var vs = visitSessionRepository.findActiveSessionForToday()
+                .orElseThrow(() -> new ApplicationException("Active session not found."));
+        vs.checkIn(appointmentId, LocalTime.now().withSecond(0).withNano(0));
+        visitSessionRepository.updateActiveVisitSession(vs);
     }
 }

@@ -49,7 +49,6 @@ public class LoadPatientsDataService {
             day = today.format(DateTimeFormatter.ofPattern("dd"));
             month = today.format(DateTimeFormatter.ofPattern("MMMM"));
             year = today.format(DateTimeFormatter.ofPattern("yyyy"));
-
         }
 
         public boolean isVisiting() {

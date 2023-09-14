@@ -21,23 +21,19 @@ public class AdminController {
     @PutMapping("/set/visit/time")
     @ResponseBody
     public void setVisitTime(@RequestBody Request request) {
-        visitSessionRepository
-                .findActiveSessionForToday()
-                .get()
-                .getAppointments()
+        var vs = visitSessionRepository.findActiveSessionForToday().get();
+        vs.getAppointments()
                 .stream().filter(appointment -> appointment.getTurnNumber() == request.ticketNum)
                 .findFirst().get().setVisitTime(LocalDateTime.of(LocalDate.now(), request.time));
-        visitSessionRepository.updateActiveVisitSession();
+        visitSessionRepository.updateActiveVisitSession(vs);
     }
 
     @PutMapping("/set/last/appointment/time")
     @ResponseBody
     public void setLastAppointmentTime(@RequestBody Request2 request) {
-        visitSessionRepository
-                .findActiveSessionForToday()
-                .get()
-                .setLastAppointmentTime(LocalDateTime.of(LocalDate.now(), request.time));
-        visitSessionRepository.updateActiveVisitSession();
+        var vs = visitSessionRepository.findActiveSessionForToday().get();
+        vs.setLastAppointmentTime(LocalDateTime.of(LocalDate.now(), request.time));
+        visitSessionRepository.updateActiveVisitSession(vs);
     }
 
     @DeleteMapping("/clear/active/visit/session")

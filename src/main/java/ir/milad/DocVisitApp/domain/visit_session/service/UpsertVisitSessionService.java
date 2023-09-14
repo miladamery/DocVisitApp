@@ -22,10 +22,8 @@ public class UpsertVisitSessionService {
         var vs = visitSessionRepository.findActiveSessionForToday();
         if (vs.isPresent()) {
             vs.get().update(date, fromTime, toTime, sessionLength);
-            this.visitSessionRepository.updateActiveVisitSession();
+            this.visitSessionRepository.updateActiveVisitSession(vs.get());
         } else {
-            /*if (fromTime.isBefore(LocalTime.now()))
-                throw new ApplicationException("Visit session 'fromTime' cant be before current time!");*/
             visitSessionRepository.setActiveVisitSession(new VisitSession(date, fromTime, toTime, sessionLength));
         }
     }

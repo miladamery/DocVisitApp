@@ -30,8 +30,8 @@ public class DoctorGivingAppointmentService {
         else
             realEntryTime = entryTime;
 
-        var turn = vs.giveAppointment(patient, realEntryTime, 1);
-        visitSessionRepository.updateActiveVisitSession();
+        var turn = vs.giveAppointment(patient, realEntryTime.withSecond(0).withNano(0), 1);
+        visitSessionRepository.updateActiveVisitSession(vs);
 
         return turn;
     }
