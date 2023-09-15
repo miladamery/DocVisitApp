@@ -9,6 +9,7 @@
     <script th:inline="javascript">
         /*<![CDATA[*/
         htmx.onLoad(function (elt) {
+			console.log("htmx.onLoad");
             $('#date-picker').mobiscroll().date({
                 setText: 'Terminer',
                 cancelText: 'Annuler',
@@ -17,12 +18,37 @@
                 dateFormat: 'yyyy-mm-dd'
             });
 
-            document.getElementById("get-appointment-form").addEventListener('htmx:confirm', function (evt) {
+            document.getElementById("get-appointment-form").removeEventListener('htmx:confirm', function() {});
+			document.getElementById("get-appointment-form").addEventListener('htmx:confirm', function (evt) {
                 evt.preventDefault();
-                if (!$("#date-picker").val())
-                    alert("Please Fill in Date Of Birth!");
-                else
-                    evt.detail.issueRequest();
+				var valid = true;
+                var phoneNumberPattern = /\d\d-\d\d-\d\d-\d\d-\d\d/;
+                if (!$("#date-picker").val()) {
+                    $("#dateOfBirthEmptyError").removeClass("hidden");
+                    valid = false;
+                } else {
+					$("#dateOfBirthEmptyError").addClass("hidden");
+					var dateStr = $("#date-picker").val();
+					var date = Date.parse(dateStr);
+					var today = new Date();
+					if (date > today) {
+						$("#dateOfBirthWrongError").removeClass("hidden");
+						valid = false;
+					} else {
+						$("#dateOfBirthWrongError").addClass("hidden");						
+					}					
+				}
+				
+				
+                if (!phoneNumberPattern.test($("#phoneNumber").val())) {
+					$("#phoneNumberError").removeClass("hidden");
+					valid = false;
+				} else {
+					$("#phoneNumberError").addClass("hidden");
+				}
+				
+				if (valid)
+					evt.detail.issueRequest();               
             });
 
             $("#num_of_persons_increment").off().click(function () {
@@ -85,10 +111,13 @@
             <div class="grid place-content-center mt-4">
                 <input autocomplete="off" class="calendar" type="text" name="dateOfBirth" th:placeholder="#{date.of.birth}"
                        placeholder="Date of Birth*" id="date-picker" required/>
+				<span id="dateOfBirthEmptyError" class="text-red-500 hidden text-sm" th:text="#{date.of.birth.empty.error}">Date invalide</span>
+				<span id="dateOfBirthWrongError" class="text-red-500 hidden text-sm" th:text="#{date.of.birth.wrong.error}">Je ne peux pas être plus grand qu'aujourd'hui</span>
             </div>
             <div class="grid place-content-center mt-4">
                 <input id="phoneNumber" autocomplete="off" class="phone" type="text" name="phoneNumber" th:placeholder="#{phone.number}"
-                       placeholder="Phone Number*" required/>
+                       placeholder="Phone Number*" required />
+				<span id="phoneNumberError" class="text-red-500 hidden text-sm" th:text="#{phone.number.error}">Numéro de téléphone invalide</span>
             </div>
             <div class="grid place-content-center mt-4">
                 <span

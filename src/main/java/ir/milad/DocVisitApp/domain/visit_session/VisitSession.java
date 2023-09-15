@@ -255,8 +255,7 @@ public class VisitSession {
     @UnitTestRequired
     public Long appointmentTurnsToAwait(String appointmentId) {
         var turnsToAwait = 0L;
-        for (int i = 0; i < appointments.size(); i++) {
-            var a = appointments.get(i);
+        for (Appointment a : appointments) {
             if (Objects.equals(a.getId(), appointmentId))
                 break;
             if (a.getStatus() == AppointmentStatus.WAITING || a.getStatus() == AppointmentStatus.VISITING)
