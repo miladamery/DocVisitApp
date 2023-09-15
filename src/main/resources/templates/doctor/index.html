@@ -98,7 +98,8 @@
             })
         }
 
-		document.body.addEventListener('htmx:afterSettle', function(evt) {			
+		document.body.addEventListener('htmx:afterSettle', function(evt) {
+			console.log(evt.target.id);		
 			if ($("#session_duration").val() !== undefined) {
                 $("#session_duration").val(8);
             }
@@ -117,8 +118,15 @@
                 });
             }
 
-            if ($("#visit_session_creator_button").val() !== undefined) {
+            if (evt.target.id === "kt_app_content_container" && $("#visit_session_creator_button").val() !== undefined) {
 
+				$("#session_duration").off().on("keydown", function(event) {
+					var validChars = "0123456789";
+					var ch = event.key;
+					if (validChars.indexOf(ch) < 0 && ch !== "Backspace")
+						event.preventDefault();
+				});
+				
                 document.getElementById("visit_session_creator_button").addEventListener('htmx:confirm', function (evt) {
 					evt.preventDefault();
                     
@@ -136,14 +144,17 @@
                         swalAlert("Validation Failed!", "Please select session duration");
                         return;
                     }
+					
+					if ($("#session_duration").val() <= 0) {
+						swalAlert("Validation Failed!", "Zero or negative number for session length");
+						return;
+					}
 
                     evt.detail.issueRequest();
                 });
             }
 			
 			if ($("#doc_patient_add_submit").val() !== undefined && (evt.target.id == "kt_app_content_container" || evt.target.id == "doc_patient_form")) {
-				console.log("After Settle");
-				console.log(evt);
 				$('#doc_patient_add_phone_number').val("0");
 				$('#doc_patient_add_phone_number').inputmask("99-99-99-99-99");
 				document.getElementById("doc_add_patient_form").removeEventListener('htmx:confirm', function() {});
