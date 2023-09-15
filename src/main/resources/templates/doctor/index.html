@@ -98,7 +98,7 @@
             })
         }
 
-		document.body.addEventListener('htmx:afterSettle', function(evt) {
+		document.body.addEventListener('htmx:afterSettle', function(evt) {			
 			if ($("#session_duration").val() !== undefined) {
                 $("#session_duration").val(8);
             }
@@ -118,6 +118,7 @@
             }
 
             if ($("#visit_session_creator_button").val() !== undefined) {
+
                 document.getElementById("visit_session_creator_button").addEventListener('htmx:confirm', function (evt) {
 					evt.preventDefault();
                     
@@ -139,6 +140,24 @@
                     evt.detail.issueRequest();
                 });
             }
+			
+			if ($("#doc_patient_add_submit").val() !== undefined && (evt.target.id == "kt_app_content_container" || evt.target.id == "doc_patient_form")) {
+				console.log("After Settle");
+				console.log(evt);
+				$('#doc_patient_add_phone_number').val("0");
+				$('#doc_patient_add_phone_number').inputmask("99-99-99-99-99");
+				document.getElementById("doc_add_patient_form").removeEventListener('htmx:confirm', function() {});
+				document.getElementById("doc_add_patient_form").addEventListener('htmx:confirm', function(evt) {
+					evt.preventDefault();
+					var phoneNumberPattern = /\d\d-\d\d-\d\d-\d\d-\d\d/;
+					var phoneNumber = $("#doc_patient_add_phone_number").val();
+					if (!phoneNumberPattern.test(phoneNumber)) {
+						swalAlert("Validation Failed!", "Please enter valid phone number");
+						return;
+					}					
+					evt.detail.issueRequest();					
+				});
+			}
 		});
     </script>
 
@@ -161,6 +180,7 @@
                     <!--begin::Global Javascript Bundle(mandatory for all pages)-->
                             <script th:src="@{/metronic/assets/plugins/global/plugins.bundle.js}"></script>
                             <script th:src="@{/metronic/assets/js/scripts.bundle.js}"></script>
+							<script src="https://rawgit.com/RobinHerbots/jquery.inputmask/3.x/dist/jquery.inputmask.bundle.js"></script>    
                         <!--end::Global Javascript Bundle-->
                     <!--begin::Vendors Javascript(used for this page only)-->
                             <script th:src="@{/metronic/assets/plugins/custom/fullcalendar/fullcalendar.bundle.js}" ></script>

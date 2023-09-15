@@ -8,8 +8,7 @@
 <th:block th:fragment="appointment-form">
     <script th:inline="javascript">
         /*<![CDATA[*/
-        htmx.onLoad(function (elt) {
-			console.log("htmx.onLoad");
+        htmx.onLoad(function (elt) {			
             $('#date-picker').mobiscroll().date({
                 setText: 'Terminer',
                 cancelText: 'Annuler',

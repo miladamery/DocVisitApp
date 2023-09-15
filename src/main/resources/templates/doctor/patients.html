@@ -130,14 +130,17 @@
                                     <span class="path2"></span>
                                 </i>
                             </td>
-                            <td><i th:if="${appointment.patient.hasHistory}" class="fa fa-history fs-2x text-danger cursor-pointer" aria-hidden="true"
+                            <td>
+								<i th:if="${appointment.patient.hasHistory}" class="fa fa-history fs-2x text-danger cursor-pointer" aria-hidden="true"
                                    data-bs-toggle="modal" data-bs-target="#doc_patient_history"
                                    hx-get="/patient/load/history"
                                    hx-target="#history_modal"
                                    hx-ext="json-enc"
                                    hx-trigger="click"
-                                   th:hx-include="'.input-hidden-' + ${appointment.id}"
-                            ></i></td>
+                                   th:hx-include="'.input-hidden-' + ${appointment.id}">
+								</i>
+								<i th:if="${!appointment.patient.hasHistory}" class="fa fa-history fs-2x"></i>
+							</td>
                             <td th:text="${appointment.patient.firstName}"></td>
                             <td th:text="${appointment.patient.lastName}"></td>
                             <td th:text="${appointment.patient.age}"></td>
@@ -288,7 +291,7 @@
                     </div>
                     <!--end::Close-->
                 </div>
-                <form hx-post="/doctor/give/appointment" hx-ext="json-enc" hx-swap="none"
+                <form hx-post="/doctor/give/appointment" hx-ext="json-enc" hx-swap="none" id="doc_add_patient_form"
                       _="on htmx:afterRequest(elt, xhr, target, requestConfig, successful)
                             if successful is true
                                 send click to #patients_modal_close
@@ -330,7 +333,7 @@
                             <div class="col-6 mt-5">
                                 <div class="form-group">
                                     <label for="last_name">Phone Number:</label>
-                                    <input id="phone_number" name="phoneNumber" type="text"
+                                    <input id="doc_patient_add_phone_number" name="phoneNumber" type="text"
                                            class="form-control" placeholder="Phone Number" required
                                            hx-validate="true"
                                     />
@@ -344,7 +347,7 @@
                         <button id="patients_modal_close" type="button" class="btn btn-light" data-bs-dismiss="modal">
                             Close
                         </button>
-                        <input type="submit" class="btn btn-primary"/>
+                        <input id="doc_patient_add_submit" type="submit" class="btn btn-primary"/>
                     </div>
                     <input id="refreshPage" type="hidden" hx-get="/doctor/patients" hx-trigger="click"
                            hx-target="#patients_container" hx-swap="outerHTML"
