@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +33,9 @@ public class LoadPatientsDataService {
         public final String month;
         public final String year;
         public final List<AppointmentDto> appointments;
+        public final String currentTime;
+        public final String amPm;
+        public final String currentWeekDay;
 
         public PatientsData(Optional<VisitSession> visitSession, VisitSessionRepository visitSessionRepository) {
             if (visitSession.isPresent()) {
@@ -46,9 +50,13 @@ public class LoadPatientsDataService {
                 this.appointments = new ArrayList<>();
             }
             var today = LocalDate.now();
+            var now = LocalTime.now();
             day = today.format(DateTimeFormatter.ofPattern("dd"));
             month = today.format(DateTimeFormatter.ofPattern("MMMM"));
             year = today.format(DateTimeFormatter.ofPattern("yyyy"));
+            currentTime = now.format(DateTimeFormatter.ofPattern("hh:mm a")).split(" ")[0];
+            amPm = now.format(DateTimeFormatter.ofPattern("hh:mm a")).split(" ")[1];
+            currentWeekDay = LocalDate.now().getDayOfWeek().name();
         }
 
         public boolean isVisiting() {

@@ -11,48 +11,61 @@
 </head>
 <body>
 <th:block th:fragment="patients">
-    <div id="patients_container" hx-get="/doctor/patients" hx-trigger="every 30s" style="font-family: Poppins, serif;">
-        <div class="container-fluid p-5 rounded mt-5"
-             style="background-color: #494462; font-style: normal;">
-            <div class="row" style="color: white;">
-                <div class="col-6 text-center mt-5" style="border-right: 5px solid #C5A470;">
-                    <div class="row">
+    <div id="patients_container" hx-get="/doctor/patients" hx-trigger="every 30s" style="font-family: Poppins, serif;">		
+        <div class="container-fluid p-5 rounded mt-5" style="background-color: #494462; font-style: normal;">
+            <div class="row" style="color: white;">                
+				<div class="col-4 text-center" style="border-right: 5px solid #C5A470;font-size: x-large;">
+					<div class="row">
 						<div class="col-12">
-							<span style="font-size: xxx-large;" th:text="${data.day}"></span>&nbsp;&nbsp;
-							<span style="font-size: xx-large;" th:text="${data.month}"></span>&nbsp;&nbsp;
-							<span style="font-size: xx-large;" th:text="${data.year}"></span>&nbsp;&nbsp;
+							<span>Today's Office Hours</span>
 						</div>
-						<div th:if="${data.summary != null}" class="col-12" style="font-size: large;">
-							<span th:text="${'Today Office Hours: ' + data.summary.fromTime + ' - ' + data.summary.toTime}"></span>
+						<div class="col-12">
+							<span style="font-weight: bold;" th:text="${data.summary.fromTime + ' - ' + data.summary.toTime}">08:00 AM - 02:00 PM</span>
 						</div>
-						<div th:if="${data.summary != null}" class="col-12" style="font-size: large;">
-							<span th:text="${'Session length: ' + data.summary.sessionLength + ' Minutes'}"></span>
+						<div class="col-12 mt-4">
+							<span>Session Length:</span>
+						</div>
+						<div class="col-12">
+							<span style="font-weight: bold;" th:text="${data.summary.sessionLength + ' Minutes'}">8 Minutes</span>
 						</div>
 					</div>
-                </div>
-                <div class="col-6 text-center">
-                    <div class="row" th:if="${data.summary != null}">
-                        <div class="col-12">
-                            <span style="font-size: xxx-large;" th:text="${data.summary.total}"></span>&nbsp;&nbsp;
-                            <span style="font-size: large;">Total Patients</span>
-                        </div>
-                        <div class="col-12">
-							<span class="numberCircle">
-								<span style="font-size: large;" th:text="${data.summary.waiting}"></span>
-							</span>
-							<span style="font-size: medium;">&nbsp;&nbsp;Waiting&nbsp;&nbsp;</span>
-							<span class="numberCircle">
-								<span style="font-size: large;" th:text="${data.summary.visited}"></span>
-							</span>
-							<span style="font-size: medium;">&nbsp;&nbsp;Visited&nbsp;&nbsp;</span>
-							<span class="numberCircle">
-								<span style="font-size: large;" th:text="${data.summary.cancelled}"></span>
-							</span>
-							<span style="font-size: medium;">&nbsp;&nbsp;Canceled&nbsp;&nbsp;</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
+				</div>
+				<div class="col-4 text-center" style="border-right: 5px solid #C5A470;font-size: x-large;">
+					<div class="row">
+						<div class="col-12">
+							<span style="font-size: xxx-large;" th:text="${data.day + ' '}">23 </span><span th:text="${' ' + data.month + ' ' + data.year}">January 2023</span>
+						</div>
+						<div class="col-12">
+							<span style="font-size: xxx-large;" th:text="${data.currentTime + ' '}">12:06 </span><span th:text="${data.amPm + ' '}">AM </span><span class="capitalize" th:text="${data.currentWeekDay}">Wednesday</span>
+						</div>
+					</div>
+				</div>
+				<div class="col-4 text-center" style="font-size: x-large;">
+					<div class="row">
+						<div class="col-12">
+							<span style="font-size: xxx-large;" th:text="${data.summary.total + ' '}">68 </span><span>Total Patients</span>
+						</div>
+						<div class="col-4">
+							<span>Waiting</span>
+						</div>
+						<div class="col-4">
+							<span>Visited</span>
+						</div>
+						<div class="col-4">
+							<span>Cancelled</span>
+						</div>
+						<div class="col-4">
+							<span th:text="${data.summary.waiting}">49</span>
+						</div>
+						<div class="col-4">
+							<span th:text="${data.summary.visited}">16</span>
+						</div>
+						<div class="col-4">
+							<span th:text="${data.summary.cancelled}">3</span>
+						</div>
+					</div>
+				</div>
+			</div>
         </div>
 
         <div class="card mb-5 my-xl-10">
