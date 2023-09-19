@@ -1,5 +1,6 @@
 package ir.milad.DocVisitApp.infra.web;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.vavr.control.Try;
 import ir.milad.DocVisitApp.domain.ApplicationException;
 import ir.milad.DocVisitApp.domain.patient.Patient;
@@ -7,12 +8,15 @@ import ir.milad.DocVisitApp.domain.patient.PatientIsBlockedException;
 import ir.milad.DocVisitApp.domain.patient.service.*;
 import ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus;
 import ir.milad.DocVisitApp.domain.visit_session.service.GetActiveVisitSessionService;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalTime;
 
 @Controller
@@ -21,6 +25,7 @@ public class PatientController {
 
     public static final String HTMX_REDIRECT_HEADER = "HX-Redirect";
     public static final String ERROR_500_ATTRIBUTE_NAME = "errorMessage";
+    public static final String COOKIE_NAME = "patient_info";
 
     private final TakeAppointmentService takeAppointmentService;
     private final GetActiveVisitSessionService getActiveVisitSessionService;
@@ -32,6 +37,7 @@ public class PatientController {
     private final PatientAppointmentDoneService patientAppointmentDoneService;
     private final PatientAppointmentOnHoldService patientAppointmentOnHoldService;
     private final PatientAppointmentResumeService patientAppointmentResumeService;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     public PatientController(
             TakeAppointmentService takeAppointmentService,
@@ -57,6 +63,7 @@ public class PatientController {
     @GetMapping("/index")
     public String index(@RequestParam(defaultValue = "fr") String language, Model model) {
         model.addAttribute("language", language);
+        model.addAttribute("cookieName", COOKIE_NAME);
         return getActiveVisitSessionService.findActiveSessionForTodayAndNow()
                 .map(vs -> "patient/index")
                 .orElse("patient/office-closed");
@@ -72,14 +79,24 @@ public class PatientController {
     public String getAppointment(
             @Valid @RequestBody PatientRequestModel request,
             @RequestParam(defaultValue = "fr") String language,
-            Model model) {
+            Model model,
+            HttpServletResponse response) {
         model.addAttribute("language", language);
         return Try.of(() -> {
                     var patient = getPatientFromRequest(request);
                     var entryTime = LocalTime.now().withSecond(0).withNano(0);
                     return takeAppointmentService.takeAppointment(patient, entryTime, request.numOfPersons);
                 })
-                .map(appointment -> appointmentInfo(model, appointment))
+                .map(appointment -> {
+                    response.addCookie(
+                            Cookie.of(
+                                    COOKIE_NAME,
+                                    URLEncoder.encode(objectMapper.writeValueAsString(request), StandardCharsets.UTF_8),
+                                    3 * 60 * 60
+                            )
+                    );
+                    return appointmentInfo(model, appointment);
+                })
                 .recover(throwable -> {
                     if (throwable instanceof ApplicationException) {
                         return "patient/office-closed :: office-closed";
@@ -106,16 +123,22 @@ public class PatientController {
                     if (appointment.status == AppointmentStatus.VISITING) {
                         model.addAttribute("turnNumber", appointment.turnNumber);
                         model.addAttribute("appointmentId", id);
+                        response.addCookie(Cookie.of(COOKIE_NAME, "", 0));
                         return "patient/appointment-arrived :: appointment-arrived";
-                    } else if (appointment.status == AppointmentStatus.CANCELED_BY_DOCTOR)
+                    } else if (appointment.status == AppointmentStatus.CANCELED_BY_DOCTOR) {
+                        response.addCookie(Cookie.of(COOKIE_NAME, "", 0));
                         return "patient/appointment-cancel-by-doc :: appointment-cancel-by-doc";
-                    else if (appointment.status == AppointmentStatus.VISITED)
+                    }
+                    else if (appointment.status == AppointmentStatus.VISITED) {
+                        response.addCookie(Cookie.of(COOKIE_NAME, "", 0));
                         return "patient/appointment-done :: apponintment-done";
+                    }
                     else
                         return appointmentInfo(model, appointment);
 
                 })
                 .orElseGet(() -> {
+                    response.addCookie(Cookie.of(COOKIE_NAME, "", 0));
                     model.addAttribute(ERROR_500_ATTRIBUTE_NAME, "Your turn not found");
                     return "500";
                 });
@@ -125,10 +148,12 @@ public class PatientController {
     public String cancelAppointment(@RequestParam String id, HttpServletResponse response, Model model) {
         return Try.run(() -> cancelPatientAppointmentService.cancelByPatient(id))
                 .map(__ -> {
+                    response.addCookie(Cookie.of(COOKIE_NAME, "", 0));
                     response.setHeader(HTMX_REDIRECT_HEADER, "/patient/index");
                     return "/patient/index";
                 })
                 .recover(throwable -> {
+                    response.addCookie(Cookie.of(COOKIE_NAME, "", 0));
                     model.addAttribute(ERROR_500_ATTRIBUTE_NAME, throwable.getMessage());
                     return "500";
                 })
@@ -179,14 +204,16 @@ public class PatientController {
     }
 
     @GetMapping("/blocked")
-    public String blocked(@RequestParam(defaultValue = "fr") String language, Model model) {
+    public String blocked(@RequestParam(defaultValue = "fr") String language, Model model, HttpServletResponse response) {
         model.addAttribute("language", language);
+        response.addCookie(Cookie.of(COOKIE_NAME, "", 0));
         return "patient/blocked :: blocked";
     }
 
     @GetMapping("/closed")
-    public String closed(@RequestParam(defaultValue = "fr") String language, Model model) {
+    public String closed(@RequestParam(defaultValue = "fr") String language, Model model, HttpServletResponse response) {
         model.addAttribute("language", language);
+        response.addCookie(Cookie.of(COOKIE_NAME, "", 0));
         return "patient/office-closed :: office-closed";
     }
 
@@ -197,14 +224,16 @@ public class PatientController {
     }
 
     @GetMapping("/done")
-    public String done(@RequestParam(defaultValue = "fr") String language, Model model) {
+    public String done(@RequestParam(defaultValue = "fr") String language, Model model, HttpServletResponse response) {
         model.addAttribute("language", language);
+        response.addCookie(Cookie.of(COOKIE_NAME, "", 0));
         return "patient/appointment-done :: apponintment-done";
     }
 
     @GetMapping("/cancelled/by/doc")
-    public String cancelledByDoc(@RequestParam(defaultValue = "fr") String language, Model model) {
+    public String cancelledByDoc(@RequestParam(defaultValue = "fr") String language, Model model, HttpServletResponse response) {
         model.addAttribute("language", language);
+        response.addCookie(Cookie.of(COOKIE_NAME, "", 0));
         return "patient/appointment-cancel-by-doc :: appointment-cancel-by-doc";
     }
 

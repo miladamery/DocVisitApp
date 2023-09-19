@@ -157,8 +157,8 @@
 			if ($("#doc_patient_add_submit").val() !== undefined && (evt.target.id == "kt_app_content_container" || evt.target.id == "doc_patient_form")) {
 				$('#doc_patient_add_phone_number').val("0");
 				$('#doc_patient_add_phone_number').inputmask("99-99-99-99-99");
-				document.getElementById("doc_add_patient_form").removeEventListener('htmx:confirm', function() {});
-				document.getElementById("doc_add_patient_form").addEventListener('htmx:confirm', function(evt) {
+				document.getElementById("doc_patient_add_submit").removeEventListener('htmx:confirm', function() {});
+				document.getElementById("doc_patient_add_submit").addEventListener('htmx:confirm', function(evt) {
 					evt.preventDefault();
 					var phoneNumberPattern = /\d\d-\d\d-\d\d-\d\d-\d\d/;
 					var phoneNumber = $("#doc_patient_add_phone_number").val();

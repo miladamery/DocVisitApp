@@ -129,6 +129,11 @@
                                    hx-swap="none"
 
                                    _="
+										on htmx:confirm(issueRequest)
+											halt the event
+											call Swal.fire({title: 'Confirm', showCancelButton: true, text:'Do you want to cancel appointment?'})
+											if result.isConfirmed issueRequest()
+										end
                                         on htmx:afterRequest(elt, xhr, target, requestConfig, successful)
                                             if successful is true then send click to #refreshPage
                                             else call requestFailedAlert('Cancellation Failed.', xhr)

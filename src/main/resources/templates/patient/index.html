@@ -25,13 +25,39 @@
     <link th:href="@{/css/mobiscroll.frame.css}" rel="stylesheet" type="text/css" />
     <link th:href="@{/css/mobiscroll.scroller.css}" rel="stylesheet" type="text/css" />
 
-    <script>
+    <script th:inline="javascript">
+		/*<![CDATA[*/
         function reload(locationAddr) {
             location = locationAddr
         }
+
+        function checkIFAppointmentIsSet() {			
+			var cookieName = [[${cookieName}]];		
+			var cookies = document.cookie.split(";");
+			var cookieValue = "";
+			
+			for(i = cookies.length - 1; i >= 0; i--) {
+				var cookie = cookies[i].split('=');
+				if (cookie[0].trim() == cookieName) {					
+					cookieValue = cookie[1];
+					break;
+				}				
+			}
+			
+			if (cookieValue) {
+				const patient = JSON.parse(decodeURIComponent(cookieValue));				
+				$("#firstName").val(patient.firstName);
+				$("#lastName").val(patient.lastName);
+				$("#dateOfBirth").val(patient.dateOfBirth);
+				$("#phoneNumber").val(patient.phoneNumber);
+				$("#num_of_persons").val(patient.num_of_persons);
+				$("#cookie-get-appointment-form-submit").click();
+			}
+		}
+		/*]]>*/
     </script>
 </head>
-<body class="min-h-screen bg-no-repeat bg-cover" >
+<body class="min-h-screen bg-no-repeat bg-cover" onload="checkIFAppointmentIsSet()">
     <section id="main_container">
         <main>
             <div class="grid place-content-center mt-12">
@@ -90,6 +116,20 @@
                 </div>
             </div>
         </footer>
+		<div style="display: none;" id="cookie-get-appointment-form">
+			<input type="hidden" id="firstName" name="firstName" value=""/>
+			<input type="hidden" id="lastName" name="lastName" value=""/>
+			<input type="hidden" id="dateOfBirth" name="dateOfBirth" value=""/>
+			<input type="hidden" id="phoneNumber" name="phoneNumber" value=""/>
+			<input type="hidden" id="num_of_persons" name="num_of_persons" value=""/>
+			<input type="hidden" id="cookie-get-appointment-form-submit"
+				th:attr="hx-post='/patient/get/appointment?language=' + ${language}"
+				hx-ext="json-enc"
+				hx-target="#main_container"				
+				hx-include="input[type='hidden']"	
+				hx-trigger="click"
+			/>
+		</div>
     </section>
 </body>
 </html>
