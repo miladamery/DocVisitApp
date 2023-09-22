@@ -99,7 +99,7 @@
         }
 
 		document.body.addEventListener('htmx:afterSettle', function(evt) {
-			console.log(evt.target.id);		
+
 			if ($("#session_duration").val() !== undefined) {
                 $("#session_duration").val(8);
             }

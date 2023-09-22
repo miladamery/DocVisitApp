@@ -1,6 +1,5 @@
 package ir.milad.DocVisitApp.domain.visit_session;
 
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -23,7 +22,6 @@ public class VisitSessionSummary {
             LocalDateTime fromTime,
             LocalDateTime toTime,
             Integer sessionLength) {
-        SimpleDateFormat sdf = new SimpleDateFormat("hh:mm a");
         this.total = total;
         this.waiting = waiting;
         this.visited = visited;
