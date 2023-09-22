@@ -6,9 +6,9 @@
 </head>
 <body>
 <th:block th:fragment="appointment-form">
-    <script th:inline="javascript">
+    <script th:inline="javascript">		
         /*<![CDATA[*/
-        htmx.onLoad(function (elt) {			
+        htmx.onLoad(function (elt) {				
             $('#date-picker').mobiscroll().date({
                 setText: 'Terminer',
                 cancelText: 'Annuler',
@@ -66,25 +66,25 @@
                 $("#num_of_persons").val(numOfPeople);
             });
 
-            $("#firstName").off().on("keydown", function(event) {
-                var ch = event.key;				                
+            $("#firstName").off("beforeinput").on("beforeinput", function(event) {
+                var ch = event.originalEvent.data;
                 if (isPersian(ch))
                     event.preventDefault();
-            } );
+            } );						
+				
+			$("#lastName").off("beforeinput").on("beforeinput", function(event) {				
+				const ch = event.originalEvent.data;
+                if (isPersian(ch))
+					event.preventDefault();
+			});			
 			
-			$("#lastName").off().on("keydown", function(event) {
-                var ch = event.key;				                
-                if (isPersian(ch))
-                    event.preventDefault();
-            } );
-					
 			$("#phoneNumber").val("0");
 			$('#phoneNumber').inputmask("99-99-99-99-99");
 			
 			function isPersian(ch) {
 				var frobiddenChars = "ابپتثجچحخدذرزژسشصضطظعغفقکگلمنوهیئ";
                 return ch == 'ا' || frobiddenChars.indexOf(ch) > 0;
-			}
+			}			           
         })
     </script>
     <main id="appointment-form-main">
