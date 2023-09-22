@@ -54,11 +54,13 @@
 						<div class="card-body">					
 							<span class="card-text" style="color: #494462;font-family: Poppins;font-size: 1.25rem;font-style: normal;font-weight: 400;line-height: normal;letter-spacing: -0.01875rem;">Today's Office Hours:</span>
 							<br/>
-							<span class="card-text" style="color: #494462;font-family: Poppins;font-size: 1.875rem;font-style: normal;font-weight: 600;line-height: normal;letter-spacing: -0.01875rem;">08:00 AM - 02:00 PM</span>
+							<span class="card-text" style="color: #494462;font-family: Poppins;font-size: 1.875rem;font-style: normal;font-weight: 600;line-height: normal;letter-spacing: -0.01875rem;"
+							th:text="${dashboardInfo.officeHours}">08:00 AM - 02:00 PM</span>
 							<br/><br/>
 							<span class="card-text" style="color: #494462;font-family: Poppins;font-size: 1.25rem;font-style: normal;font-weight: 400;line-height: normal;letter-spacing: -0.01875rem;">Session Length:</span>
 							<br/>
-							<span class="card-text" style="color: #494462;font-family: Poppins;font-size: 1.875rem;font-style: normal;font-weight: 600;line-height: normal;letter-spacing: -0.01875rem;">8 minutes</span>
+							<span class="card-text" style="color: #494462;font-family: Poppins;font-size: 1.875rem;font-style: normal;font-weight: 600;line-height: normal;letter-spacing: -0.01875rem;"
+							th:text="${dashboardInfo.sessionLength}">8 minutes</span>
 							<br/><br/>
 							<div style="text-align: right;">
 								<button class="btn btn-sm btn-center" style="background-color: #C5A470;color: white;width: 50%;"
