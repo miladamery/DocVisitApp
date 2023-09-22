@@ -6,75 +6,96 @@
 </head>
 <body>
 <th:block th:fragment="dashboard">
-    <div class="container-fluid p-5 bg-white rounded mt-5" style="font-family: Poppins, serif;"
-         hx-get="/doctor/dashboard" hx-target="#kt_app_content_container"  hx-trigger="every 30s"
+    <div class="bg-white rounded mt-5 p-5" style="font-family: Poppins, serif;max-width: 1150px;text-align: left;"
+         hx-get="/doctor/dashboard" hx-target="#kt_app_content_container"  hx-trigger="every 30s"		 
     >
         <div class="row">
             <div class="col-xl-2 col-lg-2 col-md-2">
                 <img th:src="@{/images/DrPak.svg}" style="border-radius: 50%; border: 5px solid #494462;" alt="Dr Pak image" class="img-fluid">
             </div>
-            <div class="col-xl-10 col-lg-10 col-md-10">
-                <h2><span style="color: #494462;">Good Morning</span> <span
+            <div class="col-xl-10 col-lg-10 col-md-10 pt-5">
+                <h2><span style="color: #494462;">Hello</span> <span
                         style="color: #C5A470;">Dr.Alireza Pak</span></h2>
-                <p style="font-size: smaller;">Have a nice day at work</p>
+                <p style="color: rgba(73, 68, 98, 0.84);font-family: Poppins;font-size: 1.625rem;font-style: normal;font-weight: 400;line-height: normal;letter-spacing: -0.01875rem;">Have a nice day at work</p>
             </div>
         </div>
-    </div>
-    <div class="row g-5 g-xl-10 mb-5 mb-xl-10 align-items-center mt-5">
-        <div class="col-md-6 col-lg-6 col-xl-6 col-xxl-3 mb-md-5 mb-xl-10">
-            <!--begin::Card-->
-            <div class="card">
-                <!--begin::Card body-->
-                <div class="card-body d-flex flex-center flex-column py-9 px-5">
-                    <!--begin::Avatar-->
-                    <div class="mb-5">
-                        <img th:src="@{/images/dashboard-patients.png}" alt="patients" class="rounded">
-                    </div>
-                    <!--end::Avatar-->
-                    <!--begin::Name-->
-                    <div class="mb-0" style="color: #494462;">People waiting in line:</div>
-                    <!--end::Name-->
-                    <!--begin::Position-->
-                    <div class="fs-4 fw-bold mb-6" style="color: #494462;" th:text="${dashboardInfo.numberOfPeopleAwaiting} + ' people'">20 people</div>
-                    <!--end::Position-->
-                    <button class="btn btn-sm btn-center" style="background-color: #C5A470;color: white;width: 50%;"
-                            hx-get="/doctor/patients" hx-target="#kt_app_content_container"  hx-trigger="click"
-                    >View All</button>
-                </div>
-                <!--begin::Card body-->
-            </div>
-            <!--begin::Card-->
-        </div>
-        <div class="col-md-6 col-lg-6 col-xl-6 col-xxl-3 mb-md-5 mb-xl-10">
-            <!--begin::Card-->
-            <div class="card">
-                <!--begin::Card body-->
-                <div class="card-body d-flex flex-center flex-column py-9 px-5">
-                    <!--begin::Avatar-->
-                    <div class="mb-5">
-                        <img th:src="@{/images/dashboard-calendar.png}" alt="patients" class="rounded">
-                    </div>
-                    <!--end::Avatar-->
-                    <!--begin::Name-->
-                    <div class="mb-0" style="color: #494462;">Today's Office Hours:</div>
-                    <!--end::Name-->
-                    <!--begin::Position-->
-                    <div class="fs-4 fw-bold mb-6" style="color: #494462;" th:text="${dashboardInfo.officeHours}">08:00 AM - 02:00 PM</div>
-                    <!--end::Position-->
-                    <!--begin::Follow-->
-                    <button class="btn btn-sm btn-center" style="background-color: #C5A470;color: white;width: 50%;"
-                            hx-get="/doctor/calendar" hx-target="#kt_app_content_container" hx-trigger="click"
-                    >View All</button>
-                    <!--end::Follow-->
-                </div>
-                <!--begin::Card body-->
-            </div>
-            <!--begin::Card-->
-        </div>
-        <div class="col-xxl-6">
-
-        </div>
-    </div>
+    </div>    
+	<div class="row mt-5" style="max-width: 1150px;">
+		<div class="col-md-8">
+			<div class="card mb-3">
+				<div class="row">
+					<div class="col-md-4 ">
+						<img th:src="@{/images/dashboard-patients2.svg}" class="img-fluid rounded-start m-5" alt="patients">
+					</div>
+					<div class="col-md-8">
+						<div class="card-body">
+							<br/><br/>
+							<span class="card-text" style="color: #494462;font-family: Poppins;font-size: 1.25rem;font-style: normal;font-weight: 400;line-height: normal;letter-spacing: -0.01875rem;text-transform: capitalize;"
+							>people waiting in line:</span>
+							<br/>
+							<span class="card-text" style="color: #494462;font-family: Poppins;font-size: 1.875rem;font-style: normal;font-weight: 600;line-height: normal;letter-spacing: -0.01875rem;text-transform: capitalize;"
+							th:text="${dashboardInfo.numberOfPeopleAwaiting + ' people'}">20 people</span>
+							<br/><br/><br/>
+							<div style="text-align: right;">
+								<button class="btn btn-sm btn-center" style="background-color: #C5A470;color: white;width: 50%;"
+								hx-get="/doctor/patients" hx-target="#kt_app_content_container"  hx-trigger="click"
+								>View All</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="card mb-3">
+				<div class="row">
+					<div class="col-md-4 ">
+						<img th:src="@{/images/dashboard-calendar2.svg}" class="img-fluid rounded-start m-5" alt="patients">
+					</div>
+					<div class="col-md-8">
+						<div class="card-body">					
+							<span class="card-text" style="color: #494462;font-family: Poppins;font-size: 1.25rem;font-style: normal;font-weight: 400;line-height: normal;letter-spacing: -0.01875rem;">Today's Office Hours:</span>
+							<br/>
+							<span class="card-text" style="color: #494462;font-family: Poppins;font-size: 1.875rem;font-style: normal;font-weight: 600;line-height: normal;letter-spacing: -0.01875rem;">08:00 AM - 02:00 PM</span>
+							<br/><br/>
+							<span class="card-text" style="color: #494462;font-family: Poppins;font-size: 1.25rem;font-style: normal;font-weight: 400;line-height: normal;letter-spacing: -0.01875rem;">Session Length:</span>
+							<br/>
+							<span class="card-text" style="color: #494462;font-family: Poppins;font-size: 1.875rem;font-style: normal;font-weight: 600;line-height: normal;letter-spacing: -0.01875rem;">8 minutes</span>
+							<br/><br/>
+							<div style="text-align: right;">
+								<button class="btn btn-sm btn-center" style="background-color: #C5A470;color: white;width: 50%;"
+								hx-get="/doctor/calendar" hx-target="#kt_app_content_container" hx-trigger="click"
+								>View All</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="col-md-4">
+			<div class="rounded" style="background-color: #494462;height: 100%;">
+				<div class="row pt-20">
+					<div class="col-md-12 text-center">
+						<span style="color: #FFF;text-align: center;font-family: Poppins;font-size: 1.25rem;font-style: normal;font-weight: 400;line-height: normal;letter-spacing: -0.01875rem;"
+						th:text="${dashboardInfo.currentWeekDay}">Wednesday</span>
+					</div>
+					<div class="col-md-12 text-center pb-20">
+						<span style="color: #FFF;text-align: center;font-family: Poppins;font-size: 4.375rem;font-style: normal;font-weight: 600;line-height: 5.375rem;letter-spacing: -0.01875rem;"
+						th:text="${dashboardInfo.currentTime}">12 : 06</span>
+						<span style="color: #FFF;text-align: center;font-family: Poppins;font-size: 1.25rem;font-style: normal;font-weight: 400;line-height: normal;letter-spacing: -0.01875rem;">PM</span>
+					</div>				
+					<div class="col-md-8 offset-md-2" style="border-bottom: 5px solid #C5A470;">
+					</div>
+					<div class="col-md-12 text-center pt-20">
+						<span style="color: #FFF;font-family: Poppins;font-size: 4.375rem;font-style: normal;font-weight: 600;line-height: 103.3%;letter-spacing: -0.01875rem;"
+						th:text="${dashboardInfo.day}">23</span>
+					</div>
+					<div class="col-md-12 text-center ">
+						<span style="color: #FFF;text-align: center;font-family: Poppins;font-size: 1.875rem;font-style: normal;font-weight: 400;line-height: normal;letter-spacing: -0.01875rem;"
+						th:text="${dashboardInfo.month + ' ' + dashboardInfo.year}">January 2023</span>
+					</div>
+				</div>				
+			</div>
+		</div>
+	</div>
 </th:block>
 </body>
 </html>

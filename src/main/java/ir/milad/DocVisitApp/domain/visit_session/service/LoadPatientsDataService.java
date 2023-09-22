@@ -42,7 +42,6 @@ public class LoadPatientsDataService {
                 var vs = visitSession.get();
                 this.summary = vs.summary();
                 this.appointments = vs.getAppointments()
-                        .stream()
                         .map(appointment -> new AppointmentDto(appointment, visitSessionRepository))
                         .toList();
             } else {
@@ -54,7 +53,8 @@ public class LoadPatientsDataService {
             day = today.format(DateTimeFormatter.ofPattern("dd"));
             month = today.format(DateTimeFormatter.ofPattern("MMMM"));
             year = today.format(DateTimeFormatter.ofPattern("yyyy"));
-            currentTime = now.format(DateTimeFormatter.ofPattern("hh:mm a")).split(" ")[0];
+            var ct = now.format(DateTimeFormatter.ofPattern("hh:mm a")).split(" ")[0];
+            currentTime = ct.setCharBeforeAndAfter(' ', ct.indexOf(":"));
             amPm = now.format(DateTimeFormatter.ofPattern("hh:mm a")).split(" ")[1];
             currentWeekDay = LocalDate.now().getDayOfWeek().name();
         }
