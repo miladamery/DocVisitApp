@@ -99,6 +99,7 @@
         }
 
 		document.body.addEventListener('htmx:afterSettle', function(evt) {
+			console.log(evt.target);
 
 			if ($("#session_duration").val() !== undefined) {
                 $("#session_duration").val(8);
@@ -154,7 +155,7 @@
                 });
             }
 			
-			if ($("#doc_patient_add_submit").val() !== undefined && (evt.target.id == "kt_app_content_container" || evt.target.id == "doc_patient_form")) {
+			if ($("#doc_patient_add_submit").val() !== undefined && (evt.target.id == "kt_app_content_container" || evt.target.id == "patients_container")) {				
 				$('#doc_patient_add_phone_number').val("0");
 				$('#doc_patient_add_phone_number').inputmask("99-99-99-99-99");
 				document.getElementById("doc_add_patient_form").removeEventListener('htmx:confirm', function() {});
