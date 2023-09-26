@@ -91,7 +91,7 @@ public class PatientController {
                     response.addCookie(
                             Cookie.of(
                                     COOKIE_NAME,
-                                    URLEncoder.encode(objectMapper.writeValueAsString(request), StandardCharsets.UTF_8),
+                                    URLEncoder.encode(appointment.id, StandardCharsets.UTF_8),
                                     3 * 60 * 60
                             )
                     );

@@ -44,13 +44,8 @@
 				}				
 			}
 			
-			if (cookieValue) {
-				const patient = JSON.parse(decodeURIComponent(cookieValue));				
-				$("#firstName").val(patient.firstName);
-				$("#lastName").val(patient.lastName);
-				$("#dateOfBirth").val(patient.dateOfBirth);
-				$("#phoneNumber").val(patient.phoneNumber);
-				$("#num_of_persons").val(patient.num_of_persons);
+			if (cookieValue) {							
+				$("#id").val(cookieValue);
 				$("#cookie-get-appointment-form-submit").click();
 			}
 		}
@@ -117,13 +112,9 @@
             </div>
         </footer>
 		<div style="display: none;" id="cookie-get-appointment-form">
-			<input type="hidden" id="firstName" name="firstName" value=""/>
-			<input type="hidden" id="lastName" name="lastName" value=""/>
-			<input type="hidden" id="dateOfBirth" name="dateOfBirth" value=""/>
-			<input type="hidden" id="phoneNumber" name="phoneNumber" value=""/>
-			<input type="hidden" id="num_of_persons" name="num_of_persons" value=""/>
+			<input type="hidden" id="id" name="id" value=""/>
 			<input type="hidden" id="cookie-get-appointment-form-submit"
-				th:attr="hx-post='/patient/get/appointment?language=' + ${language}"
+				th:attr="hx-get='/patient/load/appointment'"
 				hx-ext="json-enc"
 				hx-target="#main_container"				
 				hx-include="input[type='hidden']"	
