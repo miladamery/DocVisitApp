@@ -2,9 +2,11 @@ package ir.milad.DocVisitApp.domain.patient.service;
 
 import ir.milad.DocVisitApp.domain.visit_session.Appointment;
 import ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus;
+import lombok.ToString;
 
 import java.time.format.DateTimeFormatter;
 
+@ToString
 public class AppointmentData {
     public String id;
     public int turnNumber;

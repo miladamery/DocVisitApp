@@ -113,6 +113,7 @@
         </footer>
 		<div style="display: none;" id="cookie-get-appointment-form">
 			<input type="hidden" id="id" name="id" value=""/>
+            <input type="hidden" id="isAppointmentSet" name="isAppointmentSet" value="true" />
 			<input type="hidden" id="cookie-get-appointment-form-submit"
 				th:attr="hx-get='/patient/load/appointment'"
 				hx-ext="json-enc"

@@ -1,6 +1,5 @@
 package ir.milad.DocVisitApp.infra.web;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.vavr.control.Try;
 import ir.milad.DocVisitApp.domain.ApplicationException;
 import ir.milad.DocVisitApp.domain.patient.Patient;
@@ -11,6 +10,7 @@ import ir.milad.DocVisitApp.domain.visit_session.service.GetActiveVisitSessionSe
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +21,7 @@ import java.time.LocalTime;
 
 @Controller
 @RequestMapping("/patient")
+@Slf4j
 public class PatientController {
 
     public static final String HTMX_REDIRECT_HEADER = "HX-Redirect";
@@ -37,7 +38,6 @@ public class PatientController {
     private final PatientAppointmentDoneService patientAppointmentDoneService;
     private final PatientAppointmentOnHoldService patientAppointmentOnHoldService;
     private final PatientAppointmentResumeService patientAppointmentResumeService;
-    private final ObjectMapper objectMapper = new ObjectMapper();
 
     public PatientController(
             TakeAppointmentService takeAppointmentService,
@@ -114,12 +114,17 @@ public class PatientController {
     public String loadAppointment(
             @RequestParam(defaultValue = "fr") String language,
             @RequestParam String id,
+            @RequestParam(defaultValue = "false") Boolean isAppointmentSet,
             Model model,
             HttpServletResponse response
     ) {
+        if (isAppointmentSet)
+            log.info("Event: Loading appointment#{} from cookie", id);
         model.addAttribute("language", language);
         return loadPatientAppointmentService.loadPatientAppointment(id)
                 .map(appointment -> {
+                    if (isAppointmentSet)
+                        log.info("Event: Appointment#{} loaded from cookie details is: {}", id, appointment.toString());
                     if (appointment.status == AppointmentStatus.VISITING) {
                         model.addAttribute("turnNumber", appointment.turnNumber);
                         model.addAttribute("appointmentId", id);
