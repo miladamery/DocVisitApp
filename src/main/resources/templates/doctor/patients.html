@@ -336,6 +336,9 @@
                                 </div>
                             </div>
                             <script>
+								for (let item of document.getElementsByClassName("flatpickr-calendar")) {
+									item.remove();
+								}
                                 flatpickr("#patients_date_of_birth", {
                                     disableMobile: "true",
                                     defaultDate: "today",
@@ -374,7 +377,7 @@
 						/>
                     </div>
                     <input id="refreshPage" type="hidden" hx-get="/doctor/patients" hx-trigger="click"
-                           hx-target="#patients_container" hx-swap="outerHTML"
+                           hx-target="#kt_app_content_container"
                     >                
             </div>
         </div>

@@ -158,13 +158,30 @@
 			if ($("#doc_patient_add_submit").val() !== undefined && (evt.target.id == "kt_app_content_container" || evt.target.id == "patients_container")) {												
 				document.getElementById("doc_patient_add_submit").removeEventListener('htmx:confirm', function() {});
 				document.getElementById("doc_patient_add_submit").addEventListener('htmx:confirm', function(evt) {				
-					evt.preventDefault();                    
+					evt.preventDefault();
+					
+					if (!$("#first_name").val()) {
+						swalAlert("Validation Failed!", "First name can't be empty");
+						return;
+					}
+					
+					if (!$("#last_name").val()) {
+						swalAlert("Validation Failed!", "Last name can't be empty");
+						return;
+					}
+					
+					if (!$("#patients_date_of_birth").val()) {
+						swalAlert("Validation Failed!", "Date of birth can't be empty");
+						return;
+					}
+					
 					var phoneNumberPattern = /\d\d-\d\d-\d\d-\d\d-\d\d/;
 					var phoneNumber = $("#doc_patient_add_phone_number").val();
 					if (!phoneNumberPattern.test(phoneNumber)) {
 						swalAlert("Validation Failed!", "Please enter valid phone number");
 						return;
-					}					
+					}						
+					
 					evt.detail.issueRequest();					
 				});
 			}
