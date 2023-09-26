@@ -11,7 +11,7 @@
 </head>
 <body>
 <th:block th:fragment="patients">
-    <div id="patients_container" hx-get="/doctor/patients" hx-trigger="every 30s" style="font-family: Poppins, serif;">		
+    <div id="patients_container" hx-get="/doctor/patients" hx-trigger="every 30s" hx-target="#kt_app_content_container" style="font-family: Poppins, serif;">		
         <div class="container-fluid p-5 rounded mt-5" style="background-color: #494462; font-style: normal;">
             <div class="row" style="color: white;">                
 				<div class="col-4 text-center" style="border-right: 5px solid #C5A470;font-size: x-large;">
@@ -309,28 +309,20 @@
                         <i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span class="path2"></span></i>
                     </div>
                     <!--end::Close-->
-                </div>
-                <form hx-post="/doctor/give/appointment" hx-ext="json-enc" hx-swap="none" id="doc_add_patient_form"
-                      _="on htmx:afterRequest(elt, xhr, target, requestConfig, successful)
-                            if successful is true
-                                send click to #patients_modal_close
-                                send click to #refreshPage
-                            else call requestFailedAlert('Sorry Doctor. Adding Patient Failed.', xhr)
-                            end
-                        ">
+                </div>                
                     <div class="modal-body">
                         <div class="row">
                             <div class="col-6">
                                 <div class="form-group">
                                     <label for="first_name">First Name:</label>
-                                    <input type="text" class="form-control" id="first_name" name="firstName"
+                                    <input type="text" class="form-control docPatientAddInput" id="first_name" name="firstName"
                                            aria-describedby="first_name" placeholder="First Name" required>
                                 </div>
                             </div>
                             <div class="col-6">
                                 <div class="form-group">
                                     <label for="last_name">Last Name:</label>
-                                    <input type="text" class="form-control" id="last_name" name="lastName"
+                                    <input type="text" class="form-control docPatientAddInput" id="last_name" name="lastName"
                                            aria-describedby="last_name" placeholder="Last Name" required>
                                 </div>
                             </div>
@@ -339,7 +331,7 @@
                                 <div class="form-group">
                                     <label for="last_name">Date Of Birth:</label>
                                     <input id="patients_date_of_birth" name="dateOfBirth" type="text"
-                                           class="form-control" placeholder="Date Of Birth" required
+                                           class="form-control docPatientAddInput" placeholder="Date Of Birth" required
                                     />
                                 </div>
                             </div>
@@ -354,11 +346,14 @@
                                 <div class="form-group">
                                     <label for="last_name">Phone Number:</label>
                                     <input id="doc_patient_add_phone_number" name="phoneNumber" type="text"
-                                           class="form-control" placeholder="Phone Number" required
+                                           class="form-control docPatientAddInput" placeholder="Phone Number" required
                                            hx-validate="true"
                                     />
                                 </div>
-
+								<script>
+									$('#doc_patient_add_phone_number').val("0");
+									$('#doc_patient_add_phone_number').inputmask("99-99-99-99-99");
+								</script>
                             </div>
                         </div>
                     </div>
@@ -367,12 +362,20 @@
                         <button id="patients_modal_close" type="button" class="btn btn-light" data-bs-dismiss="modal">
                             Close
                         </button>
-                        <input id="doc_patient_add_submit" type="submit" class="btn btn-primary"/>
+                        <input id="doc_patient_add_submit" type="submit" class="btn btn-primary"
+							hx-post="/doctor/give/appointment" hx-ext="json-enc" hx-swap="none" hx-include=".docPatientAddInput"
+							_="on htmx:afterRequest(elt, xhr, target, requestConfig, successful)
+                            if successful is true
+                                send click to #patients_modal_close
+                                send click to #refreshPage
+                            else call requestFailedAlert('Sorry Doctor. Adding Patient Failed.', xhr)
+                            end
+                        "
+						/>
                     </div>
                     <input id="refreshPage" type="hidden" hx-get="/doctor/patients" hx-trigger="click"
                            hx-target="#patients_container" hx-swap="outerHTML"
-                    >
-                </form>
+                    >                
             </div>
         </div>
     </div>
