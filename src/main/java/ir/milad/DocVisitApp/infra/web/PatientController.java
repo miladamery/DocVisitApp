@@ -32,32 +32,34 @@ public class PatientController {
     private final GetActiveVisitSessionService getActiveVisitSessionService;
     private final LoadPatientAppointmentService loadPatientAppointmentService;
     private final CancelPatientAppointmentService cancelPatientAppointmentService;
-    private final LoadPatientHistoryService loadPatientHistoryService;
+    private final LoadPatientHistoryViewDataService loadPatientHistoryViewDataService;
     private final BlockPatientService blockPatientService;
     private final PatientAppointmentCheckInService patientAppointmentCheckInService;
     private final PatientAppointmentDoneService patientAppointmentDoneService;
     private final PatientAppointmentOnHoldService patientAppointmentOnHoldService;
     private final PatientAppointmentResumeService patientAppointmentResumeService;
+    private final UnblockPatientService unblockPatientService;
 
     public PatientController(
             TakeAppointmentService takeAppointmentService,
             GetActiveVisitSessionService getActiveVisitSessionService,
             LoadPatientAppointmentService loadPatientAppointmentService,
             CancelPatientAppointmentService cancelPatientAppointmentService,
-            LoadPatientHistoryService loadPatientHistoryService,
+            LoadPatientHistoryViewDataService loadPatientHistoryViewDataService,
             BlockPatientService blockPatientService,
             PatientAppointmentCheckInService patientAppointmentCheckInService,
-            PatientAppointmentDoneService patientAppointmentDoneService, PatientAppointmentOnHoldService patientAppointmentOnHoldService, PatientAppointmentResumeService patientAppointmentResumeService) {
+            PatientAppointmentDoneService patientAppointmentDoneService, PatientAppointmentOnHoldService patientAppointmentOnHoldService, PatientAppointmentResumeService patientAppointmentResumeService, UnblockPatientService unblockPatientService) {
         this.takeAppointmentService = takeAppointmentService;
         this.getActiveVisitSessionService = getActiveVisitSessionService;
         this.loadPatientAppointmentService = loadPatientAppointmentService;
         this.cancelPatientAppointmentService = cancelPatientAppointmentService;
-        this.loadPatientHistoryService = loadPatientHistoryService;
+        this.loadPatientHistoryViewDataService = loadPatientHistoryViewDataService;
         this.blockPatientService = blockPatientService;
         this.patientAppointmentCheckInService = patientAppointmentCheckInService;
         this.patientAppointmentDoneService = patientAppointmentDoneService;
         this.patientAppointmentOnHoldService = patientAppointmentOnHoldService;
         this.patientAppointmentResumeService = patientAppointmentResumeService;
+        this.unblockPatientService = unblockPatientService;
     }
 
     @GetMapping("/index")
@@ -173,8 +175,7 @@ public class PatientController {
             Model model
     ) {
         var patient = new Patient("", firstName, lastName, dateOfBirth);
-        model.addAttribute("patient", patient);
-        model.addAttribute("histories", loadPatientHistoryService.load(patient));
+        model.addAttribute("data", loadPatientHistoryViewDataService.load(patient));
         return "/doctor/patients-history :: patient-history";
     }
 
@@ -182,6 +183,12 @@ public class PatientController {
     @ResponseBody
     public void block(@Valid @RequestBody PatientRequestModel request) {
         blockPatientService.block(getPatientFromRequest(request));
+    }
+
+    @PutMapping("/unblock")
+    @ResponseBody
+    public void unblock(@Valid @RequestBody PatientRequestModel request) {
+        unblockPatientService.unblock(getPatientFromRequest(request));
     }
 
     @PutMapping("/check/in/{id}")

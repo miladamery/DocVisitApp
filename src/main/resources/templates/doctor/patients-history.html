@@ -8,7 +8,7 @@
 <th:block th:fragment="patient-history">
     <div class="row no-gutters text-center">
         <div class="modal-header">
-            <h3 class="modal-title" style="color: #494462;" th:text="${patient.firstName + ' ' + patient.lastName} + '\'s History'">Patient History</h3>
+            <h3 class="modal-title" style="color: #494462;" th:text="${data.patient.firstName + ' ' + data.patient.lastName} + '\'s History'">Patient History</h3>
 
             <!--begin::Close-->
             <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal"
@@ -20,7 +20,7 @@
             <!--end::Close-->
         </div>
         <div class="modal-body">
-            <th:block th:each="history,iter : ${histories}">
+            <th:block th:each="history,iter : ${data.histories}">
                 <div class="col-sm-12 d-flex justify-content-center">
                     <div class="mt-5 badge text-center py-1 px-4 mx-1" style="width: 10%;color: white;background-color: #615A83;font-size: 1.25rem;align-content: center;" th:text="${iter.index + 1}"></div>
                     <div class="mt-5 text-center py-1 px-4 mx-1" style="width:40%;color: #494462;background-color: #F8F5FF;"
@@ -52,7 +52,7 @@
                 Close
             </button>
             <button class="btn" style="background-color: #C5A470;color: white;"
-                    hx-put="/patient/block"
+                    th:attr="hx-put=${data.isBlocked} ? '/patient/unblock' : '/patient/block'"
                     hx-trigger="click"
                     hx-swap="none"
                     hx-include=".block-patient"
@@ -61,13 +61,14 @@
                             if successful is true then send click to #patients_history_modal_close
                             else call requestFailedAlert('Sorry Doctor. Blocking Patient Failed.', xhr)
                             end"
+					th:text="${data.isBlocked ? 'Unblock' : 'Block'}"
             >Block
             </button>
         </div>
     </div>
-    <input type="hidden" name="firstName" th:class="'block-patient'" th:value="${patient.firstName}"/>
-    <input type="hidden" name="lastName" th:class="'block-patient'" th:value="${patient.lastName}"/>
-    <input type="hidden" name="dateOfBirth" th:class="'block-patient'" th:value="${patient.dateOfBirth}"/>
+    <input type="hidden" name="firstName" th:class="'block-patient'" th:value="${data.patient.firstName}"/>
+    <input type="hidden" name="lastName" th:class="'block-patient'" th:value="${data.patient.lastName}"/>
+    <input type="hidden" name="dateOfBirth" th:class="'block-patient'" th:value="${data.patient.dateOfBirth}"/>
 </th:block>
 </body>
 </html>

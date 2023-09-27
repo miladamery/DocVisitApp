@@ -27,10 +27,9 @@
                     valid = false;
                 } else {
 					$("#dateOfBirthEmptyError").addClass("hidden");
-					var dateStr = $("#date-picker").val();
-					var date = Date.parse(dateStr);
-					var today = new Date();
-					if (date > today) {
+					var dateStr = $("#date-picker").val();					
+					var todayStr = new Date().toLocaleDateString("fr-CA");
+					if (dateStr > todayStr) {
 						$("#dateOfBirthWrongError").removeClass("hidden");
 						valid = false;
 					} else {

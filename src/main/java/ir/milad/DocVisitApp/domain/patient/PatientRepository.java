@@ -9,5 +9,7 @@ public interface PatientRepository {
 
     void addToBlocked(Patient patient);
 
+    void removeFromBlocked(Patient patient);
+
     boolean isBlocked(Patient patient);
 }

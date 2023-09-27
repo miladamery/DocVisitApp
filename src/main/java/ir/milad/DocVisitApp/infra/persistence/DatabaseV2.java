@@ -96,6 +96,12 @@ public class DatabaseV2 {
         storageManager.store(blockedPatients);
     }
 
+    public void removeFromBlocked(PatientEntity patient) {
+        var blockedPatients = blockedPatientsRef.get();
+        blockedPatients.remove(patient);
+        storageManager.store(blockedPatients);
+    }
+
     public void clearActiveVisitSession() {
         activeVisitSession = Optional.empty();
         var eagerStorer = storageManager.createEagerStorer();

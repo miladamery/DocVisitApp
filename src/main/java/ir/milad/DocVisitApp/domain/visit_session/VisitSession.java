@@ -168,25 +168,15 @@ public class VisitSession {
         var appointment = loadAppointmentAndCheckItsStatus(appointmentId, AppointmentStatus.VISITING, errorMsg);
         logOperation("Before OnHold", appointment);
 
-        var remainingTime = ((long) appointment.numOfPersons * sessionLength);
-        var visitToEntryTimeDiff = appointment.visitTime.toLocalTime().withSecond(0).withNano(0) -entryTime;
-        if (visitToEntryTimeDiff > 0)
-            remainingTime -= visitToEntryTimeDiff;
-        onHoldTimes.put(appointmentId, remainingTime);
-
-        if (appointments.indexOf(appointment) < appointments.size() - 1) {
-            var nextAppointment = appointments.get(appointments.indexOf(appointment) + 1);
-            nextAppointment.decreaseVisitTime(onHoldTimes.values().stream().mapToLong(value -> value).sum());
-            if (nextAppointment.getVisitTime().toLocalTime() < LocalTime.nowHM())
-                nextAppointment.setVisitTime(LocalDateTime.nowHM());
-        }
+        var timeToDecrease = ((long) appointment.numOfPersons * sessionLength) -
+                (appointment.visitTime.toLocalTime().withSecond(0).withNano(0) - entryTime);
 
         updateAppointmentStatusThenRescheduleSubsequentAppointments(
                 appointment,
                 AppointmentStatus.ON_HOLD,
                 _appointment -> {
                     if (_appointment.status == AppointmentStatus.WAITING)
-                        _appointment.increaseVisitTime(visitToEntryTimeDiff);
+                        _appointment.decreaseVisitTime(timeToDecrease);
                 }
         );
 
@@ -197,11 +187,27 @@ public class VisitSession {
     public void resume(String appointmentId, LocalTime entryTime) {
         var errorMsg = "Can't resume appointment, Patient is not in `On-Hold` Status";
         var appointment = loadAppointmentAndCheckItsStatus(appointmentId, AppointmentStatus.ON_HOLD, errorMsg);
-        appointment.setStatus(AppointmentStatus.VISITING);
         logOperation("Before Resume", appointment);
 
-        onHoldTimes.remove(appointmentId);
         appointment.visitTime = LocalDateTime.of(entryTime);
+        var resumeStandardTime = firstWaitingAppointmentVisitTime().orElse(entryTime);
+        long resumeStandardTimeToEntryTimeDiff = resumeStandardTime - entryTime;
+
+        long timeToIncrease;
+        if (resumeStandardTimeToEntryTimeDiff > 0)
+            timeToIncrease = (long) appointment.numOfPersons * sessionLength + resumeStandardTimeToEntryTimeDiff;
+        else
+            timeToIncrease = (long) appointment.numOfPersons * sessionLength;
+
+        updateAppointmentStatusThenRescheduleSubsequentAppointments(
+                appointment,
+                AppointmentStatus.VISITING,
+                _appointment -> {
+                    if (_appointment.status == AppointmentStatus.WAITING)
+                        _appointment.increaseVisitTime(timeToIncrease);
+                }
+        );
+
         logOperation("Resume Completed", appointment);
     }
 
@@ -331,6 +337,15 @@ public class VisitSession {
         for (int i = appointments.size() - 1; i >= 0; i--) {
             if (appointments.get(i).getStatus() == AppointmentStatus.WAITING) {
                 return Optional.of(appointments.get(i));
+            }
+        }
+        return Optional.empty();
+    }
+
+    private Optional<LocalTime> firstWaitingAppointmentVisitTime() {
+        for (Appointment appointment : appointments) {
+            if (appointment.getStatus() == AppointmentStatus.WAITING) {
+                return Optional.of(appointment.visitTime.toLocalTime());
             }
         }
         return Optional.empty();

@@ -57,6 +57,16 @@ public class MicroStreamPatientRepository implements PatientRepository {
     }
 
     @Override
+    public void removeFromBlocked(Patient patient) {
+        lock.writeLock().lock();
+        try {
+            database.removeFromBlocked(PatientEntity.from(patient));
+        } finally {
+            lock.writeLock().unlock();
+        }
+    }
+
+    @Override
     public boolean isBlocked(Patient patient) {
         lock.readLock().lock();
         try {
