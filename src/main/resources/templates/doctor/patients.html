@@ -197,7 +197,7 @@
                                     !data.isVisiting() &&
                                     data.summary.nextAppointmentId.equals(appointment.id)
                                 }"
-                                      class="badge fs-7 fw-bold text-capitalize cursor-pointer"
+                                      class="badge fs-7 fw-bold text-capitalize cursor-pointer py-2"
                                       style="color: white; background-color: #3B82F6;"
                                       th:attr="hx-put='/patient/check/in/' + ${appointment.id}"
                                       hx-swap="none"
@@ -209,7 +209,7 @@
                                         end"
                                 >Check-In</span>
                                 <span th:if="${appointment.status == T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).VISITING}"
-                                      class="badge fs-7 fw-bold text-capitalize cursor-pointer"
+                                      class="badge fs-7 fw-bold text-capitalize cursor-pointer py-2"
                                       style="color: white; background-color: #F59E0B;"
                                       th:attr="hx-put='/patient/done/' + ${appointment.id}"
                                       hx-swap="none"
@@ -224,7 +224,7 @@
                                     appointment.status == T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).ON_HOLD &&
                                     !data.isVisiting()
                                 }"
-                                      class="badge fs-7 fw-bold text-capitalize cursor-pointer"
+                                      class="badge fs-7 fw-bold text-capitalize cursor-pointer py-2"
                                       style="color: white; background-color: #A855F7;"
                                       th:attr="hx-put='/patient/resume/' + ${appointment.id}"
                                       hx-swap="none"
@@ -240,7 +240,7 @@
                                     !data.isVisiting() &&
                                     !data.summary.nextAppointmentId.equals(appointment.id)
 								}"
-								class="fs-7 fw-bold text-capitalize cursor-pointer rounded px-3 py-1" 									  
+								class="fs-7 fw-bold text-capitalize cursor-pointer rounded px-4 py-1" 									  
 								style="border: 1px black solid !important;"
 								th:attr="hx-put='/patient/urgent/' + ${appointment.id}"
 								hx-ext="json-enc"

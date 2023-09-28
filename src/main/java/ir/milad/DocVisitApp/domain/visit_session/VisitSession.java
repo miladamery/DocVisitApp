@@ -137,24 +137,28 @@ public class VisitSession {
     }
 
     @UnitTestRequired
-    public void done(String appointmentId, LocalTime doneTime) {
+    public void done(String appointmentId, LocalTime entryTime) {
         var errorMsg = "Wrong appointment to done! Doctor is not visiting this patient.";
         var appointment = loadAppointmentAndCheckItsStatus(appointmentId, AppointmentStatus.VISITING, errorMsg);
         logOperation("Before Done", appointment);
 
-        var timeDiff = appointment.calculatedEndTime(sessionLength) - LocalDateTime.of(doneTime.withSecond(0));
-        /*var timeDiff = Duration.between(
-                appointment.calculatedEndTime(sessionLength), LocalDateTime.of(doneTime.withSecond(0))
-        ).toMinutes();*/
+        var timeDiff = appointment.calculatedEndTime(sessionLength) - LocalDateTime.of(entryTime.withSecond(0));
 
-        updateAppointmentStatusThenRescheduleSubsequentAppointments(
+        appointment.status = AppointmentStatus.VISITED;
+        appointments.forEach(_appointment -> {
+            if (_appointment.status == AppointmentStatus.WAITING) {
+                _appointment.increaseVisitTime(timeDiff);
+            }
+        });
+
+        /*updateAppointmentStatusThenRescheduleSubsequentAppointments(
                 appointment,
                 AppointmentStatus.VISITED,
                 _appointment -> {
                     if (_appointment.getStatus() == AppointmentStatus.WAITING)
                         _appointment.increaseVisitTime(timeDiff);
                 }
-        );
+        );*/
 
         if (appointments.indexOf(appointment) == appointments.size() - 1)
             lastAppointmentTime = appointment.visitTime;
