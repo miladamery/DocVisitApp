@@ -59,7 +59,7 @@
             </div>
             <input id="appointmentId" type="hidden" name="id" th:value="${appointment.id}">
             <div
-                    hx-get="/patient/load/appointment"
+					th:attr="hx-get='/patient/load/appointment?language=' + ${language}"                    
                     hx-include="input[type='hidden']"
                     hx-trigger="every 10s"
                     hx-target="#main_container"
