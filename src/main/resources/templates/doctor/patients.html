@@ -12,56 +12,56 @@
 <body>
 <th:block th:fragment="patients">
     <div id="patients_container" hx-get="/doctor/patients" hx-trigger="every 30s" hx-target="#kt_app_content_container" style="font-family: Poppins, serif;">		
-        <div class="container-fluid p-5 rounded mt-5" style="background-color: #494462; font-style: normal;">
+        <div class="container-fluid p-5 rounded mt-5" style="background-color: #494462;">
             <div class="row" style="color: white;">                
-				<div class="col-4 text-center" style="border-right: 5px solid #C5A470;font-size: x-large;">
+				<div class="col-4 text-center" style="border-right: 5px solid #C5A470;">
 					<div class="row">
 						<div class="col-12">
-							<span>Today's Office Hours</span>
+							<span style="color: #FFF;font-size: 18px;">Today's Office Hours</span>
 						</div>
 						<div class="col-12">
-							<span th:if="${data.summary != null}" style="font-weight: bold;" th:text="${data.summary.fromTime + ' - ' + data.summary.toTime}">08:00 AM - 02:00 PM</span>
-						</div>
+							<span th:if="${data.summary != null}" style="font-weight: bold;font-size: 20;" th:text="${data.summary.fromTime + ' - ' + data.summary.toTime}">08:00 AM - 02:00 PM</span>
+						</div>						
 						<div class="col-12 mt-4">
-							<span>Session Length:</span>
+							<span style="font-size: 18;">Session Length:</span>
 						</div>
 						<div class="col-12">
-							<span th:if="${data.summary != null}" style="font-weight: bold;" th:text="${data.summary.sessionLength + ' Minutes'}">8 Minutes</span>
+							<span th:if="${data.summary != null}" style="font-weight: bold;font-size: large;" th:text="${data.summary.sessionLength + ' Minutes'}">8 minutes</span>
 						</div>
 					</div>
 				</div>
-				<div class="col-4 text-center" style="border-right: 5px solid #C5A470;font-size: x-large;">
+				<div class="col-4 text-center" style="border-right: 5px solid #C5A470;">
 					<div class="row">
 						<div class="col-12">
-							<span style="font-size: xxx-large;" th:text="${data.day + ' '}">23 </span><span th:text="${' ' + data.month + ' ' + data.year}">January 2023</span>
-						</div>
+							<span style="font-size: 40px;font-weight: bold;" th:text="${data.day + ' '}">23 </span><span style="font-size: 18px;font-weight: medium;" th:text="${' ' + data.month + ' ' + data.year}">January 2023</span>
+						</div>						
 						<div class="col-12">
-							<span style="font-size: xxx-large;" th:text="${data.currentTime + ' '}">12:06 </span><span th:text="${data.amPm + ' '}">AM </span><span class="capitalize" th:text="${data.currentWeekDay}">Wednesday</span>
+							<span style="font-size: 40px;font-weight: bold;" th:text="${data.currentTime + ' '}">12:06 </span><span style="font-size: 18px;" th:text="${data.amPm + ' '}">AM </span><span style="font-size: 18px;" class="capitalize" th:text="${data.currentWeekDay}">Wednesday</span>
 						</div>
 					</div>
 				</div>
-				<div class="col-4 text-center" style="font-size: x-large;">
+				<div class="col-4 text-center">
 					<div class="row">
 						<div class="col-12">
-							<span th:if="${data.summary != null}" style="font-size: xxx-large;" th:text="${data.summary.total + ' '}">68 </span><span>Total Patients</span>
+							<span th:if="${data.summary != null}" style="font-size: 40px;font-weight: bold;" th:text="${data.summary.total + ' '}">68 </span><span style="font-size: 18px;font-weight: medium;">Total Patients</span>
+						</div>						
+						<div class="col-4">
+							<span style="font-size: 18px;">Waiting</span>
 						</div>
 						<div class="col-4">
-							<span>Waiting</span>
+							<span style="font-size: 18px;">Visited</span>
 						</div>
 						<div class="col-4">
-							<span>Visited</span>
+							<span style="font-size: 18px;">Cancelled</span>
 						</div>
 						<div class="col-4">
-							<span>Cancelled</span>
+							<span style="font-size: 20px;font-weight: bold;" th:if="${data.summary != null}" th:text="${data.summary.waiting}">49</span>
 						</div>
 						<div class="col-4">
-							<span th:if="${data.summary != null}" th:text="${data.summary.waiting}">49</span>
+							<span style="font-size: 20px;font-weight: bold;" th:if="${data.summary != null}" th:text="${data.summary.visited}">16</span>
 						</div>
 						<div class="col-4">
-							<span th:if="${data.summary != null}" th:text="${data.summary.visited}">16</span>
-						</div>
-						<div class="col-4">
-							<span th:if="${data.summary != null}" th:text="${data.summary.cancelled}">3</span>
+							<span style="font-size: 20px;font-weight: bold;" th:if="${data.summary != null}" th:text="${data.summary.cancelled}">3</span>
 						</div>
 					</div>
 				</div>

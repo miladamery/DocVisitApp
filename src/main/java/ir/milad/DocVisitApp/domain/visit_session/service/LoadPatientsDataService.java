@@ -3,6 +3,7 @@ package ir.milad.DocVisitApp.domain.visit_session.service;
 import ir.milad.DocVisitApp.domain.UnitTestRequired;
 import ir.milad.DocVisitApp.domain.patient.Patient;
 import ir.milad.DocVisitApp.domain.visit_session.*;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -56,7 +57,7 @@ public class LoadPatientsDataService {
             var ct = now.format(DateTimeFormatter.ofPattern("hh:mm a")).split(" ")[0];
             currentTime = ct.setCharBeforeAndAfter(' ', ct.indexOf(":"));
             amPm = now.format(DateTimeFormatter.ofPattern("hh:mm a")).split(" ")[1];
-            currentWeekDay = LocalDate.now().getDayOfWeek().name();
+            currentWeekDay = StringUtils.capitalize(LocalDate.now().getDayOfWeek().name().toLowerCase());
         }
 
         public boolean isVisiting() {
