@@ -235,6 +235,22 @@
                                             else call requestFailedAlert('Done Operation failed.', xhr)
                                         end"
                                 >Resume</span>
+								<span th:if="${
+									appointment.status == T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).WAITING &&
+                                    !data.isVisiting() &&
+                                    !data.summary.nextAppointmentId.equals(appointment.id)
+								}"
+								class="fs-7 fw-bold text-capitalize cursor-pointer rounded px-3 py-1" 									  
+								style="border: 1px black solid !important;"
+								th:attr="hx-put='/patient/urgent/' + ${appointment.id}"
+								hx-ext="json-enc"
+								hx-swap="none"
+								hx-trigger="click"
+                                      _="on htmx:afterRequest(elt, xhr, target, requestConfig, successful)
+                                            if successful is true then send click to #refreshPage
+                                            else call requestFailedAlert('Done Operation failed.', xhr)
+                                        end"
+								>Urgent</span>
                             </td>
                             <td>
                                 <svg

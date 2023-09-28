@@ -39,6 +39,7 @@ public class PatientController {
     private final PatientAppointmentOnHoldService patientAppointmentOnHoldService;
     private final PatientAppointmentResumeService patientAppointmentResumeService;
     private final UnblockPatientService unblockPatientService;
+    private final PatientAppointmentUrgentService patientAppointmentUrgentService;
 
     public PatientController(
             TakeAppointmentService takeAppointmentService,
@@ -48,7 +49,7 @@ public class PatientController {
             LoadPatientHistoryViewDataService loadPatientHistoryViewDataService,
             BlockPatientService blockPatientService,
             PatientAppointmentCheckInService patientAppointmentCheckInService,
-            PatientAppointmentDoneService patientAppointmentDoneService, PatientAppointmentOnHoldService patientAppointmentOnHoldService, PatientAppointmentResumeService patientAppointmentResumeService, UnblockPatientService unblockPatientService) {
+            PatientAppointmentDoneService patientAppointmentDoneService, PatientAppointmentOnHoldService patientAppointmentOnHoldService, PatientAppointmentResumeService patientAppointmentResumeService, UnblockPatientService unblockPatientService, PatientAppointmentUrgentService patientAppointmentUrgentService) {
         this.takeAppointmentService = takeAppointmentService;
         this.getActiveVisitSessionService = getActiveVisitSessionService;
         this.loadPatientAppointmentService = loadPatientAppointmentService;
@@ -60,6 +61,7 @@ public class PatientController {
         this.patientAppointmentOnHoldService = patientAppointmentOnHoldService;
         this.patientAppointmentResumeService = patientAppointmentResumeService;
         this.unblockPatientService = unblockPatientService;
+        this.patientAppointmentUrgentService = patientAppointmentUrgentService;
     }
 
     @GetMapping("/index")
@@ -213,6 +215,12 @@ public class PatientController {
     @ResponseBody
     public void resume(@PathVariable String appointmentId) {
         patientAppointmentResumeService.resume(appointmentId);
+    }
+
+    @PutMapping("/urgent/{appointmentId}")
+    @ResponseBody
+    public void urgent(@PathVariable String appointmentId) {
+        patientAppointmentUrgentService.urgent(appointmentId);
     }
 
     @GetMapping("/blocked")

@@ -270,6 +270,36 @@ public class VisitSession {
         return turnsToAwait;
     }
 
+    public void urgent(String appointmentId, LocalTime entryTime) {
+        var errorMessage = "Appointment status is not `Waiting`";
+        var appointment = loadAppointmentAndCheckItsStatus(appointmentId, AppointmentStatus.WAITING, errorMessage);
+
+        var fwao = firstWaitingAppointment();
+        if (fwao.isPresent() && Objects.equals(fwao.get().getId(), appointmentId))
+            throw new ApplicationException("Can't use `urgent` on first `Waiting` appointment. Please use `Check-in`");
+
+        appointment.status = AppointmentStatus.VISITING;
+        appointment.visitTime = LocalDateTime.of(entryTime);
+
+        var visitTimeToEntryTimeDiff = firstWaitingAppointmentVisitTime().orElse(entryTime).diffWithNowInMinutes();
+        if (visitTimeToEntryTimeDiff < 0)
+            visitTimeToEntryTimeDiff = 0L;
+
+        var apIndx = appointments.indexOf(appointment);
+        Long finalToIncrease = (long) appointment.numOfPersons * sessionLength + visitTimeToEntryTimeDiff;
+        Long finalVisitTimeToEntryTimeDiff = visitTimeToEntryTimeDiff;
+
+        appointments.forEachIndexed((i, _appointment) -> {
+            if (_appointment.status == AppointmentStatus.WAITING) {
+                if (i < apIndx) {
+                    _appointment.increaseVisitTime(finalToIncrease);
+                } else if (i > apIndx) {
+                    _appointment.increaseVisitTime(finalVisitTimeToEntryTimeDiff);
+                }
+            }
+        });
+    }
+
     private Appointment giveNewAppointment(Patient patient, LocalTime entryTime, int numOfPersons) {
         var entryDateTime = LocalDateTime.of(entryTime);
         LocalDateTime visitTime;
@@ -288,7 +318,7 @@ public class VisitSession {
 
     private Optional<Appointment> findActiveAppointmentByPatient(Patient patient) {
         return appointments
-                .filter(t -> t.isSamePatient(patient) && (t.status == AppointmentStatus.WAITING || t.status == AppointmentStatus.ON_HOLD) )
+                .filter(t -> t.isSamePatient(patient) && (t.status == AppointmentStatus.WAITING || t.status == AppointmentStatus.ON_HOLD))
                 .findFirst();
     }
 
@@ -346,6 +376,15 @@ public class VisitSession {
         for (Appointment appointment : appointments) {
             if (appointment.getStatus() == AppointmentStatus.WAITING) {
                 return Optional.of(appointment.visitTime.toLocalTime());
+            }
+        }
+        return Optional.empty();
+    }
+
+    private Optional<Appointment> firstWaitingAppointment() {
+        for (Appointment appointment : appointments) {
+            if (appointment.getStatus() == AppointmentStatus.WAITING) {
+                return Optional.of(appointment);
             }
         }
         return Optional.empty();

@@ -17,4 +17,8 @@ public class LocalTimeExtension {
     public static LocalTime nowHM() {
         return LocalTime.now().withSecond(0).withNano(0);
     }
+
+    public static Long diffWithNowInMinutes(@This LocalTime thiz) {
+        return Duration.between(thiz, LocalTime.nowHM()).toMinutes();
+    }
 }
