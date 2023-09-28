@@ -95,23 +95,23 @@
                         <!--begin::Thead-->
                         <thead class="border-gray-200 fs-5 fw-semibold bg-lighten">
                         <tr>
-                            <th class="fw-bold">Cancel</th>
-                            <th class="fw-bold">History</th>
-                            <th class="fw-bold">First Name</th>
-                            <th class="fw-bold">Last Name</th>
-                            <th class="fw-bold">Age</th>
-                            <th class="fw-bold">Check-in Time</th>
-                            <th class="fw-bold">Phone Number</th>
-                            <th class="fw-bold">Ticket Number</th>
-                            <th class="fw-bold">Status
+                            <th class="fw-bold patients-table-header">Cancel</th>
+                            <th class="fw-bold patients-table-header">History</th>
+                            <th class="fw-bold patients-table-header">First Name</th>
+                            <th class="fw-bold patients-table-header">Last Name</th>
+                            <th class="fw-bold patients-table-header">Age</th>
+                            <th class="fw-bold patients-table-header">Check-in Time</th>
+                            <th class="fw-bold patients-table-header">Phone Number</th>
+                            <th class="fw-bold patients-table-header">Ticket Number</th>
+                            <th class="fw-bold patients-table-header">Status
                                 <i class="ki-duotone ki-filter">
                                     <i class="path1"></i>
                                     <i class="path2"></i>
                                 </i>
                             </th>
-                            <th class="fw-bold">Action</th>
-                            <th class="fw-bold">On-Hold</th>
-                            <th class="fw-bold">NO</th>
+                            <th class="fw-bold patients-table-header">Action</th>
+                            <th class="fw-bold patients-table-header">On-Hold</th>
+                            <th class="fw-bold patients-table-header">NO</th>
                         </tr>
                         </thead>
                         <!--end::Thead-->
@@ -160,16 +160,18 @@
 								</i>
 								<i th:if="${!appointment.patient.hasHistory}" class="fa fa-history fs-2x"></i>
 							</td>
-                            <td th:text="${appointment.patient.firstName}"></td>
-                            <td th:text="${appointment.patient.lastName}"></td>
-                            <td th:text="${appointment.patient.age}"></td>
+                            <td th:text="${appointment.patient.firstName}" th:class="${appointment.isActive} ? 'active-appointment' : 'inactive-appointment'"></td>
+                            <td th:text="${appointment.patient.lastName}" th:class="${appointment.isActive} ? 'active-appointment' : 'inactive-appointment'"></td>
+                            <td th:text="${appointment.patient.age}" th:class="${appointment.isActive} ? 'active-appointment' : 'inactive-appointment'"></td>
                             <td th:text="${(
                             appointment.status != T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).CANCELED &&
                              appointment.status != T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).CANCELED_BY_DOCTOR &&
                              appointment.status != T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).ON_HOLD
-                             ) ? appointment.visitTime.toLocalTime().withSecond(0).withNano(0) : '-'}"></td>
-                            <td th:text="${appointment.patient.phoneNumber}"></td>
-                            <td th:text="${appointment.turnNumber}"></td>
+                             ) ? appointment.visitTime.toLocalTime().withSecond(0).withNano(0) : '-'}"
+							 th:class="${appointment.isActive} ? 'active-appointment' : 'inactive-appointment'"
+							 ></td>
+                            <td th:text="${appointment.patient.phoneNumber}" th:class="${appointment.isActive} ? 'active-appointment' : 'inactive-appointment'"></td>
+                            <td th:text="${appointment.turnNumber}" th:class="${appointment.isActive} ? 'active-appointment' : 'inactive-appointment'"></td>
                             <th:block th:switch="${appointment.status}">
                                 <td th:case="${T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).WAITING}">
                                     <span style="color: #3B82F6" class="fs-7 fw-bold text-capitalize">Waiting</span>

@@ -40,6 +40,9 @@
                             <th:block th:case="${T(ir.milad.DocVisitApp.domain.patient.PatientHistoryStatus).BLOCKED}">
                                 <span class="badge badge-light-danger fs-7 fw-bold text-capitalize w-100 text-center">BLOCKED</span>
                             </th:block>
+							<th:block th:case="${T(ir.milad.DocVisitApp.domain.patient.PatientHistoryStatus).UNBLOCKED}">
+                                <span class="badge badge-light-danger fs-7 fw-bold text-capitalize w-100 text-center">UNBLOCKED</span>
+                            </th:block>
                         </th:block>
                     </div>
                 </div>

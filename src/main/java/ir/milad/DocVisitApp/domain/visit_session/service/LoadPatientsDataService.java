@@ -73,6 +73,7 @@ public class LoadPatientsDataService {
         public final PatientDto patient;
         public final AppointmentStatus status;
         public final Integer numOfPersons;
+        public final Boolean isActive;
 
         public AppointmentDto(Appointment appointment, VisitSessionRepository visitSessionRepository) {
             id = appointment.getId();
@@ -82,6 +83,7 @@ public class LoadPatientsDataService {
             patient = new PatientDto(appointment.getPatient(), visitSessionRepository.hasHistory(appointment.getPatient()));
             status = appointment.getStatus();
             numOfPersons = appointment.getNumOfPersons();
+            isActive = appointment.getStatus().isActive;
         }
     }
 
