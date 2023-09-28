@@ -288,7 +288,7 @@ public class VisitSession {
 
     private Optional<Appointment> findActiveAppointmentByPatient(Patient patient) {
         return appointments
-                .filter(t -> t.isSamePatient(patient) && t.status == AppointmentStatus.WAITING)
+                .filter(t -> t.isSamePatient(patient) && (t.status == AppointmentStatus.WAITING || t.status == AppointmentStatus.ON_HOLD) )
                 .findFirst();
     }
 
