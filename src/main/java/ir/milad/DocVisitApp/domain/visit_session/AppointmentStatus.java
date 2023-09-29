@@ -6,7 +6,8 @@ public enum AppointmentStatus {
     VISITED(false),
     CANCELED(false),
     CANCELED_BY_DOCTOR(false),
-    ON_HOLD(true);
+    ON_HOLD(true),
+    BLOCKED(false);
 
     public final boolean isActive;
 

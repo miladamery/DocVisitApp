@@ -14,14 +14,10 @@ var KTSigninGeneral = function() {
 			form,
 			{
 				fields: {					
-					'email': {
-                        validators: {
-                            regexp: {
-                                regexp: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                                message: 'The value is not a valid email address',
-                            },
+					'username': {
+                        validators: {                            
 							notEmpty: {
-								message: 'Email address is required'
+								message: 'Username is required'
 							}
 						}
 					},
@@ -116,11 +112,11 @@ var KTSigninGeneral = function() {
             // Validate form
             validator.validate().then(function (status) {
                 if (status == 'Valid') {
-                    // Hide loading indication
-                    submitButton.removeAttribute('data-kt-indicator');
+					// Show loading indication
+                    submitButton.setAttribute('data-kt-indicator', 'on');
 
-                    // Enable button
-                    submitButton.disabled = false;
+                    // Disable button to avoid multiple click 
+                    submitButton.disabled = true;					                 
 
                     const params = new URLSearchParams()
                     params.append('username', form.querySelector('[name="username"]').value)
@@ -133,40 +129,52 @@ var KTSigninGeneral = function() {
                     }
 
                     axios.post('/login', params, config)
-                        .then(function (response) {
-                        if (response) {
-                            form.querySelector('[name="username"]').value= "";
-                            form.querySelector('[name="password"]').value= "";  
-
-                            const redirectUrl = form.getAttribute('data-kt-redirect-url');
-                            
-                            if (redirectUrl) {
-                                location.href = redirectUrl;
-                            }
-                        } else {
-                            // Show error popup. For more info check the plugin's official documentation: https://sweetalert2.github.io/
-                            Swal.fire({
-                                text: "Sorry, the email or password is incorrect, please try again.",
-                                icon: "error",
-                                buttonsStyling: false,
-                                confirmButtonText: "Ok, got it!",
-                                customClass: {
-                                    confirmButton: "btn btn-primary"
-                                }
-                            });
-                        }
-                    }).catch(function (error) {
-                        Swal.fire({
-                            text: "Sorry, looks like there are some errors detected, please try again.",
-                            icon: "error",
-                            buttonsStyling: false,
-                            confirmButtonText: "Ok, got it!",
-                            customClass: {
-                                confirmButton: "btn btn-primary"
-                            }
-                        });
-                    });
-                } else {
+                        .then(
+							function (response) {
+								// Hide loading indication
+								submitButton.removeAttribute('data-kt-indicator');
+			
+								// Enable button
+								submitButton.disabled = false;
+								if (response) {
+									form.querySelector('[name="username"]').value= "";
+									form.querySelector('[name="password"]').value= "";  
+		
+									const redirectUrl = form.getAttribute('data-kt-redirect-url');
+									
+									if (redirectUrl) {
+										location.href = redirectUrl;
+									}
+								} else {
+									// Show error popup. For more info check the plugin's official documentation: https://sweetalert2.github.io/								
+									Swal.fire({
+										text: "Sorry, looks like there are some errors detected, please try again.",
+										icon: "error",
+										buttonsStyling: false,
+										confirmButtonText: "Ok, got it!",
+										customClass: {
+											confirmButton: "btn btn-primary"
+										}
+									});
+								}
+							}
+						).catch(function (error) {
+							// Hide loading indication
+							submitButton.removeAttribute('data-kt-indicator');
+			
+							// Enable button
+							submitButton.disabled = false;							
+							Swal.fire({
+								text: error.response.data,
+								icon: "error",
+								buttonsStyling: false,
+								confirmButtonText: "Ok, got it!",
+								customClass: {
+									confirmButton: "btn btn-primary"
+								}
+							});
+						});
+                } else {					
                     // Show error popup. For more info check the plugin's official documentation: https://sweetalert2.github.io/
                     Swal.fire({
                         text: "Sorry, looks like there are some errors detected, please try again.",

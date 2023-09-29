@@ -151,15 +151,6 @@ public class VisitSession {
             }
         });
 
-        /*updateAppointmentStatusThenRescheduleSubsequentAppointments(
-                appointment,
-                AppointmentStatus.VISITED,
-                _appointment -> {
-                    if (_appointment.getStatus() == AppointmentStatus.WAITING)
-                        _appointment.increaseVisitTime(timeDiff);
-                }
-        );*/
-
         if (appointments.indexOf(appointment) == appointments.size() - 1)
             lastAppointmentTime = appointment.visitTime;
 
@@ -224,14 +215,18 @@ public class VisitSession {
     public VisitSessionSummary summary() {
         var nextAppointmentId = appointments.filter(appointment -> appointment.status == AppointmentStatus.WAITING)
                 .findFirst().map(Appointment::getId).orElse("-1");
+
+        var total = appointments.stream().mapToInt(ap -> ap.numOfPersons).sum();
+        var waiting = numOfPatientsByAppointmentStatus(AppointmentStatus.WAITING);
+        var visited = numOfPatientsByAppointmentStatus(AppointmentStatus.VISITED);
+        var canceled = numOfPatientsByAppointmentStatus(AppointmentStatus.CANCELED);
+        var canceledByDoc = numOfPatientsByAppointmentStatus(AppointmentStatus.CANCELED_BY_DOCTOR);
+
         return new VisitSessionSummary(
-                numberOfAppointmentsByStatus(Optional.empty()),
-                numberOfAppointmentsAwaiting(),
-                numberOfAppointmentsByStatus(Optional.of(AppointmentStatus.VISITED)),
-                numberOfAppointmentsByStatus(Optional.of(AppointmentStatus.CANCELED)) +
-                        numberOfAppointmentsByStatus(Optional.of(AppointmentStatus.CANCELED_BY_DOCTOR)),
-                nextAppointmentId,
-                fromTime, toTime, sessionLength);
+                total, waiting, visited,
+                canceled + canceledByDoc,
+                nextAppointmentId, fromTime, toTime, sessionLength
+        );
     }
 
     @UnitTestRequired
@@ -277,6 +272,7 @@ public class VisitSession {
     public void urgent(String appointmentId, LocalTime entryTime) {
         var errorMessage = "Appointment status is not `Waiting`";
         var appointment = loadAppointmentAndCheckItsStatus(appointmentId, AppointmentStatus.WAITING, errorMessage);
+        logOperation("Before Urgent: ", appointment);
 
         var fwao = firstWaitingAppointment();
         if (fwao.isPresent() && Objects.equals(fwao.get().getId(), appointmentId))
@@ -302,6 +298,14 @@ public class VisitSession {
                 }
             }
         });
+
+        logOperation("Urgent completed: ", appointment);
+    }
+
+    public void addBlockedAppointment(Patient patient, LocalTime entryTime) {
+        var appointment = Appointment.newAppointment(-1, -1, LocalDateTime.of(entryTime), patient, 1);
+        appointment.status = AppointmentStatus.BLOCKED;
+        appointments.add(appointment);
     }
 
     private Appointment giveNewAppointment(Patient patient, LocalTime entryTime, int numOfPersons) {
@@ -315,7 +319,13 @@ public class VisitSession {
             lastAppointmentTime = lastAppointmentTime.plusMinutes((long) sessionLength * numOfPersons);
         }
 
-        var appointment = Appointment.newAppointment(appointments.size() + 1, appointments.size(), visitTime, patient, numOfPersons);
+        var appointment = Appointment.newAppointment(
+                (int) (appointments.filter(a -> a.status == AppointmentStatus.BLOCKED).count() + 1),
+                appointments.size(),
+                visitTime,
+                patient,
+                numOfPersons
+        );
         appointments.add(appointment);
         return appointment;
     }
@@ -392,6 +402,12 @@ public class VisitSession {
             }
         }
         return Optional.empty();
+    }
+
+    private int numOfPatientsByAppointmentStatus(AppointmentStatus status) {
+        return appointments.filter(ap -> ap.status == status)
+                .mapToInt(ap -> ap.numOfPersons)
+                .sum();
     }
 
     private void logOperation(String operation, Appointment appointment) {

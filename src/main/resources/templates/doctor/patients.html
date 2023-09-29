@@ -166,12 +166,15 @@
                             <td th:text="${(
                             appointment.status != T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).CANCELED &&
                              appointment.status != T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).CANCELED_BY_DOCTOR &&
-                             appointment.status != T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).ON_HOLD
+                             appointment.status != T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).ON_HOLD &&
+                             appointment.status != T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).BLOCKED 
                              ) ? appointment.visitTime.toLocalTime().withSecond(0).withNano(0) : '-'}"
 							 th:class="${appointment.isActive} ? 'active-appointment' : 'inactive-appointment'"
 							 ></td>
                             <td th:text="${appointment.patient.phoneNumber}" th:class="${appointment.isActive} ? 'active-appointment' : 'inactive-appointment'"></td>
-                            <td th:text="${appointment.turnNumber}" th:class="${appointment.isActive} ? 'active-appointment' : 'inactive-appointment'"></td>
+                            <td th:text="${
+								appointment.status != T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).BLOCKED
+							} ? ${appointment.turnNumber} : '-' " th:class="${appointment.isActive} ? 'active-appointment' : 'inactive-appointment'"></td>
                             <th:block th:switch="${appointment.status}">
                                 <td th:case="${T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).WAITING}">
                                     <span style="color: #3B82F6" class="fs-7 fw-bold text-capitalize">Waiting</span>
@@ -190,6 +193,9 @@
                                 </td>
                                 <td th:case="${T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).CANCELED_BY_DOCTOR}">
                                     <span style="color: #E00047" class="fs-7 fw-bold text-capitalize">Cancelled Dr</span>
+                                </td>
+								<td th:case="${T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).BLOCKED}">
+                                    <span style="color: #C9C7C5" class="fs-7 fw-bold text-capitalize">Blocked</span>
                                 </td>
                             </th:block>
                             <td>

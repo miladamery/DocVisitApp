@@ -3,6 +3,7 @@ package ir.milad.DocVisitApp.domain.patient.service;
 import ir.milad.DocVisitApp.domain.ApplicationException;
 import ir.milad.DocVisitApp.domain.UnitTestRequired;
 import ir.milad.DocVisitApp.domain.patient.*;
+import ir.milad.DocVisitApp.domain.visit_session.Appointment;
 import ir.milad.DocVisitApp.domain.visit_session.VisitSessionRepository;
 import org.springframework.stereotype.Service;
 
@@ -22,17 +23,25 @@ public class TakeAppointmentService {
         this.patientRepository = patientRepository;
     }
 
-    public synchronized AppointmentData takeAppointment(Patient patient, LocalTime entryTime, int numOfPersons) {
-        var vs = visitSessionRepository.getActiveSession(LocalDateTime.of(LocalDate.now(), entryTime.withSecond(0).withNano(0)))
+    public AppointmentData takeAppointment(Patient patient, LocalTime entryTime, int numOfPersons) {
+        var et = entryTime.withSecond(0).withNano(0);
+        var vs = visitSessionRepository.getActiveSession(LocalDateTime.of(LocalDate.now(), et))
                 .orElseThrow(() -> new ApplicationException("Active session not found."));
 
         if (patientRepository.isBlocked(patient)) {
-            patientRepository.addPatientHistory(patient, new PatientHistory(LocalDate.now(), PatientHistoryStatus.BLOCKED));
+            synchronized (this) {
+                patientRepository.addPatientHistory(patient, new PatientHistory(LocalDate.now(), PatientHistoryStatus.BLOCKED));
+                vs.addBlockedAppointment(patient, et);
+                visitSessionRepository.updateActiveVisitSession(vs);
+            }
             throw new PatientIsBlockedException("Patient is blocked");
         }
 
-        var appointment = vs.giveAppointment(patient, entryTime, numOfPersons);
-        visitSessionRepository.updateActiveVisitSession(vs);
+        Appointment appointment;
+        synchronized (this) {
+            appointment = vs.giveAppointment(patient, et, numOfPersons);
+            visitSessionRepository.updateActiveVisitSession(vs);
+        }
         return new AppointmentData(appointment, vs.appointmentTurnsToAwait(appointment.getId()));
     }
 }

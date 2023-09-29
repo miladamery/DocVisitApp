@@ -64,6 +64,17 @@
                         <span class="menu-title">Calendar</span>
                     </a>
                 </div>
+				
+				<div class="menu-item" style="position: absolute; bottom: 0px;"
+					hx-get="/logout" hx-swap="none" hx-trigger="click"
+				>
+                    <a class="menu-link" id="logout_menu">
+                        <span class="menu-icon">
+                            <i><img style="margin-left: 7px;" th:src="@{/images/logout.png}"></i>
+                        </span>
+                        <span class="menu-title">&nbsp;&nbsp;Logout</span>
+                    </a>
+                </div>
             </div>
             <!--end::Menu-->
         </div>
