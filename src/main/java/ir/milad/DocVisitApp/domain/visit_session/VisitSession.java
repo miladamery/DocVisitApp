@@ -320,7 +320,7 @@ public class VisitSession {
         }
 
         var appointment = Appointment.newAppointment(
-                (int) (appointments.filter(a -> a.status == AppointmentStatus.BLOCKED).count() + 1),
+                (int) (appointments.filter(a -> a.status != AppointmentStatus.BLOCKED).count() + 1),
                 appointments.size(),
                 visitTime,
                 patient,
