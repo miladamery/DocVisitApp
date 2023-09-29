@@ -14,3 +14,6 @@ target/
 ### DB
 visitTimeTables/
 /logs
+/database_v2
+/database_v3
+/database
