@@ -24,8 +24,13 @@ public class LoadPatientsDataService {
         this.visitSessionRepository = visitSessionRepository;
     }
 
-    public PatientsData load() {
-        return new PatientsData(visitSessionRepository.findActiveSessionForToday(), visitSessionRepository);
+    public PatientsData load(LocalDate date) {
+        Optional<VisitSession> visitSession;
+        if (date == LocalDate.now())
+            visitSession = visitSessionRepository.findActiveSessionForToday();
+        else
+            visitSession = visitSessionRepository.findVisitSessionByDate(date);
+        return new PatientsData(visitSession, visitSessionRepository, date);
     }
 
     public static class PatientsData {
@@ -37,17 +42,20 @@ public class LoadPatientsDataService {
         public final String currentTime;
         public final String amPm;
         public final String currentWeekDay;
+        public final String date;
 
-        public PatientsData(Optional<VisitSession> visitSession, VisitSessionRepository visitSessionRepository) {
+        public PatientsData(Optional<VisitSession> visitSession, VisitSessionRepository visitSessionRepository, LocalDate date) {
             if (visitSession.isPresent()) {
                 var vs = visitSession.get();
                 this.summary = vs.summary();
                 this.appointments = vs.getAppointments()
                         .map(appointment -> new AppointmentDto(appointment, visitSessionRepository))
                         .toList();
+                this.date = summary.date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
             } else {
                 this.summary = null;
                 this.appointments = new ArrayList<>();
+                this.date = date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
             }
             var today = LocalDate.now();
             var now = LocalTime.now();

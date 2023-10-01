@@ -224,8 +224,8 @@ public class VisitSession {
 
         return new VisitSessionSummary(
                 total, waiting, visited,
-                canceled + canceledByDoc,
-                nextAppointmentId, fromTime, toTime, sessionLength
+                canceled + canceledByDoc, nextAppointmentId,
+                fromTime, toTime, sessionLength, date
         );
     }
 

@@ -81,8 +81,13 @@ public class DoctorController {
     }
 
     @GetMapping("/patients")
-    public String patients(Model model) {
-        var patientsData = loadPatientsDataService.load();
+    public String patients(Model model, @RequestParam(value = "visitSessionDate", required = false, defaultValue = "") String visitSessionDate) {
+        LocalDate date;
+        if (visitSessionDate == null || visitSessionDate.isBlank())
+            date = LocalDate.now();
+        else
+            date = LocalDate.parse(visitSessionDate, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        var patientsData = loadPatientsDataService.load(date);
         model.addAttribute("data", patientsData);
         return "/doctor/patients :: patients";
     }

@@ -11,7 +11,12 @@
 </head>
 <body>
 <th:block th:fragment="patients">
-    <div id="patients_container" hx-get="/doctor/patients" hx-trigger="every 30s" hx-target="#kt_app_content_container" style="font-family: Poppins, serif;">		
+    <div id="patients_container" 
+		hx-get="/doctor/patients" 
+		hx-trigger="every 30s" 
+		hx-target="#kt_app_content_container"
+		hx-include="#doc-visit-session-date"
+	style="font-family: Poppins, serif;">		
         <div class="container-fluid p-5 rounded mt-5" style="background-color: #494462;">
             <div class="row" style="color: white;">                
 				<div class="col-4 text-center" style="border-right: 5px solid #C5A470;">
@@ -74,14 +79,15 @@
                 <!--begin::Heading-->
                 <div class="card-title">
                     <h3 class="fs-1 fw-bold" style="color: #494462;">Patients List</h3>
+					<button style="background-color: #C5A470;color: white;" class="btn btn-lg m-5"
+							th:disabled="${data.summary == null}"
+                            data-bs-toggle="modal" data-bs-target="#doc_patient_form">+ Add Patient
+                    </button>
                 </div>
                 <!--end::Heading-->
                 <!--begin::Toolbar-->
-                <div class="card-toolbar">
-                    <button style="background-color: #C5A470;color: white;" class="btn btn-lg my-1"
-							th:disabled="${data.summary == null}"
-                            data-bs-toggle="modal" data-bs-target="#doc_patient_form">Add Patient +
-                    </button>
+                <div class="card-toolbar">					
+                    <input id="doc-visit-session-date" type="text" name="visitSessionDate" />
                 </div>
                 <!--end::Toolbar-->
             </div>
@@ -310,7 +316,7 @@
                         <input type="hidden" id="refresh"
                                hx-get="/doctor/patients"
                                hx-trigger="click"
-                               hx-target="#patients_container"
+                               hx-target="#patients_container"							   
                         />
                     </table>
                     <!--end::Table-->
@@ -401,8 +407,8 @@
 						/>
                     </div>
                     <input id="refreshPage" type="hidden" hx-get="/doctor/patients" hx-trigger="click"
-                           hx-target="#kt_app_content_container"
-                    >                
+                           hx-target="#kt_app_content_container" hx-include="#doc-visit-session-date"
+                    >				
             </div>
         </div>
     </div>
@@ -413,6 +419,18 @@
             </div>
         </div>
     </div>
+	<script>
+		flatpickr("#doc-visit-session-date", {
+            altInput: true,
+			altFormat: "F / j / Y",
+			altInputClass: "altInputStyle",
+			dateFormat: "Y-m-d",
+			defaultDate: "[[${data.date}]]",
+			onChange: function(selectedDates, dateStr, instance) {
+				document.getElementById("refreshPage").click();
+			}
+        });						
+	</script>
 </th:block>
 </body>
 </html>

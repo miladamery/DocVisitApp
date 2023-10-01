@@ -49,7 +49,7 @@ public class DatabaseV2 {
 
     public void setActiveVisitSession(VisitSessionEntity visitSessionEntity) {
         Objects.requireNonNull(visitSessionEntity, "Database.setCurrentActiveVisitSession can't accept null visitSession");
-        visitSessionsHistory.get().add(visitSessionEntity);
+        activeVisitSession.ifPresent(vs -> visitSessionsHistory.get().add(vs));
         activeVisitSession = Optional.of(visitSessionEntity);
         var eagerStorer = storageManager.createEagerStorer();
         eagerStorer.storeAll(this);
@@ -107,6 +107,20 @@ public class DatabaseV2 {
         var eagerStorer = storageManager.createEagerStorer();
         eagerStorer.store(this);
         eagerStorer.commit();
+    }
+
+    public Optional<VisitSessionEntity> findVisitSessionByDate(LocalDate date) {
+        var visitSessions = visitSessionsHistory.get().filterToList(vs -> vs.getDate() == date);
+        activeVisitSession.filter(vs -> vs.getDate() == date).ifPresent(visitSessions::add);
+        if (visitSessions.isEmpty())
+            return Optional.empty();
+
+        var maxAppointmentsVisitSession = visitSessions[0];
+        for (VisitSessionEntity vs : visitSessions) {
+            if (vs.getAppointments().size() > maxAppointmentsVisitSession.getAppointments().size())
+                maxAppointmentsVisitSession = vs;
+        }
+        return Optional.of(maxAppointmentsVisitSession);
     }
 
     public void setStorageManager(StorageManager storageManager) {

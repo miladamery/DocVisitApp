@@ -1,9 +1,10 @@
 package ir.milad.DocVisitApp.domain.visit_session;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-public class VisitSessionSummary {
+public class  VisitSessionSummary {
     public final long total;
     public final long waiting;
     public final long visited;
@@ -12,6 +13,7 @@ public class VisitSessionSummary {
     public final String fromTime;
     public final String toTime;
     public final Integer sessionLength;
+    public final LocalDate date;
 
     public VisitSessionSummary(
             long total,
@@ -21,7 +23,8 @@ public class VisitSessionSummary {
             String nextAppointmentId,
             LocalDateTime fromTime,
             LocalDateTime toTime,
-            Integer sessionLength) {
+            Integer sessionLength,
+            LocalDate date) {
         this.total = total;
         this.waiting = waiting;
         this.visited = visited;
@@ -30,5 +33,6 @@ public class VisitSessionSummary {
         this.fromTime = fromTime.format(DateTimeFormatter.ofPattern("hh:mm a"));
         this.toTime = toTime.format(DateTimeFormatter.ofPattern("hh:mm a"));
         this.sessionLength = sessionLength;
+        this.date = date;
     }
 }

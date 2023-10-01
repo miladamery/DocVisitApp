@@ -22,6 +22,8 @@ public interface VisitSessionRepository {
 
     boolean hasHistory(Patient patient);
 
+    Optional<VisitSession> findVisitSessionByDate(LocalDate date);
+
     default Optional<VisitSession> findActiveSessionForToday() {
         return getActiveSession(LocalDate.now());
     }

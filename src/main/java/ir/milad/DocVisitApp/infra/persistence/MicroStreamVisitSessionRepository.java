@@ -67,6 +67,11 @@ public class MicroStreamVisitSessionRepository implements VisitSessionRepository
         return readWithLock(() -> database.existsHistoryFor(PatientEntity.from(patient)));
     }
 
+    @Override
+    public Optional<VisitSession> findVisitSessionByDate(LocalDate date) {
+        return readWithLock(() -> database.findVisitSessionByDate(date).map(this::from));
+    }
+
     private <O> O readWithLock(Supplier<O> dbOperation) {
         lock.readLock().lock();
         try {
