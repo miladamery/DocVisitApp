@@ -76,26 +76,18 @@
                                 <span th:text="${m + '/' + d + '/' + y}"></span>
                             </div>
                             <div class="col-6 p-1 mt-1" >
-                                <input required id="fromTime" name="fromTime" type="text" class="visit_session_data form-control form-control-sm" placeholder="Entrance Time">
+                                <input th:value="${fromTime}" th:disabled="${hasPatient}" required id="fromTime" name="fromTime" type="text" class="visit_session_data form-control form-control-sm" placeholder="Entrance Time">
                             </div>
                             <div class="col-6 p-1 mt-1" >
-                                <input required id="toTime" name="toTime" type="text" class="visit_session_data form-control form-control-sm" placeholder="Exit Time">
+                                <input th:value="${toTime}" required id="toTime" name="toTime" type="text" class="visit_session_data form-control form-control-sm" placeholder="Exit Time">
                             </div>
-                            <div class="row m-2">
-                                <div class="col-1 p-0 mt-1 cursor-pointer" id="decrease"
-                                     _="on click if #session_duration.value =='undefined' then set #session_duration.value to 1 end
-                                     on click decrement #session_duration.value
-                                     then if #session_duration.value < 1
-                                     then set #session_duration.value to 1 end
-                                "
-                                ><img style="border-radius: 0.25rem;background: #494462;" th:src="@{/images/ic_round-plus.png}"></div>
+                            <div class="row m-2">								
+                                <div class="col-1 p-0 mt-1 cursor-pointer" id="decrease">
+									<img style="border-radius: 0.25rem;background: #494462;" th:src="@{/images/ic_round-plus.png}"></div>
                                 <div class="col-9">
-                                    <input required name="sessionLength" _="set :sessionLen to 0 end" id="session_duration" style="width: 14.25rem;height: 1.75rem;" type="text" class="visit_session_data form-control form-control-sm text-center" placeholder="Session Duration(minuts)">
-                                </div>
-                                <div class="col-1 mt-1 cursor-pointer" id="increase"
-                                     _="on click if #session_duration.value =='undefined' then set #session_duration.value to 1 end
-                                     on click increment #session_duration.value"
-                                >
+                                    <input th:value="${sessionLength}" th:disabled="${hasPatient}" required name="sessionLength" _="set :sessionLen to 0 end" id="session_duration" style="width: 14.25rem;height: 1.75rem;" type="text" class="visit_session_data form-control form-control-sm text-center" placeholder="Session Duration(minuts)">
+                                </div>								
+                                <div class="col-1 mt-1 cursor-pointer" id="increase">
                                     <img style="border-radius: 0.25rem;background: #494462;" th:src="@{/images/ic_round-plus2.png}">
                                 </div>
                             </div>

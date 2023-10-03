@@ -128,23 +128,35 @@
 		document.body.addEventListener('htmx:afterSettle', function(evt) {
 			console.log(evt.target);
 
-			if ($("#session_duration").val() !== undefined) {
-                $("#session_duration").val(8);
-            }
-
-            if($("#fromTime").val() !== undefined) {
+            if($("#fromTime").val() !== undefined && !$('#fromTime').prop('disabled')) {
                 $("#fromTime").mobiscroll().time({
                     timeFormat: 'HH:ii',
                     timeWheels: 'HHii'
                 });
             }
 
-            if ($("#toTime").val() !== undefined) {
+            if ($("#toTime").val() !== undefined && !$('#toTime').prop('disabled')) {
                 $("#toTime").mobiscroll().time({
                     timeFormat: 'HH:ii',
                     timeWheels: 'HHii'
                 });
             }
+			
+			if ($("#session_duration").val() !== undefined && !$('#session_duration').prop('disabled')) {				
+				$("#decrease").off().click(function() {
+					var duration = $("#session_duration").val();
+					if (duration <= 1)
+						return;
+					duration--;
+					$("#session_duration").val(duration)
+				});
+				
+				$("#increase").off().click(function() {
+					var duration = $("#session_duration").val();
+					duration++;
+					$("#session_duration").val(duration)
+				});
+			}
 
             if (evt.target.id === "kt_app_content_container" && $("#visit_session_creator_button").val() !== undefined) {
 

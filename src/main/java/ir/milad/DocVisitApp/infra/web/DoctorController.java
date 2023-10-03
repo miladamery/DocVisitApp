@@ -3,10 +3,7 @@ package ir.milad.DocVisitApp.infra.web;
 import ir.milad.DocVisitApp.domain.patient.Patient;
 import ir.milad.DocVisitApp.domain.patient.service.CancelPatientAppointmentService;
 import ir.milad.DocVisitApp.domain.visit_session.VisitSessionRepository;
-import ir.milad.DocVisitApp.domain.visit_session.service.DoctorGivingAppointmentService;
-import ir.milad.DocVisitApp.domain.visit_session.service.LoadDashboardDataService;
-import ir.milad.DocVisitApp.domain.visit_session.service.LoadPatientsDataService;
-import ir.milad.DocVisitApp.domain.visit_session.service.UpsertVisitSessionService;
+import ir.milad.DocVisitApp.domain.visit_session.service.*;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -35,19 +32,24 @@ public class DoctorController {
     private final DoctorGivingAppointmentService doctorGivingAppointmentService;
     private final VisitSessionRepository visitSessionRepository;
     private final CancelPatientAppointmentService cancelPatientAppointmentService;
+
+    private final GetActiveVisitSessionService getActiveVisitSessionService;
+
     public DoctorController(
             UpsertVisitSessionService upsertVisitSessionService,
             LoadDashboardDataService loadDashboardDataService,
             LoadPatientsDataService loadPatientsDataService,
             DoctorGivingAppointmentService doctorGivingAppointmentService,
             VisitSessionRepository visitSessionRepository,
-            CancelPatientAppointmentService cancelPatientAppointmentService) {
+            CancelPatientAppointmentService cancelPatientAppointmentService,
+            GetActiveVisitSessionService getActiveVisitSessionService) {
         this.upsertVisitSessionService = upsertVisitSessionService;
         this.loadDashboardDataService = loadDashboardDataService;
         this.loadPatientsDataService = loadPatientsDataService;
         this.doctorGivingAppointmentService = doctorGivingAppointmentService;
         this.visitSessionRepository = visitSessionRepository;
         this.cancelPatientAppointmentService = cancelPatientAppointmentService;
+        this.getActiveVisitSessionService = getActiveVisitSessionService;
     }
 
     @PostMapping(value = "/create/visit_session")
@@ -172,6 +174,21 @@ public class DoctorController {
         model.addAttribute("m", m);
         model.addAttribute("y", y);
         model.addAttribute("today", LocalDate.now().toString().formatted(DateTimeFormatter.ofPattern("yyyyMMdd")));
+        getActiveVisitSessionService
+                .findActiveVisitSessionForToday()
+                .ifPresentOrElse(avs -> {
+                            model.addAttribute("hasPatient", !avs.getAppointments().isEmpty());
+                            model.addAttribute("fromTime", avs.getFromTime().format(DateTimeFormatter.ofPattern("HH:mm")));
+                            model.addAttribute("toTime", avs.getToTime().format(DateTimeFormatter.ofPattern("HH:mm")));
+                            model.addAttribute("sessionLength", avs.getSessionLength());
+                        },
+                        () -> {
+                            model.addAttribute("hasPatient", false);
+                            model.addAttribute("fromTime", "");
+                            model.addAttribute("toTime", "");
+                            model.addAttribute("sessionLength", 8);
+                        }
+                );
         return "/doctor/calendar.html :: calendar";
     }
 
