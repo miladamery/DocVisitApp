@@ -93,8 +93,8 @@ public class MicroStreamVisitSessionRepository implements VisitSessionRepository
     private VisitSession from(VisitSessionEntity visitSessionEntity) {
         return new VisitSession(
                 visitSessionEntity.getDate(),
-                visitSessionEntity.getFromTime().toLocalTime(),
-                visitSessionEntity.getToTime().toLocalTime(),
+                visitSessionEntity.getFromTime(),
+                visitSessionEntity.getToTime(),
                 visitSessionEntity.getSessionLength(),
                 visitSessionEntity.getLastAppointmentTime(),
                 visitSessionEntity.getAppointments().map(this::from).toList(),

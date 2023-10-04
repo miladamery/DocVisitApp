@@ -8,8 +8,7 @@
         <link rel="shortcut icon" th:href="@{/metronic/assets/media/logos/favicon.ico}"/>
         <!--begin::Fonts(mandatory for all pages)-->
         <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,400,500,600,700"/>        <!--end::Fonts-->
-                    <!--begin::Vendor Stylesheets(used for this page only)-->
-                            <link th:href="@{/metronic/assets/plugins/custom/fullcalendar/fullcalendar.bundle.css}" rel="stylesheet" type="text/css"/>
+                    <!--begin::Vendor Stylesheets(used for this page only)-->                            
                             <link th:href="@{/metronic/assets/plugins/custom/datatables/datatables.bundle.css}" rel="stylesheet" type="text/css"/>
                         <!--end::Vendor Stylesheets-->
                     <!--begin::Global Stylesheets Bundle(mandatory for all pages)-->
@@ -22,6 +21,9 @@
         <link th:href="@{/css/mobiscroll.icons.css}" rel="stylesheet" type="text/css" />
         <link th:href="@{/css/mobiscroll.frame.css}" rel="stylesheet" type="text/css" />
         <link th:href="@{/css/mobiscroll.scroller.css}" rel="stylesheet" type="text/css" />
+        <link th:href="@{/css/daypilot/main.css?v=2023.3.499}" rel="stylesheet" type="text/css" />
+        <link th:href="@{/css/daypilot/themes/calendar_white.css?v=2023.3.499}" rel="stylesheet" type="text/css" />
+        <link th:href="@{/css/daypilot/myCustom.css?v=2023.3.499}" rel="stylesheet" type="text/css" />
 
         <style>
             .numberCircle {
@@ -43,7 +45,7 @@
             }
 
             .bg-gray-me {
-                background: rgba(73, 68, 98, 0.10);
+                background-color: rgba(73, 68, 98, 0.10) !important;
             }
 
             .bg-light-yellow {
@@ -76,6 +78,10 @@
 				background-image: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M8 2V5' stroke='%23494462' stroke-width='1.5' stroke-miterlimit='10' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M16 2V5' stroke='%23494462' stroke-width='1.5' stroke-miterlimit='10' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M3.5 9.08984H20.5' stroke='%23494462' stroke-width='1.5' stroke-miterlimit='10' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M21 8.5V17C21 20 19.5 22 16 22H8C4.5 22 3 20 3 17V8.5C3 5.5 4.5 3.5 8 3.5H16C19.5 3.5 21 5.5 21 8.5Z' stroke='%23494462' stroke-width='1.5' stroke-miterlimit='10' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M11.9955 13.7002H12.0045' stroke='%23494462' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M8.29431 13.7002H8.30329' stroke='%23494462' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M8.29431 16.7002H8.30329' stroke='%23494462' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E%0A");
 				background-repeat: no-repeat !important;
 				background-position: right 5px top 7px;
+			}
+			
+			#dp > div:nth-child(2) {
+				height: 1500px !important;
 			}
         </style>
         <script>
@@ -248,9 +254,8 @@
                             <script th:src="@{/metronic/assets/js/scripts.bundle.js}"></script>
 							<script src="https://rawgit.com/RobinHerbots/jquery.inputmask/3.x/dist/jquery.inputmask.bundle.js"></script>    
                         <!--end::Global Javascript Bundle-->
-                    <!--begin::Vendors Javascript(used for this page only)-->
-                            <script th:src="@{/metronic/assets/plugins/custom/fullcalendar/fullcalendar.bundle.js}" ></script>
-                            <script th:src="@{/metronic/assets/plugins/custom/datatables/datatables.bundle.js}"></script>
+                    <!--begin::Vendors Javascript(used for this page only)-->                            
+                        <script th:src="@{/metronic/assets/plugins/custom/datatables/datatables.bundle.js}"></script>
                         <!--end::Vendors Javascript-->
                         <script th:src="@{/js/mobiscroll.core.js}"></script>
                         <script th:src="@{/js/mobiscroll.frame.js}"></script>
@@ -260,6 +265,9 @@
                         <script th:src="@{/js/mobiscroll.datetimebase.js}"></script>
                         <script th:src="@{/js/mobiscroll.datetime.js}"></script>
                         <script th:src="@{/js/i18n/mobiscroll.i18n.fr.js}"></script>
+						
+                        <script th:src="@{/js/daypilot/daypilot-common.src.js}"></script>
+                        <script th:src="@{/js/daypilot/daypilot-calendar.src.js}"></script>
                 <!--end::Javascript-->
             </body>
     <!--end::Body-->

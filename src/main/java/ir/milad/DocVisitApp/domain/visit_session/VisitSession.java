@@ -44,8 +44,8 @@ public class VisitSession {
 
     public VisitSession(
             LocalDate date,
-            LocalTime fromTime,
-            LocalTime toTime,
+            LocalDateTime fromTime,
+            LocalDateTime toTime,
             Integer sessionLength,
             LocalDateTime lastAppointmentTime,
             List<Appointment> appointments,
@@ -53,8 +53,8 @@ public class VisitSession {
     ) {
         this.id = TsidCreator.getTsid().toString();
         this.date = date;
-        this.fromTime = LocalDateTime.of(fromTime);
-        this.toTime = LocalDateTime.of(toTime);
+        this.fromTime = fromTime;
+        this.toTime = toTime;
         this.sessionLength = sessionLength;
         this.lastAppointmentTime = lastAppointmentTime;
         this.appointments = new ArrayList<>(appointments);

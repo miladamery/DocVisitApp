@@ -6,121 +6,121 @@
 </head>
 <body>
     <th:block th:fragment="calendar">
-        <table id="calendar-table" class="table-responsive" style="width: 100%;background-color: white;"
-               data-bs-toggle="modal" data-bs-target="#calendar_set_event"
-               hx-disable>
-            <thead>
-                <tr>
-                    <td style="border: 2px solid #C5A4701A; border-left: 0;" class="p-4 text-center"><img th:src="@{/images/clock.png}"/></td>
-                    <td th:each="day : ${days}" style="border: 1px solid #C5A4701A; border-top: 0;" class="p-10"
-                        th:classappend="${day.isToday ? 'bg-gray-me' : ''}"
-                    >
-                        <div class="row">
-                            <div class="col-12 text-center" style="font-size: xxx-large; font-weight: bold;" th:text="${day.dayOfMonth}"></div>
-                        </div>
-                        <div class="row">
-                            <div class="col-12 text-center text-capitalize" style="font-size: x-small;" th:text="${day.day}">&nbsp;</div>
-                        </div>
-                    </td>
-                </tr>
-            </thead>
-            <tbody>
-            <tr class="text-center" th:each="time: ${times}" style="border: 2px solid #C5A4701A;" th:id="${time}">
-                <th scope="row" th:text="${time.time}" style="border: 1px solid #C5A4701A;"></th>
-                <td class="p-5" style="border: 1px solid #C5A4701A;"
-                    th:classappend="${time.hasSessions.get(0) ? 'bg-light-yellow' : ''}"
-                >&nbsp;</td>
-                <td class="p-5" style="border: 1px solid #C5A4701A;"
-                    th:classappend="${time.hasSessions.get(1) ? 'bg-light-yellow' : ''}"
-                >&nbsp;</td>
-                <td class="p-5" style="border: 1px solid #C5A4701A;"
-                    th:classappend="${time.hasSessions.get(2) ? 'bg-light-yellow' : ''}"
-                >&nbsp;</td>
-                <td class="p-5" style="border: 1px solid #C5A4701A;"
-                    th:classappend="${time.hasSessions.get(3) ? 'bg-light-yellow' : ''}"
-                >&nbsp;</td>
-                <td class="p-5" style="border: 1px solid #C5A4701A;"
-                    th:classappend="${time.hasSessions.get(4) ? 'bg-light-yellow' : ''}"
-                >&nbsp;</td>
-                <td class="p-5" style="border: 1px solid #C5A4701A;"
-                    th:classappend="${time.hasSessions.get(5) ? 'bg-light-yellow' : ''}"
-                >&nbsp;</td>
-                <td class="p-5" style="border: 1px solid #C5A4701A;"
-                    th:classappend="${time.hasSessions.get(6) ? 'bg-light-yellow' : ''}"
-                >&nbsp;</td>
-            </tr>
-            </tbody>
-        </table>
-        <div class="modal fade" tabindex="-1" id="calendar_set_event">
-            <div class="modal-dialog modal-dialog-centered modal-sm">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h3 class="modal-title" style="color: #494462;">Set Schedule</h3>
-
-                        <!--begin::Close-->
-                        <div id="visit_session_modal_closer" class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal"
-                             aria-label="Close">
-                            <i class="ki-duotone ki-cross fs-1"
-                               _="on click remove .block-patient"
-                            ><span class="path1"></span><span class="path2"></span></i>
-                        </div>
-                        <!--end::Close-->
-                    </div>
-                    <div class="modal-body" >
-                        <div class="row">
-                            <input class="visit_session_data" type="hidden" id="date" name="date" th:value="${today}">
-                            <div class="col-12 text-center p-2" style="font-weight: bold;width: 21rem;height: 2.875rem;border-radius: 0.375rem 0.375rem 0rem 0rem;background: #615A83;color: white;">
-                                <span class="mt-2">Date</span>
-                            </div>
-                            <div class="col-12 text-center p-2" style="width: 21rem;height: 2.75rem;border-radius: 0rem 0rem 0.375rem 0.375rem;background: #F8F5FF;">
-                                <span th:text="${m + '/' + d + '/' + y}"></span>
-                            </div>
-                            <div class="col-6 p-1 mt-1" >
-                                <input th:value="${fromTime}" th:disabled="${hasPatient}" required id="fromTime" name="fromTime" type="text" class="visit_session_data form-control form-control-sm" placeholder="Entrance Time">
-                            </div>
-                            <div class="col-6 p-1 mt-1" >
-                                <input th:value="${toTime}" required id="toTime" name="toTime" type="text" class="visit_session_data form-control form-control-sm" placeholder="Exit Time">
-                            </div>
-                            <div class="row m-2">								
-                                <div class="col-1 p-0 mt-1 cursor-pointer" id="decrease">
-									<img style="border-radius: 0.25rem;background: #494462;" th:src="@{/images/ic_round-plus.png}"></div>
-                                <div class="col-9">
-                                    <input th:value="${sessionLength}" th:disabled="${hasPatient}" required name="sessionLength" _="set :sessionLen to 0 end" id="session_duration" style="width: 14.25rem;height: 1.75rem;" type="text" class="visit_session_data form-control form-control-sm text-center" placeholder="Session Duration(minuts)">
-                                </div>								
-                                <div class="col-1 mt-1 cursor-pointer" id="increase">
-                                    <img style="border-radius: 0.25rem;background: #494462;" th:src="@{/images/ic_round-plus2.png}">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="modal-footer">
-                        <button id="patients_history_modal_close" type="button" class="btn btn-outline-light" data-bs-dismiss="modal"
-                        style="border:1px solid #C5A470;color:#C5A470;">
-                            Cancel
-                        </button>
-                        <inpu type="button" class="btn" style="background-color: #C5A470;color: white;"
-                                id="visit_session_creator_button"
-                                hx-post="/doctor/create/visit_session"
-                                hx-ext="json-enc"
-                                hx-include=".visit_session_data"
-                                hx-trigger="click"
-                                hx-swap="none"
-                                _="
-                                    on htmx:afterRequest(elt, xhr, target, requestConfig, successful)
-                                            if successful is true then send click to #visit_session_modal_closer
-                                            else call requestFailedAlert('Visit Session Operation Failed.', xhr)
-                                        end
-                                    "
-                        >Save</inpu>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <div id="calendar-container">
+			<div id="dp" data-bs-toggle="modal" data-bs-target="#calendar_set_event"></div>
+			<div class="modal fade" tabindex="-1" id="calendar_set_event">
+				<div class="modal-dialog modal-dialog-centered modal-sm">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h3 class="modal-title" style="color: #494462;">Set Schedule</h3>
+	
+							<!--begin::Close-->
+							<div id="visit_session_modal_closer" class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal"
+								aria-label="Close">
+								<i class="ki-duotone ki-cross fs-1"
+								_="on click remove .block-patient"
+								><span class="path1"></span><span class="path2"></span></i>
+							</div>
+							<!--end::Close-->
+						</div>
+						<div class="modal-body" >
+							<div class="row">
+								<input class="visit_session_data" type="hidden" id="date" name="date" th:value="${today}">
+								<div class="col-12 text-center p-2" style="font-weight: bold;width: 21rem;height: 2.875rem;border-radius: 0.375rem 0.375rem 0rem 0rem;background: #615A83;color: white;">
+									<span class="mt-2">Date</span>
+								</div>
+								<div class="col-12 text-center p-2" style="width: 21rem;height: 2.75rem;border-radius: 0rem 0rem 0.375rem 0.375rem;background: #F8F5FF;">
+									<span th:text="${m + '/' + d + '/' + y}"></span>
+								</div>
+								<div class="col-6 p-1 mt-1" >
+									<input th:value="${fromTime}" th:disabled="${hasPatient}" required id="fromTime" name="fromTime" type="text" class="visit_session_data form-control form-control-sm" placeholder="Entrance Time">
+								</div>
+								<div class="col-6 p-1 mt-1" >
+									<input th:value="${toTime}" required id="toTime" name="toTime" type="text" class="visit_session_data form-control form-control-sm" placeholder="Exit Time">
+								</div>
+								<div class="row m-2">								
+									<div class="col-1 p-0 mt-1 cursor-pointer" id="decrease">
+										<img style="border-radius: 0.25rem;background: #494462;" th:src="@{/images/ic_round-plus.png}"></div>
+									<div class="col-9">
+										<input th:value="${sessionLength}" th:disabled="${hasPatient}" required name="sessionLength" _="set :sessionLen to 0 end" id="session_duration" style="width: 14.25rem;height: 1.75rem;" type="text" class="visit_session_data form-control form-control-sm text-center" placeholder="Session Duration(minuts)">
+									</div>								
+									<div class="col-1 mt-1 cursor-pointer" id="increase">
+										<img style="border-radius: 0.25rem;background: #494462;" th:src="@{/images/ic_round-plus2.png}">
+									</div>
+								</div>
+							</div>
+							<input id="refereshCalendarPage" type="hidden" hx-get="/doctor/calendar" hx-target="#calendar-container" hx-trigger="click"/>
+						</div>
+						
+						<div class="modal-footer">
+							<button id="patients_history_modal_close" type="button" class="btn btn-outline-light" data-bs-dismiss="modal"
+							style="border:1px solid #C5A470;color:#C5A470;">
+								Cancel
+							</button>
+							<inpu type="button" class="btn" style="background-color: #C5A470;color: white;"
+									id="visit_session_creator_button"
+									hx-post="/doctor/create/visit_session"
+									hx-ext="json-enc"
+									hx-include=".visit_session_data"
+									hx-trigger="click"
+									hx-swap="none"
+									_="
+										on htmx:afterRequest(elt, xhr, target, requestConfig, successful)
+												if successful is true
+													send click to #visit_session_modal_closer
+													send click to #refereshCalendarPage
+												else 
+													call requestFailedAlert('Visit Session Operation Failed.', xhr)
+											end
+										"
+							>Save</inpu>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
         <script th:inline="javascript">
             /*<![CDATA[*/
             $("#calendar-table th:nth-child(" + (new Date().getDay() + 1) + "), table td:nth-child(" + (new Date().getDay() + 1) +")").addClass('bg-gray-me');
-            /*]]>*/
+			var dp = new DayPilot.Calendar("dp");
+			var l = [];
+			// view			
+			dp.cornerHtml = "<img src='/images/clock.png'>";
+			dp.startDate = [[${startDate}]];
+			dp.weekStarts = 1;
+			dp.viewType = "Week";
+			dp.showTimePostfix = false
+			dp.theme = "calendar_white";
+			dp.timeFormat = "Clock24Hours";
+			dp.eventMoveHandling = "Disabled";
+			dp.eventResizeHandling = "Disabled";
+			dp.timeRangeSelectedHandling = "Disabled";
+			dp.headerHeight = 70;
+		
+		
+			dp.onBeforeCellRender = function (args) {				
+				
+			};
+	
+			dp.onBeforeHeaderRender = function (args) {				
+				let days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+				// args.header.name = `<span>{args.header.start.getDay()}</span><br/><span>{days[args.header.start.getDayOfWeek()}</span>`;
+				args.header.html = `<div style="display: flex;font-size: xx-large;font-weight: bolder">${args.header.start.getDay()}</div><div style="display: flex">${days[args.header.start.getDayOfWeek()]}</div>`;
+		
+				// args.header.html = args.header.start.toString("d MMMM");
+			};
+		
+			dp.init();
+			
+			/*[# th:each="event : ${events}"]*/
+			dp.events.add(new DayPilot.Event({
+				start: new DayPilot.Date(/*[[${event.start}]]*/),
+				end: new DayPilot.Date(/*[[${event.end}]]*/),
+				id: DayPilot.guid(),
+				text: /*[[${event.title}]]*/
+			}));			      
+			/*[/]*/						
+			
         </script>
     </th:block>
 </body>

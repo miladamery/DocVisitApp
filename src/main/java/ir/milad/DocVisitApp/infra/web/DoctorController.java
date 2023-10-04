@@ -2,11 +2,13 @@ package ir.milad.DocVisitApp.infra.web;
 
 import ir.milad.DocVisitApp.domain.patient.Patient;
 import ir.milad.DocVisitApp.domain.patient.service.CancelPatientAppointmentService;
+import ir.milad.DocVisitApp.domain.visit_session.VisitSession;
 import ir.milad.DocVisitApp.domain.visit_session.VisitSessionRepository;
 import ir.milad.DocVisitApp.domain.visit_session.service.*;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -19,7 +21,6 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
-import java.util.Arrays;
 import java.util.List;
 
 @Controller
@@ -98,82 +99,42 @@ public class DoctorController {
     public String calendar(Model model) {
         var today = LocalDate.now();
         LocalDate previousMonday;
-        if (today.getDayOfWeek() == DayOfWeek.MONDAY)
+        if (today.getDayOfWeek() == DayOfWeek.SUNDAY)
             previousMonday = today;
         else
-            previousMonday = today.with(TemporalAdjusters.previous(DayOfWeek.MONDAY));
-        var times = Arrays.asList(
-                "00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14",
-                "15", "16", "17", "18", "19", "20", "21", "22", "23");
-
-        var dates = Arrays.asList(
-                previousMonday,
-                previousMonday.plusDays(1),
-                previousMonday.plusDays(2),
-                previousMonday.plusDays(3),
-                previousMonday.plusDays(4),
-                previousMonday.plusDays(5),
-                previousMonday.plusDays(6)
-        );
-        var ttimes = times.stream().map(t -> {
-            var time = LocalTime.of(Integer.valueOf(t), 0);
-            var res = dates.stream().map(ld ->
-                    visitSessionRepository.getVisitSessionHistories().stream().anyMatch(vs ->
-                            vs.getDate().equals(ld) &&
-                                    ((vs.getFromTime().equals(time) || vs.getFromTime().toLocalTime().isBefore(time)) &&
-                                            (vs.getToTime().toLocalTime().isAfter(time) || vs.getToTime().equals(time))
-                                    )
-                    )
-            ).toList();
-            return new TimeData(t, res);
-        }).toList();
-        var monday = new DayOfMonthAndText(
-                previousMonday.getDayOfMonth(),
-                previousMonday.getDayOfWeek().name(),
-                previousMonday.equals(LocalDate.now())
-        );
-        var tuesday = new DayOfMonthAndText(
-                previousMonday.plusDays(1).getDayOfMonth(),
-                previousMonday.plusDays(1).getDayOfWeek().name().toLowerCase(),
-                previousMonday.plusDays(1).equals(LocalDate.now())
-        );
-        var wednesday = new DayOfMonthAndText(
-                previousMonday.plusDays(2).getDayOfMonth(),
-                previousMonday.plusDays(2).getDayOfWeek().name().toLowerCase(),
-                previousMonday.plusDays(2).equals(LocalDate.now())
-        );
-        var thursday = new DayOfMonthAndText(
-                previousMonday.plusDays(3).getDayOfMonth(),
-                previousMonday.plusDays(3).getDayOfWeek().name().toLowerCase(),
-                previousMonday.plusDays(3).equals(LocalDate.now())
-        );
-        var friday = new DayOfMonthAndText(
-                previousMonday.plusDays(4).getDayOfMonth(),
-                previousMonday.plusDays(4).getDayOfWeek().name().toLowerCase(),
-                previousMonday.plusDays(4).equals(LocalDate.now())
-        );
-        var saturday = new DayOfMonthAndText(
-                previousMonday.plusDays(5).getDayOfMonth(),
-                previousMonday.plusDays(5).getDayOfWeek().name().toLowerCase(),
-                previousMonday.plusDays(5).equals(LocalDate.now())
-        );
-        var sunday = new DayOfMonthAndText(
-                previousMonday.plusDays(6).getDayOfMonth(),
-                previousMonday.plusDays(6).getDayOfWeek().name().toLowerCase(),
-                previousMonday.plusDays(6).equals(LocalDate.now())
-        );
-        var days = Arrays.asList(monday, tuesday, wednesday, thursday, friday, saturday, sunday);
+            previousMonday = today.with(TemporalAdjusters.previous(DayOfWeek.SUNDAY));
+        LocalDate nextMonday = today.with(TemporalAdjusters.next(DayOfWeek.MONDAY));
+        var activeVsOptional = getActiveVisitSessionService.findActiveVisitSessionForToday();
+        var groupedVisitSessions = visitSessionRepository
+                .getVisitSessionHistories()
+                .filter(vs -> vs.getDate() >= previousMonday && vs.getDate() < nextMonday)
+                .groupingBy(VisitSession::getDate);
+        activeVsOptional.ifPresent(vs -> groupedVisitSessions.put(vs.getDate(), List.of(vs)));
+        var visitSessions = groupedVisitSessions.values().mapToList(it -> {
+            var indx = 0;
+            var max = 0;
+            for (int i = 0; i < it.size(); i++) {
+                if (it.get(i).getAppointments().size() > max)
+                    indx = i;
+            }
+            return it.get(indx);
+        });
+        var data = visitSessions.mapToList(vs -> VisitSessionCalendarViewData.of(
+                vs.getFromTime().format(DateTimeFormatter.ISO_DATE_TIME),
+                vs.getToTime().format(DateTimeFormatter.ISO_DATE_TIME),
+                vs.getFromTime().toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm")) + " - " +
+                        vs.getToTime().toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm"))
+        ));
 
         var d = today.format(DateTimeFormatter.ofPattern("dd"));
         var m = today.format(DateTimeFormatter.ofPattern("MMMM"));
         var y = today.format(DateTimeFormatter.ofPattern("yyyy"));
-
-        model.addAttribute("days", days);
-        model.addAttribute("times", ttimes);
         model.addAttribute("d", d);
         model.addAttribute("m", m);
         model.addAttribute("y", y);
         model.addAttribute("today", LocalDate.now().toString().formatted(DateTimeFormatter.ofPattern("yyyyMMdd")));
+
+        model.addAttribute("events", data);
         getActiveVisitSessionService
                 .findActiveVisitSessionForToday()
                 .ifPresentOrElse(avs -> {
@@ -238,5 +199,12 @@ public class DoctorController {
             this.time = time;
             this.hasSessions = hasSessions;
         }
+    }
+
+    @AllArgsConstructor(staticName = "of")
+    static class VisitSessionCalendarViewData {
+        public final String start;
+        public final String end;
+        public final String title;
     }
 }
