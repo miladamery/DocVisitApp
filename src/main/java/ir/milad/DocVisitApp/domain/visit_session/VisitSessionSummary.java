@@ -30,8 +30,8 @@ public class  VisitSessionSummary {
         this.visited = visited;
         this.cancelled = cancelled;
         this.nextAppointmentId = nextAppointmentId;
-        this.fromTime = fromTime.format(DateTimeFormatter.ofPattern("hh:mm a"));
-        this.toTime = toTime.format(DateTimeFormatter.ofPattern("hh:mm a"));
+        this.fromTime = fromTime.format(DateTimeFormatter.ofPattern("HH:mm"));
+        this.toTime = toTime.format(DateTimeFormatter.ofPattern("HH:mm"));
         this.sessionLength = sessionLength;
         this.date = date;
     }

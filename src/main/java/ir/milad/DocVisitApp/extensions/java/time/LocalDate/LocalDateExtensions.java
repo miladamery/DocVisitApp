@@ -3,11 +3,16 @@ package ir.milad.DocVisitApp.extensions.java.time.LocalDate;
 import manifold.ext.rt.api.ComparableUsing;
 import manifold.ext.rt.api.Extension;
 import manifold.ext.rt.api.This;
+import org.apache.commons.lang3.StringUtils;
 
 import java.time.LocalDate;
 
 @Extension
 public class LocalDateExtensions {
+
+    public static String toFrenchMonth(@This LocalDate thiz) {
+        return StringUtils.capitalize(thiz.getMonth().toFrench().name().toLowerCase());
+    }
 
     /**
      * Manifold Operator overloading capability for LocalDateTime.

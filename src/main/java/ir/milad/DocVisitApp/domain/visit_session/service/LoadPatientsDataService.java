@@ -40,7 +40,6 @@ public class LoadPatientsDataService {
         public final String year;
         public final List<AppointmentDto> appointments;
         public final String currentTime;
-        public final String amPm;
         public final String currentWeekDay;
         public final String date;
 
@@ -60,12 +59,11 @@ public class LoadPatientsDataService {
             var today = LocalDate.now();
             var now = LocalTime.now();
             day = today.format(DateTimeFormatter.ofPattern("dd"));
-            month = today.format(DateTimeFormatter.ofPattern("MMMM"));
+            month = today.toFrenchMonth();
             year = today.format(DateTimeFormatter.ofPattern("yyyy"));
-            var ct = now.format(DateTimeFormatter.ofPattern("hh:mm a")).split(" ")[0];
+            var ct = now.format(DateTimeFormatter.ofPattern("HH:mm"));
             currentTime = ct.setCharBeforeAndAfter(' ', ct.indexOf(":"));
-            amPm = now.format(DateTimeFormatter.ofPattern("hh:mm a")).split(" ")[1];
-            currentWeekDay = StringUtils.capitalize(LocalDate.now().getDayOfWeek().name().toLowerCase());
+            currentWeekDay = StringUtils.capitalize(today.getDayOfWeek().toFrench().name().toLowerCase());
         }
 
         public boolean isVisiting() {

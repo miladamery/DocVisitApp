@@ -29,19 +29,19 @@
                     <div class="mt-5 text-truncate text-center" style="width: 20%;font-family: Poppins;">
                         <th:block th:switch="${history.status}">
                             <th:block th:case="${T(ir.milad.DocVisitApp.domain.patient.PatientHistoryStatus).VISITED}">
-                                <span class="text-center badge badge-light-success fs-7 fw-bold text-capitalize w-100 py-2 mx-1">VISITED</span>
+                                <span class="text-center badge badge-light-success fs-7 fw-bold text-capitalize w-100 py-2 mx-1">Vu</span>
                             </th:block>
                             <th:block th:case="${T(ir.milad.DocVisitApp.domain.patient.PatientHistoryStatus).CANCELLED}">
-                                <span class="badge badge-light-danger fs-7 fw-bold text-capitalize w-100 text-center">CANCELLED</span>
+                                <span class="badge badge-light-danger fs-7 fw-bold text-capitalize w-100 text-center">Annulé</span>
                             </th:block>
                             <th:block th:case="${T(ir.milad.DocVisitApp.domain.patient.PatientHistoryStatus).CANCELED_BY_DOCTOR}">
-                                <span class="badge badge-light-danger fs-7 fw-bold text-capitalize w-100 text-center">Cancelled Dr</span>
+                                <span class="badge badge-light-danger fs-7 fw-bold text-capitalize w-100 text-center">Annulé Dr</span>
                             </th:block>
                             <th:block th:case="${T(ir.milad.DocVisitApp.domain.patient.PatientHistoryStatus).BLOCKED}">
-                                <span class="badge badge-light-danger fs-7 fw-bold text-capitalize w-100 text-center">BLOCKED</span>
+                                <span class="badge badge-light-danger fs-7 fw-bold text-capitalize w-100 text-center">Bloqué</span>
                             </th:block>
 							<th:block th:case="${T(ir.milad.DocVisitApp.domain.patient.PatientHistoryStatus).UNBLOCKED}">
-                                <span class="badge badge-light-danger fs-7 fw-bold text-capitalize w-100 text-center">UNBLOCKED</span>
+                                <span class="badge badge-light-danger fs-7 fw-bold text-capitalize w-100 text-center">DÉBLOQUÉ</span>
                             </th:block>
                         </th:block>
                     </div>
@@ -62,9 +62,9 @@
                     hx-ext="json-enc"
                     _="on htmx:afterRequest(elt, xhr, target, requestConfig, successful)
                             if successful is true then send click to #patients_history_modal_close
-                            else call requestFailedAlert('Sorry Doctor. Blocking Patient Failed.', xhr)
+                            else call requestFailedAlert('Désolé docteur. Échec du blocage du patient.', xhr)
                             end"
-					th:text="${data.isBlocked ? 'Unblock' : 'Block'}"
+					th:text="${data.isBlocked ? 'Débloquer' : 'Bloquer'}"
             >Block
             </button>
         </div>

@@ -12,7 +12,7 @@
 				<div class="modal-dialog modal-dialog-centered modal-sm">
 					<div class="modal-content">
 						<div class="modal-header">
-							<h3 class="modal-title" style="color: #494462;">Set Schedule</h3>
+							<h3 class="modal-title" style="color: #494462;">Gérer les ouvertures</h3>
 	
 							<!--begin::Close-->
 							<div id="visit_session_modal_closer" class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal"
@@ -33,16 +33,16 @@
 									<span th:text="${m + '/' + d + '/' + y}"></span>
 								</div>
 								<div class="col-6 p-1 mt-1" >
-									<input th:value="${fromTime}" th:disabled="${hasPatient}" required id="fromTime" name="fromTime" type="text" class="visit_session_data form-control form-control-sm" placeholder="Entrance Time">
+									<input th:value="${fromTime}" th:disabled="${hasPatient}" required id="fromTime" name="fromTime" type="text" class="visit_session_data form-control form-control-sm" placeholder="heure de début">
 								</div>
 								<div class="col-6 p-1 mt-1" >
-									<input th:value="${toTime}" required id="toTime" name="toTime" type="text" class="visit_session_data form-control form-control-sm" placeholder="Exit Time">
+									<input th:value="${toTime}" required id="toTime" name="toTime" type="text" class="visit_session_data form-control form-control-sm" placeholder="heure de fin">
 								</div>
 								<div class="row m-2">								
 									<div class="col-1 p-0 mt-1 cursor-pointer" id="decrease">
 										<img style="border-radius: 0.25rem;background: #494462;" th:src="@{/images/ic_round-plus.png}"></div>
 									<div class="col-9">
-										<input th:value="${sessionLength}" th:disabled="${hasPatient}" required name="sessionLength" _="set :sessionLen to 0 end" id="session_duration" style="width: 14.25rem;height: 1.75rem;" type="text" class="visit_session_data form-control form-control-sm text-center" placeholder="Session Duration(minuts)">
+										<input th:value="${sessionLength}" th:disabled="${hasPatient}" required name="sessionLength" _="set :sessionLen to 0 end" id="session_duration" style="width: 14.25rem;height: 1.75rem;" type="text" class="visit_session_data form-control form-control-sm text-center" placeholder="Durée de la session (minutes)">
 									</div>								
 									<div class="col-1 mt-1 cursor-pointer" id="increase">
 										<img style="border-radius: 0.25rem;background: #494462;" th:src="@{/images/ic_round-plus2.png}">
@@ -55,9 +55,9 @@
 						<div class="modal-footer">
 							<button id="patients_history_modal_close" type="button" class="btn btn-outline-light" data-bs-dismiss="modal"
 							style="border:1px solid #C5A470;color:#C5A470;">
-								Cancel
+								Annuler
 							</button>
-							<inpu type="button" class="btn" style="background-color: #C5A470;color: white;"
+							<input type="button" class="btn" style="background-color: #C5A470;color: white;"
 									id="visit_session_creator_button"
 									hx-post="/doctor/create/visit_session"
 									hx-ext="json-enc"
@@ -73,7 +73,7 @@
 													call requestFailedAlert('Visit Session Operation Failed.', xhr)
 											end
 										"
-							>Save</inpu>
+							>Soumettre</inpu>
 						</div>
 					</div>
 				</div>
@@ -103,7 +103,7 @@
 			};
 	
 			dp.onBeforeHeaderRender = function (args) {				
-				let days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+				let days = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
 				// args.header.name = `<span>{args.header.start.getDay()}</span><br/><span>{days[args.header.start.getDayOfWeek()}</span>`;
 				args.header.html = `<div style="display: flex;font-size: xx-large;font-weight: bolder">${args.header.start.getDay()}</div><div style="display: flex">${days[args.header.start.getDayOfWeek()]}</div>`;
 		

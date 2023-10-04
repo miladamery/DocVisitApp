@@ -127,7 +127,7 @@ public class DoctorController {
         ));
 
         var d = today.format(DateTimeFormatter.ofPattern("dd"));
-        var m = today.format(DateTimeFormatter.ofPattern("MMMM"));
+        var m = today.toFrenchMonth();
         var y = today.format(DateTimeFormatter.ofPattern("yyyy"));
         model.addAttribute("d", d);
         model.addAttribute("m", m);

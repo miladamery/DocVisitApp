@@ -22,16 +22,16 @@
 				<div class="col-4 text-center" style="border-right: 5px solid #C5A470;">
 					<div class="row">
 						<div class="col-12">
-							<span style="color: #FFF;font-size: 18px;">Today's Office Hours</span>
+							<span style="color: #FFF;font-size: 18px;">Les horaires du cabinet aujourd’hui :</span>
 						</div>
 						<div class="col-12">
 							<span th:if="${data.summary != null}" style="font-weight: bold;font-size: 20;" th:text="${data.summary.fromTime + ' - ' + data.summary.toTime}">08:00 AM - 02:00 PM</span>
 						</div>						
 						<div class="col-12 mt-4">
-							<span style="font-size: 18;">Session Length:</span>
+							<span style="font-size: 18;">Durée des séances :</span>
 						</div>
 						<div class="col-12">
-							<span th:if="${data.summary != null}" style="font-weight: bold;font-size: large;" th:text="${data.summary.sessionLength + ' Minutes'}">8 minutes</span>
+							<span th:if="${data.summary != null}" style="font-weight: bold;font-size: large;" th:text="${data.summary.sessionLength + ' minutes'}">8 minutes</span>
 						</div>
 					</div>
 				</div>
@@ -41,23 +41,23 @@
 							<span style="font-size: 40px;font-weight: bold;" th:text="${data.day + ' '}">23 </span><span style="font-size: 18px;font-weight: medium;" th:text="${' ' + data.month + ' ' + data.year}">January 2023</span>
 						</div>						
 						<div class="col-12">
-							<span style="font-size: 40px;font-weight: bold;" th:text="${data.currentTime + ' '}">12:06 </span><span style="font-size: 18px;" th:text="${data.amPm + ' '}">AM </span><span style="font-size: 18px;" class="capitalize" th:text="${data.currentWeekDay}">Wednesday</span>
+							<span style="font-size: 40px;font-weight: bold;" th:text="${data.currentTime + ' '}">12:06 </span><span style="font-size: 18px;" class="capitalize" th:text="${data.currentWeekDay}">Wednesday</span>
 						</div>
 					</div>
 				</div>
 				<div class="col-4 text-center">
 					<div class="row">
 						<div class="col-12">
-							<span th:if="${data.summary != null}" style="font-size: 40px;font-weight: bold;" th:text="${data.summary.total + ' '}">68 </span><span style="font-size: 18px;font-weight: medium;">Total Patients</span>
+							<span th:if="${data.summary != null}" style="font-size: 40px;font-weight: bold;" th:text="${data.summary.total + ' '}">68 </span><span style="font-size: 18px;font-weight: medium;">Total de patients</span>
 						</div>						
 						<div class="col-4">
-							<span style="font-size: 18px;">Waiting</span>
+							<span style="font-size: 18px;">En attente</span>
 						</div>
 						<div class="col-4">
-							<span style="font-size: 18px;">Visited</span>
+							<span style="font-size: 18px;">Vu</span>
 						</div>
 						<div class="col-4">
-							<span style="font-size: 18px;">Cancelled</span>
+							<span style="font-size: 18px;">Annulé</span>
 						</div>
 						<div class="col-4">
 							<span style="font-size: 20px;font-weight: bold;" th:if="${data.summary != null}" th:text="${data.summary.waiting}">49</span>
@@ -78,10 +78,10 @@
             <div class="card-header">
                 <!--begin::Heading-->
                 <div class="card-title">
-                    <h3 class="fs-1 fw-bold" style="color: #494462;">Patients List</h3>
+                    <h3 class="fs-1 fw-bold" style="color: #494462;">liste des patients</h3>
 					<button style="background-color: #C5A470;color: white;" class="btn btn-lg m-5"
 							th:disabled="${data.summary == null}"
-                            data-bs-toggle="modal" data-bs-target="#doc_patient_form">+ Add Patient
+                            data-bs-toggle="modal" data-bs-target="#doc_patient_form">+ Ajouter un nouveau patient
                     </button>
                 </div>
                 <!--end::Heading-->
@@ -101,14 +101,14 @@
                         <!--begin::Thead-->
                         <thead class="border-gray-200 fs-5 fw-semibold bg-lighten">
                         <tr>
-                            <th class="fw-bold patients-table-header">Cancel</th>
-                            <th class="fw-bold patients-table-header">History</th>
-                            <th class="fw-bold patients-table-header">First Name</th>
-                            <th class="fw-bold patients-table-header">Last Name</th>
-                            <th class="fw-bold patients-table-header">Age</th>
-                            <th class="fw-bold patients-table-header">Check-in Time</th>
-                            <th class="fw-bold patients-table-header">Phone Number</th>
-                            <th class="fw-bold patients-table-header">Ticket Number</th>
+                            <th class="fw-bold patients-table-header">Annuler</th>
+                            <th class="fw-bold patients-table-header">Historique</th>
+                            <th class="fw-bold patients-table-header">Nom</th>
+                            <th class="fw-bold patients-table-header">Prénom</th>
+                            <th class="fw-bold patients-table-header">Âge</th>
+                            <th class="fw-bold patients-table-header">Heure d’Accepter</th>
+                            <th class="fw-bold patients-table-header">Téléphone Portable</th>
+                            <th class="fw-bold patients-table-header">Le Numéro</th>
                             <th class="fw-bold patients-table-header">Status
                                 <i class="ki-duotone ki-filter">
                                     <i class="path1"></i>
@@ -116,8 +116,8 @@
                                 </i>
                             </th>
                             <th class="fw-bold patients-table-header">Action</th>
-                            <th class="fw-bold patients-table-header">On-Hold</th>
-                            <th class="fw-bold patients-table-header">NO</th>
+                            <th class="fw-bold patients-table-header">En Pause</th>
+                            <th class="fw-bold patients-table-header">Nombre</th>
                         </tr>
                         </thead>
                         <!--end::Thead-->
@@ -183,25 +183,25 @@
 							} ? ${appointment.turnNumber} : '-' " th:class="${appointment.isActive} ? 'active-appointment' : 'inactive-appointment'"></td>
                             <th:block th:switch="${appointment.status}">
                                 <td th:case="${T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).WAITING}">
-                                    <span style="color: #3B82F6" class="fs-7 fw-bold text-capitalize">Waiting</span>
+                                    <span style="color: #3B82F6" class="fs-7 fw-bold text-capitalize">En attendant</span>
                                 </td>
                                 <td th:case="${T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).VISITING}">
-                                    <span style="color: #F59E0B" class="fs-7 fw-bold text-capitalize">In Progress</span>
+                                    <span style="color: #F59E0B" class="fs-7 fw-bold text-capitalize">En cours</span>
                                 </td>
                                 <td th:case="${T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).VISITED}">
-                                    <span style="color: #16A34A" class="fs-7 fw-bold text-capitalize">VISITED</span>
+                                    <span style="color: #16A34A" class="fs-7 fw-bold text-capitalize">Vu</span>
                                 </td>
                                 <td th:case="${T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).CANCELED}">
-                                    <span style="color:#E00047;" class="fs-7 fw-bold text-capitalize">CANCELED</span>
+                                    <span style="color:#E00047;" class="fs-7 fw-bold text-capitalize">Annulé Pt</span>
                                 </td>
                                 <td th:case="${T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).ON_HOLD}">
-                                    <span style="color: #A855F7" class="fs-7 fw-bold text-capitalize">ON_HOLD</span>
+                                    <span style="color: #A855F7" class="fs-7 fw-bold text-capitalize">En Pause</span>
                                 </td>
                                 <td th:case="${T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).CANCELED_BY_DOCTOR}">
-                                    <span style="color: #E00047" class="fs-7 fw-bold text-capitalize">Cancelled Dr</span>
+                                    <span style="color: #E00047" class="fs-7 fw-bold text-capitalize">Annulé Dr</span>
                                 </td>
 								<td th:case="${T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).BLOCKED}">
-                                    <span style="color: #C9C7C5" class="fs-7 fw-bold text-capitalize">Blocked</span>
+                                    <span style="color: #C9C7C5" class="fs-7 fw-bold text-capitalize">Bloqué</span>
                                 </td>
                             </th:block>
                             <td>
@@ -221,7 +221,7 @@
                                             if successful is true then send click to #refreshPage
                                             else call requestFailedAlert('CheckIn Operation failed.', xhr)
                                         end"
-                                >Check-In</span>
+                                >Accepter</span>
                                 <span th:if="${appointment.status == T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).VISITING}"
                                       class="badge fs-7 fw-bold text-capitalize cursor-pointer py-2"
                                       style="color: white; background-color: #F59E0B;"
@@ -233,7 +233,7 @@
                                             if successful is true then send click to #refreshPage
                                             else call requestFailedAlert('Done Operation failed.', xhr)
                                         end"
-                                >done</span>
+                                >Fait</span>
                                 <span th:if="${
                                     appointment.status == T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).ON_HOLD &&
                                     !data.isVisiting()
@@ -248,7 +248,7 @@
                                             if successful is true then send click to #refreshPage
                                             else call requestFailedAlert('Done Operation failed.', xhr)
                                         end"
-                                >Resume</span>
+                                >Reprendre</span>
 								<span th:if="${
 									appointment.status == T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).WAITING &&
                                     !data.isVisiting() &&
@@ -331,7 +331,7 @@
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h3 class="modal-title">Add Patient</h3>
+                    <h3 class="modal-title">Ajouter un nouveau patient</h3>
 
                     <!--begin::Close-->
                     <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal"
@@ -344,24 +344,24 @@
                         <div class="row">
                             <div class="col-6">
                                 <div class="form-group">
-                                    <label for="first_name">First Name:</label>
+                                    <label for="first_name">Nom:</label>
                                     <input type="text" class="form-control docPatientAddInput" id="first_name" name="firstName"
-                                           aria-describedby="first_name" placeholder="First Name" required>
+                                           aria-describedby="first_name" placeholder="Nom*" required>
                                 </div>
                             </div>
                             <div class="col-6">
                                 <div class="form-group">
-                                    <label for="last_name">Last Name:</label>
+                                    <label for="last_name">Prénom:</label>
                                     <input type="text" class="form-control docPatientAddInput" id="last_name" name="lastName"
-                                           aria-describedby="last_name" placeholder="Last Name" required>
+                                           aria-describedby="last_name" placeholder="Prénom*" required>
                                 </div>
                             </div>
 
                             <div class="col-6 mt-5">
                                 <div class="form-group">
-                                    <label for="last_name">Date Of Birth:</label>
+                                    <label for="last_name">Date de naissance:</label>
                                     <input id="patients_date_of_birth" name="dateOfBirth" type="text"
-                                           class="form-control docPatientAddInput" placeholder="Date Of Birth" required
+                                           class="form-control docPatientAddInput" placeholder="Date de naissance" required
                                     />
                                 </div>
                             </div>
@@ -372,14 +372,15 @@
                                 flatpickr("#patients_date_of_birth", {
                                     disableMobile: "true",
                                     defaultDate: "today",
-									maxDate: "today"
+									maxDate: "today",
+									"locale": "fr",
                                 });
                             </script>
                             <div class="col-6 mt-5">
                                 <div class="form-group">
-                                    <label for="last_name">Phone Number:</label>
+                                    <label for="last_name">Téléphone portable:</label>
                                     <input id="doc_patient_add_phone_number" name="phoneNumber" type="text"
-                                           class="form-control docPatientAddInput" placeholder="Phone Number" required
+                                           class="form-control docPatientAddInput" placeholder="Téléphone portable" required
                                            hx-validate="true"
                                     />
                                 </div>
@@ -393,9 +394,9 @@
 
                     <div class="modal-footer">
                         <button id="patients_modal_close" type="button" class="btn btn-light" data-bs-dismiss="modal">
-                            Close
+                            Annuler
                         </button>
-                        <input id="doc_patient_add_submit" type="submit" class="btn btn-primary"
+                        <input id="doc_patient_add_submit" value="Soumettre" type="submit" class="btn btn-primary"
 							hx-post="/doctor/give/appointment" hx-ext="json-enc" hx-swap="none" hx-include=".docPatientAddInput"
 							_="on htmx:afterRequest(elt, xhr, target, requestConfig, successful)
                             if successful is true
@@ -404,7 +405,7 @@
                             else call requestFailedAlert('Sorry Doctor. Adding Patient Failed.', xhr)
                             end
                         "
-						/>
+						></input>
                     </div>
                     <input id="refreshPage" type="hidden" hx-get="/doctor/patients" hx-trigger="click"
                            hx-target="#kt_app_content_container" hx-include="#doc-visit-session-date"
@@ -426,6 +427,7 @@
 			altInputClass: "altInputStyle",
 			dateFormat: "Y-m-d",
 			defaultDate: "[[${data.date}]]",
+			"locale": "fr",
 			onChange: function(selectedDates, dateStr, instance) {
 				document.getElementById("refreshPage").click();
 			}

@@ -3,6 +3,7 @@ package ir.milad.DocVisitApp.domain.visit_session.service;
 import ir.milad.DocVisitApp.domain.UnitTestRequired;
 import ir.milad.DocVisitApp.domain.visit_session.VisitSessionRepository;
 import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -34,7 +35,6 @@ public class LoadDashboardDataService {
         private final Long numberOfPeopleAwaiting;
         private final String officeHours;
         private final String currentTime;
-        private final String amPm;
         private final String currentWeekDay;
         private final String sessionLength;
         private final String day;
@@ -47,12 +47,11 @@ public class LoadDashboardDataService {
             this.numberOfPeopleAwaiting = numberOfPeopleAwaiting;
             this.officeHours = officeHours;
             this.sessionLength = sessionLength;
-            var ct = now.format(DateTimeFormatter.ofPattern("hh:mm a")).split(" ")[0];
+            var ct = now.format(DateTimeFormatter.ofPattern("HH:mm"));
             currentTime = ct.setCharBeforeAndAfter(' ', ct.indexOf(":"));
-            amPm = now.format(DateTimeFormatter.ofPattern("hh:mm a")).split(" ")[1];
-            currentWeekDay = today.getDayOfWeek().name();
+            currentWeekDay = StringUtils.capitalize(today.getDayOfWeek().toFrench().name().toLowerCase());
             day = today.format(DateTimeFormatter.ofPattern("dd"));
-            month = today.format(DateTimeFormatter.ofPattern("MMMM"));
+            month = StringUtils.capitalize(today.getMonth().toFrench().name().toLowerCase());
             year = today.format(DateTimeFormatter.ofPattern("yyyy"));
         }
     }

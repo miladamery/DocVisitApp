@@ -25,7 +25,7 @@ public class LoadPatientHistoryViewDataService {
         var res = patientRepository.findHistoryByPatient(patient);
         Collections.reverse(res);
         return PatientHistoryViewData.from(
-                res.stream().map(PatientHistoryDto::new).toList(),
+                res.map(PatientHistoryDto::new).toList(),
                 patient,
                 patientRepository.isBlocked(patient)
         );
@@ -46,7 +46,7 @@ public class LoadPatientHistoryViewDataService {
 
         public PatientHistoryDto(PatientHistory history) {
             day = history.date.format(DateTimeFormatter.ofPattern("dd"));
-            month = history.date.format(DateTimeFormatter.ofPattern("MMMM"));
+            month = history.date.toFrenchMonth();
             year = history.date.format(DateTimeFormatter.ofPattern("yyyy"));
             this.status = history.status;
         }
