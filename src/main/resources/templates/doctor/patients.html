@@ -109,7 +109,7 @@
                             <th class="fw-bold patients-table-header">Heure d’Accepter</th>
                             <th class="fw-bold patients-table-header">Téléphone Portable</th>
                             <th class="fw-bold patients-table-header">Le Numéro</th>
-                            <th class="fw-bold patients-table-header">Status
+                            <th class="fw-bold patients-table-header">Statut
                                 <i class="ki-duotone ki-filter">
                                     <i class="path1"></i>
                                     <i class="path2"></i>
@@ -183,7 +183,7 @@
 							} ? ${appointment.turnNumber} : '-' " th:class="${appointment.isActive} ? 'active-appointment' : 'inactive-appointment'"></td>
                             <th:block th:switch="${appointment.status}">
                                 <td th:case="${T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).WAITING}">
-                                    <span style="color: #3B82F6" class="fs-7 fw-bold text-capitalize">En attendant</span>
+                                    <span style="color: #3B82F6" class="fs-7 fw-bold text-capitalize">En attente</span>
                                 </td>
                                 <td th:case="${T(ir.milad.DocVisitApp.domain.visit_session.AppointmentStatus).VISITING}">
                                     <span style="color: #F59E0B" class="fs-7 fw-bold text-capitalize">En cours</span>
