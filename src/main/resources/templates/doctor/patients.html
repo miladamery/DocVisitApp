@@ -26,12 +26,14 @@
 						</div>
 						<div class="col-12">
 							<span th:if="${data.summary != null}" style="font-weight: bold;font-size: 20;" th:text="${data.summary.fromTime + ' - ' + data.summary.toTime}">08:00 AM - 02:00 PM</span>
+							<span th:if="${data.summary == null}">--</span>
 						</div>						
 						<div class="col-12 mt-4">
 							<span style="font-size: 18;">Durée des séances :</span>
 						</div>
 						<div class="col-12">
 							<span th:if="${data.summary != null}" style="font-weight: bold;font-size: large;" th:text="${data.summary.sessionLength + ' minutes'}">8 minutes</span>
+							<span th:if="${data.summary == null}">--</span>
 						</div>
 					</div>
 				</div>
@@ -61,12 +63,15 @@
 						</div>
 						<div class="col-4">
 							<span style="font-size: 20px;font-weight: bold;" th:if="${data.summary != null}" th:text="${data.summary.waiting}">49</span>
+							<span th:if="${data.summary == null}">--</span>
 						</div>
 						<div class="col-4">
 							<span style="font-size: 20px;font-weight: bold;" th:if="${data.summary != null}" th:text="${data.summary.visited}">16</span>
+							<span th:if="${data.summary == null}">--</span>
 						</div>
 						<div class="col-4">
 							<span style="font-size: 20px;font-weight: bold;" th:if="${data.summary != null}" th:text="${data.summary.cancelled}">3</span>
+							<span th:if="${data.summary == null}">--</span>
 						</div>
 					</div>
 				</div>
@@ -423,7 +428,7 @@
 	<script>
 		flatpickr("#doc-visit-session-date", {
             altInput: true,
-			altFormat: "F / j / Y",
+			altFormat: "j / F / Y",
 			altInputClass: "altInputStyle",
 			dateFormat: "Y-m-d",
 			defaultDate: "[[${data.date}]]",

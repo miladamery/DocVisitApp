@@ -23,11 +23,11 @@ public class LoadDashboardDataService {
     public DashboardData load() {
         var vs = visitSessionRepository.findActiveSessionForToday();
         if (vs.isEmpty())
-            return new DashboardData(0L, "No Session is set", "-----------------");
+            return new DashboardData(0L, "Aucune session n'est définie", "--");
 
         var officeHours = vs.get().getFromTime().toLocalTime() + " - " + vs.get().getToTime().toLocalTime();
         var numberOfPeopleAwaiting = vs.get().numberOfAppointmentsAwaiting();
-        return new DashboardData(numberOfPeopleAwaiting, officeHours, vs.get().getSessionLength().toString());
+        return new DashboardData(numberOfPeopleAwaiting, officeHours, vs.get().getSessionLength().toString() + " minutes");
     }
 
     @Data
